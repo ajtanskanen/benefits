@@ -850,16 +850,19 @@ class Benefits():
     
         return kokoelake
     
-    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000):
+    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
+        eff=np.zeros(max_salary+1)
         
         if p==None:
             p=self.get_default_parameter()
 
         dt=100
 
+        p['t']=0 # palkka
+        n0,q0=self.laske_tulot(p,elake=0)
         for t in range(0,max_salary):
             p['t']=t # palkka
             n1,q1=self.laske_tulot(p,elake=0)
@@ -867,30 +870,57 @@ class Benefits():
             n2,q2=self.laske_tulot(p,elake=0)
             netto[t]=n1
             palkka[t]=t
-            tva[t]=(n2-n1)/dt*100
+            eff[t]=(1-(n2-n1)/dt)*100
+            if t>0:
+                tva[t]=(1-(n2-n0)/t)*100
+            else:
+                tva[t]=0
         
         fig, axs = plt.subplots()
-        axs.plot(netto)
-
+        if basenetto is not None:
+            axs.plot(basenetto)
+            axs.plot(netto)
+        else:
+            axs.plot(netto)        
         axs.set_xlabel('Palkka (e/kk)')
         axs.set_ylabel('Käteen')
-        
         axs.grid(True)
         axs.set_xlim(0, max_salary)
 
         fig, axs = plt.subplots()
-        axs.plot(tva)
+        if baseeff is not None:
+            axs.plot(baseeff)
+            axs.plot(eff)
+        else:
+            axs.plot(eff)        
+        axs.set_xlabel('Palkka (e/kk)')
+        axs.set_ylabel('Eff.marg.veroaste (%)')
+        axs.grid(True)
+        axs.set_xlim(0, max_salary)
+
+        fig, axs = plt.subplots()
+        if basenetto is not None:
+            axs.plot(basetva)
+            axs.plot(tva)
+        else:
+            axs.plot(tva)
         axs.set_xlabel('Palkka (e/kk)')
         axs.set_ylabel('Työllistymisveroaste (%)')
         axs.grid(True)
         axs.set_xlim(0, max_salary)
+        axs.set_ylim(0, 120)
 
         plt.show()
+        
+        return netto,eff,tva
 
     def perheparametrit(self,perhetyyppi):
 
         lapsia_kotihoidontuella=0    
         alle3v=0    
+        
+        pparam={}        # lapsia
+        pparam[1]=(0,0,1,2500,0,0,1250,2500,1,0)
 
         if perhetyyppi==1: # 1+0, töissä
             lapsia=0    
@@ -1280,6 +1310,27 @@ class Benefits():
         asumismenot_toimeentulo=vuokra_toimeentulo[lapsia+aikuisia]
         asumismenot_asumistuki=vuokra_asumistuki[lapsia+aikuisia]
         asumismenot_yhdistetty=vuokra_yhdistetty[lapsia+aikuisia]
+        
+        selite="Perhe, jossa {aikuisia} aikuista".format(aikuisia=aikuisia)
+        if lapsia>0:
+            selite+=" ja {lapsia} lasta.".format(lapsia=lapsia)
+            if paivahoidossa>0:
+                selite+=" Lapsista {paiva} on päivähoidossa.".format(paiva=paivahoidossa)
+            if alle3v>0:
+                selite+=" Lapsista {alle3v}".format(alle3v=alle3v)
+            selite
+        else:
+            selite=selite+", ei lapsia."
+            
+            #lapsia_kotihoidontuella=0    
+            #vakiintunutpalkka=2500    
+            #tyoton=1    
+            #saa_ansiopaivarahaa=1    
+            #puolison_tulot=0    
+            #puolison_vakiintunutpalkka=2500    
+            #puoliso_tyoton=1    
+            #puoliso_saa_ansiopaivarahaa=0                  
+        
     
         if (aikuisia<2):
             puolison_tulot=0    
