@@ -3,6 +3,7 @@ Etuuslajien funktioita
 """
 
 import numpy as np
+from .parameters import perheparametrit
 import matplotlib.pyplot as plt
 
 class Benefits():
@@ -20,7 +21,10 @@ class Benefits():
         self.min_age=25
         self.vuosi=2018
         
-    def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p):
+    def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0):
+
+        omavastuu=omavastuuprosentti*asumismenot
+        menot=max(0,asumismenot-omavastuu)+muutmenot
 
         menot=asumismenot+muutmenot    
         bruttopalkka=omabruttopalkka+puolison_bruttopalkka    
@@ -70,76 +74,8 @@ class Benefits():
             
         return tuki
     
-
-    # hallituksen päätöksenmukaiset päivähoitomenot 2018
-    def paivahoitomenot_2018_EK(self,hoidossa,tulot,p):
-        if p['piikit_pois']>0:
-            minimimaksu=0    
-        else:
-            minimimaksu=10    
-
-        prosentti1=0.08    
-        prosentti2=0.5    
-        prosentti3=0.2    
-        maksimimaksu=250    
-
-        if p['lapsia']>0:
-            vakea=p['lapsia']+p['aikuisia']
-            if vakea==1:
-                alaraja=2050    
-                prosentti=prosentti1    
-            elif vakea==2:
-                alaraja=2050    
-                prosentti=prosentti1    
-            elif vakea==3:
-                alaraja=2646    
-                prosentti=prosentti1    
-            elif vakea==4:
-                alaraja=3003    
-                prosentti=prosentti1    
-            elif vakea==5:
-                alaraja=3361    
-                prosentti=prosentti1    
-            elif vakea==6:
-                alaraja=3718    
-                prosentti=prosentti1    
-            else:
-                alaraja=3718+138*(vakea-6)    
-                prosentti=prosentti1    
-
-            pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)  
-            if hoidossa==0:  
-                kerroin=0    
-            elif hoidossa==1:
-                if (pmaksu<minimimaksu):
-                    kerroin=0    
-                else:
-                    kerroin=1    
-                end
-            elif hoidossa==2:
-                if (pmaksu<minimimaksu):
-                    kerroin=0    
-                else:
-                    if (prosentti2*pmaksu<minimimaksu):
-                        kerroin=1    
-                    else:
-                        kerroin=1+prosentti2    
-            else:
-                if (pmaksu<minimimaksu):
-                    kerroin=0    
-                else:
-                    if (prosentti2*pmaksu<minimimaksu):
-                        kerroin=1    
-                    else:
-                        if (prosentti3*pmaksu<minimimaksu):
-                            kerroin=1+prosentti2    
-                        else:
-                            kerroin=1+prosentti2+prosentti3*(p['lapsia']-2)    
-            maksu=kerroin*pmaksu    
-        else:
-            maksu=0   
-        
-        return maksu 
+    def get_default_parameter():
+        return perheparametrit(perhetyyppi=1)
     
     # tmtuki samankokoinen
     def peruspaivaraha(self,lapsia):
@@ -157,14 +93,23 @@ class Benefits():
     
         return tuki
 
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,ansiopvrahan_suojaosa,lapsikorotus):
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,ansiopvrahan_suojaosa,lapsikorotus,kesto,p,ansiokerroin=1.0):
+    #def ansiopaivaraha(self,p,ansiokerroin=1.0):
+        #tyoton=p['tyoton']
+        #vakiintunutpalkka=p['vakiintunutpalkka']
+        #lapsia=p['lapsia']
+        #tyotaikaisettulot=p['tyotaikaisettulot']
+        #saa_ansiopaivarahaa=p['saa_ansiopaivarahaa']
+        #ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
+        #lapsikorotus=p['lapsikorotus']
+    
         if tyoton>0:
             if lapsikorotus<1:
                 lapsia=0    
 
             lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
             sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
-            if saa_ansiopaivarahaa>0: 
+            if saa_ansiopaivarahaa>0 & p['tyottomyydenkesto']<400: 
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
                 vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
         
@@ -175,6 +120,7 @@ class Benefits():
                     tuki2=0.45*max(0,vakpalkka-perus)+perus    
 
                 tuki2=tuki2+lapsikorotus[min(lapsia+1,4)]    
+                tuki2=tuki2*ansiokerroin # mahdollinen porrastus tehdään tämän avulla
                 suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa)    
         
                 perus=peruspaivaraha(lapsia)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
@@ -376,9 +322,9 @@ class Benefits():
 
         netto=tulot-peritytverot
     
-        return [netto,peritytverot,valtionvero,kunnallisvero,kunnallisveronperuste,\
+        return netto,peritytverot,valtionvero,kunnallisvero,kunnallisveronperuste,\
         valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,tyotulovahennys_kunnallisveroon,\
-        ptel,sairausvakuutus,tyotvakmaksu]
+        ptel,sairausvakuutus,tyotvakmaksu
 
 
     def kotihoidontuki(self,lapsia,allekolmev,alle_kouluikaisia):
@@ -459,255 +405,87 @@ class Benefits():
 
     def laske_tulot(self,p,elake=0):
 
-        ansiopvraha=0
-        #switch (p['ansiopvrahamalli'])
-        #    case 3
-        #        [ansiopvraha,puhdasansiopvraha,peruspvraha]=ansiopaivaraha_v3(p['tyoton,p['vakiintunutpalkka,p['lapsia,p['t,p['saa_ansiopaivarahaa,p['ansiopvrahan_suojaosa,p['ansiopvraha_kulmakerroin,p['ansiopvraha_ylarajamalli,p['ansiopvraha_lapsikorotus,p['ansiopvraha_korotus)
-        #    case 2
-        #        [ansiopvraha,puhdasansiopvraha,peruspvraha]=ansiopaivaraha_v2(p['tyoton,p['vakiintunutpalkka,p['lapsia,p['t,p['saa_ansiopaivarahaa,p['ansiopvrahan_suojaosa,p['ansiopvraha_kulmakerroin,p['ansiopvraha_ylarajamalli,p['ansiopvraha_lapsikorotus,p['ansiopvraha_korotus)
-        #    case 0
-        #        ansiopvraha=0
-        #        puhdasansiopvraha=0
-        #        peruspvraha=0
-        #    else:
-        if p['elakkeella']<0:
-            ansiopvraha,puhdasansiopvraha,peruspvraha=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['ansiopvrahan_suojaosa'],p['ansiopvraha_lapsikorotus'])
-            kokoelake=0
-        else:
+        q={} # tulokset tänne
+        q['elake']=elake
+        if p['elakkeella']<0: # ei eläkkeellä
+            q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['ansiopvrahan_suojaosa'],p['ansiopvraha_lapsikorotus'],p['tyottomyyden_kesto'],p)
+            q['kokoelake']=0
+        else: # eläkkeellä
             p['tyoton']=0
             p['saa_ansiopaivarahaa']=0
-            kokoelake=self.laske_kokonaiselake(p['ika'], elake, 1)
-            ansiopvraha,puhdasansiopvraha,peruspvraha=(0,0,0)
+            q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake'], 1)
+            q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
+
+        if (p['aikuisia']>1): # perheessä 2 aikuista
+            q['puolison_ansiopvraha'],_,_=self.ansiopaivaraha(p['puoliso_tyoton'],p['puolison_vakiintunutpalkka'],p['lapsia'],p['puolison_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['ansiopvrahan_suojaosa'],p['ansiopvraha_lapsikorotus'],p['puolison_tyottomyyden_kesto'],p)
+        else: # perheessä 1 aikuinen
+            q['puolison_ansiopvraha']=0
+    
+        # q['verot] sisältää kaikki veronluonteiset maksut
+        _,q['verot'],q['valtionvero'],q['kunnallisvero'],q['kunnallisveronperuste'],q['valtionveroperuste'],\
+            q['ansiotulovahennys'],q['perusvahennys'],q['tyotulovahennys'],q['tyotulovahennys_kunnallisveroon'],\
+            q['ptel'],q['sairausvakuutus'],q['tyotvakmaksu']=self.verotus(p['t'],q['ansiopvraha'],q['kokoelake'],p['lapsia'],p)
+        _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,q['kokoelake'],p['lapsia'],p)
 
         if (p['aikuisia']>1):
-            #switch (p['ansiopvrahamalli)
-            #    case 3
-            #        [puolison_ansiopvraha]=ansiopaivaraha_v3(p['puoliso_tyoton,p['puolison_vakiintunutpalkka,p['lapsia,p['puolison_tulot,p['puoliso_saa_ansiopaivarahaa,p['ansiopvrahan_suojaosa,p['ansiopvraha_kulmakerroin,p['ansiopvraha_ylarajamalli,p['ansiopvraha_lapsikorotus,p['ansiopvraha_korotus)
-            #    case 2
-            #        [puolison_ansiopvraha]=ansiopaivaraha_v2(p['puoliso_tyoton,p['puolison_vakiintunutpalkka,p['lapsia,p['puolison_tulot,p['puoliso_saa_ansiopaivarahaa,p['ansiopvrahan_suojaosa,p['ansiopvraha_kulmakerroin,p['ansiopvraha_ylarajamalli,p['ansiopvraha_lapsikorotus,p['ansiopvraha_korotus)
-            #    case 0
-            #        puolison_ansiopvraha=0
-            #    else:
-            puolison_ansiopvraha=self.ansiopaivaraha(p['puoliso_tyoton'],p['puolison_vakiintunutpalkka'],p['lapsia'],p['puolison_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['ansiopvrahan_suojaosa'],p['ansiopvraha_lapsikorotus'])
+            _,q['puolison_verot'],_,_,_,_,_,_,_,_,q['puolison_ptel'],q['puolison_sairausvakuutus'],\
+                q['puolison_tyotvakmaksu']=self.verotus(p['puolison_tulot'],q['puolison_ansiopvraha'],0,0,p) # onko oikein että lapsia 0 tässä????
+            _,q['puolison_verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puolison_tulot'],0,0,0,p)
         else:
-            puolison_ansiopvraha=0
+            q['puolison_verot_ilman_etuuksia']=0
+            q['puolison_verot']=0
+            q['puolison_ptel']=0
+            q['puolison_sairausvakuutus']=0
+            q['puolison_tyotvakmaksu']=0
     
-        _,verot,valtionvero,kunnallisvero,kunnallisveronperuste,valtionveroperuste,\
-            ansiotulovahennys,perusvahennys,tyotulovahennys,tyotulovahennys_kunnallisveroon,\
-            ptel,sairausvakuutus,tyotvakmaksu=self.verotus(p['t'],ansiopvraha,kokoelake,p['lapsia'],p)
-        _,verot_ilman_etuuksia,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,kokoelake,p['lapsia'],p)
+        q['elatustuki']=0
+        #elatustuki=laske_elatustuki(p['lapsia'],p['aikuisia)
 
-        if (p['aikuisia']>0):
-            _,puolison_verot,_,_,_,_,_,_,_,_,puolison_ptel,puolison_sairausvakuutus,\
-                puolison_tyotvakmaksu=self.verotus(p['puolison_tulot'],puolison_ansiopvraha,0,0,p) # onko oikein että lapsia 0 tässä????
-            _,puolison_verot_ilman_etuuksia,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puolison_tulot'],0,0,0,p)
-        else:
-            puolison_verot_ilman_etuuksia=0
-            puolison_verot=0
-            puolison_ptel=0
-            puolison_sairausvakuutus=0
-            puolison_tyotvakmaksu=0
+        q['asumistuki']=self.asumistuki(p['puolison_tulot']+p['t'],q['ansiopvraha']+q['puolison_ansiopvraha'],p['asumismenot_asumistuki'],p)
+        q['pvhoito']=self.paivahoitomenot(p['paivahoidossa'],p['puolison_tulot']+p['t']+q['elatustuki']+q['ansiopvraha']+q['puolison_ansiopvraha'],p)
     
-        #switch (p['elatustukimalli)
-        #    case 0
-        elatustuki=0
-        #    else:
-        #        elatustuki=laske_elatustuki(p['lapsia'],p['aikuisia)
-        #end
-
-        #switch (p['asumistukimalli)
-        #    case 2
-        #        atuki=asumistuki_v2(p['puolison_tulot+p['t,ansiopvraha+puolison_ansiopvraha,p['asumismenot_asumistuki,p)
-        #    case 3
-        #        atuki=asumistuki_v3(p['puolison_tulot+p['t,ansiopvraha+puolison_ansiopvraha,p['asumismenot_asumistuki,p)
-        #    case 4
-        #        atuki=asumistuki_v4(p['puolison_tulot+p['t,ansiopvraha+puolison_ansiopvraha,p['asumismenot_asumistuki,p)
-        #    case 5
-        #        atuki=asumistuki_v5(p['puolison_tulot+p['t,ansiopvraha+puolison_ansiopvraha,p['asumismenot_asumistuki,p)
-        #    case 6
-        #        atuki=asumistuki_v6(p['puolison_tulot+p['t,ansiopvraha+puolison_ansiopvraha,p['asumismenot_asumistuki,p)
-        #    case 0
-        #        atuki=0
-        #    else:
-        atuki=self.asumistuki(p['puolison_tulot']+p['t'],ansiopvraha+puolison_ansiopvraha,p['asumismenot_asumistuki'],p)
-        #end
-    
-        #pvhoito=0
-        #switch (p['paivahoitomalli)
-        #    case 2
-        #        pvhoito=paivahoitomenot_v2(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #    case 3
-        #        pvhoito=paivahoitomenot_v3(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #    case 4
-        #        pvhoito=paivahoitomenot_v4(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #    case 5
-        #        pvhoito=paivahoitomenot_v5(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #    case 6
-        #        pvhoito=paivahoitomenot_2018(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #    case 7
-        #        pvhoito=paivahoitomenot_2018_EK(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #    case 8
-        #        pvhoito=paivahoitomenot_2018_EK_35alennus(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #    case 0
-        #        pvhoito=0
-        #    else:
-        pvhoito=self.paivahoitomenot_2018_EK(p['paivahoidossa'],p['puolison_tulot']+p['t']+elatustuki+ansiopvraha+puolison_ansiopvraha,p)
-        #end
-    
-        #switch (p['kotihoidontukimalli)
-        #case 1
         if (p['lapsia_kotihoidontuella']>0):
             alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['alle3v'])
-            pvhoito=pvhoito-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],alle_kouluikaisia) # etumerkki!
-        #    end
-        #case 2
-        #    if (p['lapsia_kotihoidontuella>0)
-        #        alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella-p['alle3v)
-        #        pvhoito=pvhoito-kotihoidontuki2(p['lapsia_kotihoidontuella,p['alle3v,alle_kouluikaisia) # etumerkki!
-        #    end
-        #case 0
-        #    # ei tehdä mitään.
-        #end
+            q['pvhoito']=q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],alle_kouluikaisia) # etumerkki!
 
-        #switch (p['paivahoitomalli)
-        #    case 2
-        #        pvhoito_ilman_etuuksia=paivahoitomenot_v2(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki,p)
-        #    case 3
-        #        pvhoito_ilman_etuuksia=paivahoitomenot_v3(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki,p)
-        #    case 4
-        #        pvhoito_ilman_etuuksia=paivahoitomenot_v4(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki,p)
-        #    case 5
-        #        pvhoito_ilman_etuuksia=paivahoitomenot_v5(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki,p)
-        #    case 6
-        #        pvhoito_ilman_etuuksia=paivahoitomenot_2018(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki,p)
-        #    case 7
-        pvhoito_ilman_etuuksia=self.paivahoitomenot_2018_EK(p['paivahoidossa'],p['puolison_tulot']+p['t']+elatustuki,p)
-        #    case 8
-        #        pvhoito_ilman_etuuksia=paivahoitomenot_2018_EK_35alennus(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki,p)
-        #    case 0
-        #        pvhoito_ilman_etuuksia=0
-        #    else:
-        #        pvhoito_ilman_etuuksia=paivahoitomenot(p['paivahoidossa,p['puolison_tulot+p['t+elatustuki,p)
-        #end
+        q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['paivahoidossa'],p['puolison_tulot']+p['t']+q['elatustuki'],p)
+        q['lapsilisa']=self.laske_lapsilisa(p['lapsia'])
     
-        #switch (p['lapsilisamalli)
-        #    case 0
-        #        lapsilisa=0
-        #    else:
-        lapsilisa=self.laske_lapsilisa(p['lapsia'])
-        #end
-    
-        # lasketaan netotettu ansiopäiväraha huomioiden verot
-        puolison_ansiopvraha_netto=puolison_ansiopvraha-(puolison_verot-puolison_verot_ilman_etuuksia)
-        ansiopvraha_netto=ansiopvraha-(verot-verot_ilman_etuuksia)
+        # lasketaan netotettu ansiopäiväraha huomioiden verot (kohdistetaan ansiopvrahaan se osa veroista, joka ei aiheudu palkkatuloista)
+        q['puolison_ansiopvraha_netto']=q['puolison_ansiopvraha']-(q['puolison_verot']-q['puolison_verot_ilman_etuuksia'])
+        q['ansiopvraha_netto']=q['ansiopvraha']-(q['verot']-q['verot_ilman_etuuksia'])
     
         # jaetaan ilman etuuksia laskettu pvhoitomaksu puolisoiden kesken ansiopäivärahan suhteessa
         # eli kohdistetaan päivähoitomaksun korotus ansiopäivärahan mukana
         # ansiopäivärahaan miten huomioitu päivähoitomaksussa, ilman etuuksia
         # käytässä??
-        if (puolison_ansiopvraha_netto+ansiopvraha_netto>0):
-            suhde=max(0,ansiopvraha_netto/(puolison_ansiopvraha_netto+ansiopvraha_netto))
-            ansiopvraha_nettonetto=ansiopvraha_netto-suhde*(pvhoito-pvhoito_ilman_etuuksia)
-            puolison_ansiopvraha_nettonetto=puolison_ansiopvraha_netto-(1-suhde)*(pvhoito-pvhoito_ilman_etuuksia)
-            #ansiopvraha_nettonetto=ansiopvraha_netto
-            #puolison_ansiopvraha_nettonetto=puolison_ansiopvraha_netto
+        if (q['puolison_ansiopvraha_netto']+q['ansiopvraha_netto']>0):
+            suhde=max(0,q['ansiopvraha_netto']/(q['puolison_ansiopvraha_netto']+q['ansiopvraha_netto']))
+            q['ansiopvraha_nettonetto']=q['ansiopvraha_netto']-suhde*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
+            q['puolison_ansiopvraha_nettonetto']=q['puolison_ansiopvraha_netto']-(1-suhde)*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
         else:
-            ansiopvraha_nettonetto=0
-            puolison_ansiopvraha_nettonetto=0
+            q['ansiopvraha_nettonetto']=0
+            q['puolison_ansiopvraha_nettonetto']=0
 
-        #switch (p['perustulomalli)
         #    case 1 # Kelan malli
         #        perustulo=laske_perustulo_Kelamalli(ansiopvraha_netto) # yhteensovitus
         #        puolison_perustulo=laske_perustulo_Kelamalli(puolison_ansiopvraha_netto) # yhteensovitus
         #    case 0
-        perustulo=0
-        puolison_perustulo=0
+        q['perustulo']=0
+        q['puolison_perustulo']=0
+    
+        q['perustulo_netto']=0
+        q['puolison_perustulo_netto']=0
 
-        #     switch (p['toimeentulotukimalli)
-        #     case 2
-        #         toimtuki=toimeentulotuki_v2(p['t,verot_ilman_etuuksia,p['puolison_tulot,puolison_verot_ilman_etuuksia,\
-        #             elatustuki+ansiopvraha_netto+puolison_ansiopvraha_netto+atuki+lapsilisa,0,\
-        #             p['asumismenot_toimeentulo,pvhoito,p)
-        #     case 3
-        #         toimtuki=toimeentulotuki_v3(p['t,verot_ilman_etuuksia,p['puolison_tulot,puolison_verot_ilman_etuuksia,\
-        #             elatustuki+ansiopvraha_netto+puolison_ansiopvraha_netto+atuki+lapsilisa,0,\
-        #             p['asumismenot_toimeentulo,pvhoito,p)
-        #     case 4
-        #         toimtuki=asumis_ja_toimeentulotuki(p['t,verot_ilman_etuuksia,p['puolison_tulot,puolison_verot_ilman_etuuksia,\
-        #             ansiopvraha+puolison_ansiopvraha,\
-        #             elatustuki+ansiopvraha_netto+puolison_ansiopvraha_netto+atuki+lapsilisa,\
-        #             p['asumismenot_yhdistetty,p['asumismenot_toimeentulo,pvhoito,p)
-        #     case 5
-        #         toimtuki=asumis_ja_toimeentulotuki_v2(p['t,verot_ilman_etuuksia,p['puolison_tulot,puolison_verot_ilman_etuuksia,\
-        #             ansiopvraha+puolison_ansiopvraha,\
-        #             elatustuki+ansiopvraha_netto+puolison_ansiopvraha_netto+atuki+lapsilisa,\
-        #             p['asumismenot_yhdistetty,p['asumismenot_toimeentulo,pvhoito,p)
-        #     case 6
-        #         toimtuki=asumis_ja_toimeentulotuki_v3(p['t,verot_ilman_etuuksia,p['puolison_tulot,puolison_verot_ilman_etuuksia,\
-        #             ansiopvraha+puolison_ansiopvraha,\
-        #             elatustuki+ansiopvraha_netto+puolison_ansiopvraha_netto+atuki+lapsilisa,\
-        #             p['asumismenot_yhdistetty,p['asumismenot_toimeentulo,pvhoito,p)
-        #     case 7
-        #         toimtuki=asumis_ja_toimeentulotuki_v4(p['t,verot_ilman_etuuksia,p['puolison_tulot,puolison_verot_ilman_etuuksia,\
-        #             ansiopvraha+puolison_ansiopvraha,\
-        #             elatustuki+ansiopvraha_netto+puolison_ansiopvraha_netto+atuki+lapsilisa,\
-        #             p['asumismenot_yhdistetty,pvhoito,p)
-        #     case 0
-        #         toimtuki=0
-        #     else:
-        toimtuki=self.toimeentulotuki(p['t'],verot_ilman_etuuksia,p['puolison_tulot'],puolison_verot_ilman_etuuksia,\
-            elatustuki+elake+ansiopvraha_netto+puolison_ansiopvraha_netto+atuki+lapsilisa,0,\
-            p['asumismenot_toimeentulo'],pvhoito,p)
-        #end
+        q['toimtuki']=self.toimeentulotuki(p['t'],q['verot_ilman_etuuksia'],p['puolison_tulot'],q['puolison_verot_ilman_etuuksia'],\
+            q['elatustuki']+q['elake']+q['ansiopvraha_netto']+q['puolison_ansiopvraha_netto']+q['asumistuki']+q['lapsilisa'],0,\
+            p['asumismenot_toimeentulo'],q['pvhoito'],p)
     
-        perustulo=0
-        puolison_perustulo=0
-    
-        perustulo_netto=0
-        puolison_perustulo_netto=0
-    
-        kateen=kokoelake+p['puolison_tulot']+p['t']+atuki+toimtuki+ansiopvraha+puolison_ansiopvraha+elatustuki-puolison_verot-verot-pvhoito+lapsilisa
-        tulotnetto=kokoelake+p['puolison_tulot']+p['t']-verot_ilman_etuuksia-puolison_verot_ilman_etuuksia-pvhoito_ilman_etuuksia # ilman etuuksia
-    
-        q={}
-        q['qansiopvraha']=ansiopvraha
-        q['puhdasansiopvraha']=puhdasansiopvraha
-        q['peruspvraha']=peruspvraha
-        q['puolison_ansiopvraha']=puolison_ansiopvraha
-        q['verot']=verot
-        q['valtionvero']=valtionvero
-        q['kunnallisvero']=kunnallisvero
-        q['kunnallisveronperuste']=kunnallisveronperuste
-        q['valtionveroperuste']=valtionveroperuste
-        q['ansiotulovahennys']=ansiotulovahennys
-        q['perusvahennys']=perusvahennys
-        q['tyotulovahennys']=tyotulovahennys
-        q['tyotulovahennys_kunnallisveroon']=tyotulovahennys_kunnallisveroon
-        q['ptel']=ptel
-        q['sairausvakuutus']=sairausvakuutus
-        q['tyotvakmaksu']=tyotvakmaksu
-        q['verot_ilman_etuuksia']=verot_ilman_etuuksia
-        q['puolison_verot']=puolison_verot
-        q['puolison_verot_ilman_etuuksia']=puolison_verot_ilman_etuuksia
-        q['elatustuki']=elatustuki
-        q['atuki']=atuki
-        q['pvhoito']=pvhoito
-        q['pvhoito_ilman_etuuksia']=pvhoito_ilman_etuuksia
-        q['ansiopvraha_netto']=ansiopvraha_netto
-        q['puolison_ansiopvraha_netto']=puolison_ansiopvraha_netto
-        q['toimtuki']=toimtuki
-        q['lapsilisa']=lapsilisa
-        q['ansiopvraha_nettonetto']=ansiopvraha_nettonetto
-        q['puolison_ansiopvraha_nettonetto']=puolison_ansiopvraha_nettonetto
-        q['puolison_ptel']=puolison_ptel
-        q['puolison_sairausvakuutus']=puolison_sairausvakuutus
-        q['puolison_tyotvakmaksu']=puolison_tyotvakmaksu
-        q['perustulo']=perustulo
-        q['puolison_perustulo']=puolison_perustulo
-        q['perustulo_netto']=perustulo_netto
-        q['puolison_perustulo_netto']=puolison_perustulo_netto
-    
-        #print(q)
+        kateen=q['kokoelake']+p['puolison_tulot']+p['t']+q['asumistuki']+q['toimtuki']+q['ansiopvraha']+q['puolison_ansiopvraha']+q['elatustuki']-q['puolison_verot']-q['verot']-q['pvhoito']+q['lapsilisa']
+        q['kateen']=kateen
+        q['tulotnetto']=q['kokoelake']+p['puolison_tulot']+p['t']-q['verot_ilman_etuuksia']-q['puolison_verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
+        q['tulot']=p['t']
+        q['puolison_tulot']=p['puolison_tulot']
     
         return kateen,q
 
@@ -737,7 +515,7 @@ class Benefits():
         max_lisa=np.array([137, 130, 123, 118])
         # kuntaryhma=3
 
-        max_meno=max_menot[min(4,p['aikuisia']+p['lapsia']),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
@@ -752,39 +530,45 @@ class Benefits():
 
 
     # hallituksen päätöksenmukaiset päivähoitomenot 2018
-    def paivahoitomenot(self,hoidossa,tulot,p):
+    def paivahoitomenot(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
         if p['piikit_pois']>0:
             minimimaksu=0
         else:
             minimimaksu=10
 
-        prosentti2=0.5
-        prosentti3=0.2
-        maksimimaksu=290
+        if prosentti1==None:
+            prosentti1=0.107
+        if prosentti2==None:
+            prosentti2=0.5
+        if prosentti3==None:
+            prosentti3=0.2
+            
+        if maksimimaksu==None:
+            maksimimaksu=290
 
         if p['lapsia']>0:
             vakea=p['lapsia']+p['aikuisia']
             if vakea==1:
                 alaraja=2050
-                prosentti=0.107
+                prosentti=prosentti1
             elif vakea==2:
                 alaraja=2050
-                prosentti=0.107
+                prosentti=prosentti1
             elif vakea==3:
                 alaraja=2646
-                prosentti=0.107
+                prosentti=prosentti1
             elif vakea==4:
                 alaraja=3003
-                prosentti=0.107
+                prosentti=prosentti1
             elif vakea==5:
                 alaraja=3361
-                prosentti=0.107
+                prosentti=prosentti1
             elif vakea==6:
                 alaraja=3718
-                prosentti=0.107
+                prosentti=prosentti1
             else:
                 alaraja=3718+138*(vakea-6)
-                prosentti=0.107
+                prosentti=prosentti1
 
             pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
             if hoidossa==0:
@@ -849,8 +633,58 @@ class Benefits():
         kokoelake=tyoelake+kansanelake+takuuelake
     
         return kokoelake
+        
+    def laske_marginaalit(self,q1,q2,dt,laske_tyollistymisveroaste=0):
     
-    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None):
+        if dt<1:
+            dt=1
+
+        # lasketaan marginaalit
+        marg={}        
+        marg['asumistuki']=(-q2['asumistuki']+q1['asumistuki'])*100/dt
+        marg['ansiopvraha']=(+q1['ansiopvraha_netto']-q2['ansiopvraha_netto']+q1['puolison_ansiopvraha_netto']-q2['puolison_ansiopvraha_netto'])*100/dt 
+        marg['pvhoito']=(-q1['pvhoito']+q2['pvhoito'])*100/dt
+        marg['toimtuki']=(+q1['toimtuki']-q2['toimtuki'])*100/dt
+        marg['palkkaverot']=(-q1['verot_ilman_etuuksia']+q2['verot_ilman_etuuksia']-q1['puolison_verot_ilman_etuuksia']+q2['puolison_verot_ilman_etuuksia'])*100/dt
+        marg['valtionvero']=(-q1['valtionvero']+q2['valtionvero'])*100/dt
+        marg['kunnallisvero']=(-q1['kunnallisvero']+q2['kunnallisvero'])*100/dt
+        marg['ansiotulovah']=(+q1['ansiotulovahennys']-q2['ansiotulovahennys'])*100/dt
+        marg['tyotulovahennys']=(+q1['tyotulovahennys']-q2['tyotulovahennys'])*100/dt
+        marg['perusvahennys']=(+q1['perusvahennys']-q2['perusvahennys'])*100/dt
+        marg['tyotulovahennys_kunnallisveroon']=(+q1['tyotulovahennys_kunnallisveroon']-q2['tyotulovahennys_kunnallisveroon'])*100/dt
+        marg['ptel']=(-q1['ptel']+q2['ptel']-q1['puolison_ptel']+q2['puolison_ptel'])*100/dt
+        marg['sairausvakuutus']=(-q1['sairausvakuutus']+q2['sairausvakuutus']-q1['puolison_sairausvakuutus']+q2['puolison_sairausvakuutus'])*100/dt
+        marg['tyotvakmaksu']=(-q1['tyotvakmaksu']+q2['tyotvakmaksu']-q1['puolison_tyotvakmaksu']+q2['puolison_tyotvakmaksu'])*100/dt
+        marg['perustulo']=(+q1['perustulo_netto']-q2['perustulo_netto']+q1['puolison_perustulo_netto']-q2['puolison_perustulo_netto'])*100/dt 
+    
+        marg['sivukulut']=marg['tyotvakmaksu']+marg['sairausvakuutus']+marg['ptel'] # sisältyvät jo veroihin
+        marg['etuudet']=marg['ansiopvraha']+marg['asumistuki']+marg['toimtuki']
+        marg['verot']=marg['palkkaverot'] # sisältää sivukulut
+        marg['marginaali']=marg['pvhoito']+marg['etuudet']+marg['verot']
+    
+        # ja käteen jää
+        tulot={}
+        tulot['kateen1']=q1['kateen']
+        tulot['kateen2']=q2['kateen']
+    
+        omattulotnetto1=q1['tulot']-q1['verot_ilman_etuuksia']-q1['pvhoito_ilman_etuuksia'] # ilman etuuksia
+        omattulotnetto2=q2['tulot']-q2['verot_ilman_etuuksia']-q2['pvhoito_ilman_etuuksia'] # ilman etuuksia
+        puolisontulotnetto1=q1['puolison_tulot']-q1['puolison_verot_ilman_etuuksia'] # ilman etuuksia
+        puolisontulotnetto2=q2['puolison_tulot']-q2['puolison_verot_ilman_etuuksia'] # ilman etuuksia
+        if laske_tyollistymisveroaste>0:
+            tulot['tulotnetto']=omattulotnetto2+puolisontulotnetto2
+            tulot['puolisontulotnetto']=puolisontulotnetto2
+            tulot['omattulotnetto']=omattulotnetto2
+        else:
+            tulot['tulotnetto']=omattulotnetto1+puolisontulotnetto1
+            tulot['puolisontulotnetto']=puolisontulotnetto1
+            tulot['omattulotnetto']=omattulotnetto1
+            
+        marg['marginaaliveroprosentti']=100-(tulot['kateen2']-tulot['kateen1'])*100/dt 
+    
+        return tulot,marg
+    
+    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus"):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -858,8 +692,6 @@ class Benefits():
         
         if p==None:
             p=self.get_default_parameter()
-
-        dt=100
 
         p['t']=0 # palkka
         n0,q0=self.laske_tulot(p,elake=0)
@@ -872,479 +704,154 @@ class Benefits():
             palkka[t]=t
             eff[t]=(1-(n2-n1)/dt)*100
             if t>0:
-                tva[t]=(1-(n2-n0)/t)*100
+                tva[t]=(1-(n1-n0)/t)*100
             else:
                 tva[t]=0
+                
+        if plottaa:
+            fig, axs = plt.subplots()
+            if basenetto is not None:
+                axs.plot(basenetto,label=otsikkobase)
+                axs.plot(netto,label=otsikko)
+                axs.legend(loc='upper right')
+            else:
+                axs.plot(netto)        
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Käteen (e/kk)')
+            axs.grid(True)
+            axs.set_xlim(0, max_salary)
+
+            fig, axs = plt.subplots()
+            if baseeff is not None:
+                axs.plot(baseeff,label=otsikkobase)
+                axs.plot(eff,label=otsikko)
+                axs.legend(loc='upper right')
+            else:
+                axs.plot(eff)        
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Eff.marg.veroaste (%)')
+            axs.grid(True)
+            axs.set_xlim(0, max_salary)
+
+            fig, axs = plt.subplots()
+            if basenetto is not None:
+                axs.plot(basetva,label=otsikkobase)
+                axs.plot(tva,label=otsikko)
+                axs.legend(loc='upper right')
+            else:
+                axs.plot(tva)
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Työllistymisveroaste (%)')
+            axs.grid(True)
+            axs.set_xlim(0, max_salary)
+            axs.set_ylim(0, 120)
+
+            plt.show()
         
-        fig, axs = plt.subplots()
-        if basenetto is not None:
-            axs.plot(basenetto)
-            axs.plot(netto)
-        else:
-            axs.plot(netto)        
-        axs.set_xlabel('Palkka (e/kk)')
-        axs.set_ylabel('Käteen')
-        axs.grid(True)
-        axs.set_xlim(0, max_salary)
+        return netto,eff,tva
+        
+    def laske_ja_plottaa_marginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus"):
+        netto=np.zeros(max_salary+1)
+        palkka=np.zeros(max_salary+1)
+        tva=np.zeros(max_salary+1)
+        eff=np.zeros(max_salary+1)
+        asumistuki=np.zeros(max_salary+1)
+        toimeentulotuki=np.zeros(max_salary+1)
+        ansiopvraha=np.zeros(max_salary+1)
+        nettotulot=np.zeros(max_salary+1)
+        lapsilisa=np.zeros(max_salary+1)
+        perustulo=np.zeros(max_salary+1)
+        elatustuki=np.zeros(max_salary+1)
+        margasumistuki=np.zeros(max_salary+1)
+        margtoimeentulotuki=np.zeros(max_salary+1)
+        margansiopvraha=np.zeros(max_salary+1)
+        margverot=np.zeros(max_salary+1)        
+        margpvhoito=np.zeros(max_salary+1)        
+        margyht=np.zeros(max_salary+1)        
+        margyht2=np.zeros(max_salary+1)        
+        tva_asumistuki=np.zeros(max_salary+1)
+        tva_toimeentulotuki=np.zeros(max_salary+1)
+        tva_ansiopvraha=np.zeros(max_salary+1)
+        tva_verot=np.zeros(max_salary+1)        
+        tva_pvhoito=np.zeros(max_salary+1)        
+        tva_yht=np.zeros(max_salary+1)        
+        tva_yht2=np.zeros(max_salary+1)        
+        
+        if p==None:
+            p=self.get_default_parameter()
 
-        fig, axs = plt.subplots()
-        if baseeff is not None:
-            axs.plot(baseeff)
-            axs.plot(eff)
-        else:
-            axs.plot(eff)        
-        axs.set_xlabel('Palkka (e/kk)')
-        axs.set_ylabel('Eff.marg.veroaste (%)')
-        axs.grid(True)
-        axs.set_xlim(0, max_salary)
+        p['t']=0 # palkka
+        n0,q0=self.laske_tulot(p,elake=0)
+        for t in range(0,max_salary+1):
+            p['t']=t # palkka
+            n1,q1=self.laske_tulot(p,elake=0)
+            p['t']=t+dt # palkka
+            n2,q2=self.laske_tulot(p,elake=0)
+            tulot,marg=self.laske_marginaalit(q1,q2,dt)
+            tulot2,tvat=self.laske_marginaalit(q0,q1,t,laske_tyollistymisveroaste=1)
+            netto[t]=n1
+            palkka[t]=t
+            margasumistuki[t]=marg['asumistuki']
+            margtoimeentulotuki[t]=marg['toimtuki']
+            margverot[t]=marg['verot']
+            margansiopvraha[t]=marg['ansiopvraha']
+            margpvhoito[t]=marg['pvhoito']
+            margyht[t]=marg['marginaali']
+            margyht2[t]=marg['marginaaliveroprosentti']
+            asumistuki[t]=q1['asumistuki']
+            toimeentulotuki[t]=q1['toimtuki']
+            ansiopvraha[t]=q1['ansiopvraha_nettonetto']
+            lapsilisa[t]=q1['lapsilisa']
+            nettotulot[t]=tulot['tulotnetto']
+            tva_asumistuki[t]=tvat['asumistuki']
+            tva_toimeentulotuki[t]=tvat['toimtuki']
+            tva_verot[t]=tvat['verot']
+            tva_ansiopvraha[t]=tvat['ansiopvraha']
+            tva_pvhoito[t]=tvat['pvhoito']
+            tva_yht[t]=tvat['marginaali']
+            tva_yht2[t]=tvat['marginaaliveroprosentti']
 
-        fig, axs = plt.subplots()
-        if basenetto is not None:
-            axs.plot(basetva)
-            axs.plot(tva)
-        else:
-            axs.plot(tva)
+            eff[t]=(1-(n2-n1)/dt)*100
+            if t>0:
+                tva[t]=(1-(n1-n0)/t)*100
+            else:
+                tva[t]=0
+                
+        fig,axs = plt.subplots()
+        axs.stackplot(palkka,margasumistuki,margtoimeentulotuki,margansiopvraha,margverot,margpvhoito,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Verot','Päivähoito'))
+        axs.plot(eff,label='Vaihtoehto')
+        #axs.plot(margyht,label='Vaihtoehto2')
+        #axs.plot(margyht2,label='Vaihtoehto3')
         axs.set_xlabel('Palkka (e/kk)')
-        axs.set_ylabel('Työllistymisveroaste (%)')
+        axs.set_ylabel('Eff.marginaalivero (%)')
         axs.grid(True)
         axs.set_xlim(0, max_salary)
         axs.set_ylim(0, 120)
-
+        axs.legend(loc='upper right')
         plt.show()
         
-        return netto,eff,tva
-
-    def perheparametrit(self,perhetyyppi):
-
-        lapsia_kotihoidontuella=0    
-        alle3v=0    
+        fig,axs = plt.subplots()
+        axs.stackplot(palkka,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Palkka','Lapsilisä'))
+        axs.plot(netto,label='Vaihtoehto')
         
-        pparam={}        # lapsia
-        pparam[1]=(0,0,1,2500,0,0,1250,2500,1,0)
+        axs.set_xlabel('Palkka (e/kk)')
+        axs.set_ylabel('Käteen (e/kk)')
+        axs.grid(True)
+        axs.set_xlim(0, max_salary)
+        axs.legend(loc='lower right')
+        plt.show()
 
-        if perhetyyppi==1: # 1+0, töissä
-            lapsia=0    
-            paivahoidossa=0    
-            aikuisia=1    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==2: # 1+0, työtön ansiopäivärahalla 
-            lapsia=0    
-            paivahoidossa=0    
-            aikuisia=1    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==3: # 1+0, työtön työmarkkinatuella
-            lapsia=0    
-            paivahoidossa=0    
-            aikuisia=1    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==4: # 1+1, 
-            lapsia=1    
-            paivahoidossa=1    
-            aikuisia=1    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==5: # 2+1, molemmat töissä (puoliso osapäivätöissä)
-            lapsia=1    
-            paivahoidossa=1    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=1250    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==6: # 2+1, puoliso ansioturvalla
-            lapsia=2    
-            paivahoidossa=2    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==7: # 2+1, molemmat ansiopaivarahalla
-            lapsia=1    
-            paivahoidossa=1    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==8: # 2+2, molemmat töissä
-            lapsia=1    
-            paivahoidossa=1    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==9: # 2+3, molemmat töissä
-            lapsia=3    
-            paivahoidossa=1    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==10: # 1+1, 
-            lapsia=1    
-            paivahoidossa=1    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==11: # 1+3, ansiopaivarahalla
-            lapsia=3    
-            paivahoidossa=2    
-            aikuisia=1    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==12: # 2+2, työmarkkinatuella
-            lapsia=2    
-            paivahoidossa=2    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-        elif perhetyyppi==13: # 2+2, ansiosidonnaisella
-            lapsia=2    
-            paivahoidossa=2    
-            aikuisia=2    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0            
-        elif perhetyyppi==14: # 2+1, puoliso työssä
-            lapsia=1    
-            paivahoidossa=1    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=1250    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0          
-        elif perhetyyppi==16: # 1+2, työmarkkinatuelta töihin, Kaupalle: #1
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=0    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==17: # 2+2, työssä, työllistyvä puolis0 1250e/kk
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=2    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=2000    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0         
-        elif perhetyyppi==18: # 2+2, kotihoidontuella, puolis0 2500e/kk
-            lapsia=2    
-            paivahoidossa=0    
-            lapsia_kotihoidontuella=2    
-            alle3v=2    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=0    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==19: # 2+2, kotihoidontuelta työhön, puolis0 2500e/kk
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=2    
-            aikuisia=2    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==20: # 1+2, työmarkkinatuelta töihin, Kaupalle: #2
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=0    
-            aikuisia=1    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==21: # 1+2, ansiosidonnaiselta töihin, Kaupalle: #3
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=0    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==22: # 1+1, työmarkkinatuelta töihin, Kaupalle: #4
-            lapsia=1    
-            paivahoidossa=1    
-            lapsia_kotihoidontuella=0    
-            alle3v=0    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==23: # 2+2, työmarkkinatuelta töihin, Kaupalle: #5
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=0    
-            aikuisia=2    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==24: # 2+2, työmarkkinatuelta töihin, puoliso tm-tuella, Viitamäki kuvio: #12 & #13
-            lapsia=2    
-            paivahoidossa=1    
-            lapsia_kotihoidontuella=0    
-            alle3v=0    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==25: # 2+2, ansiopäivärahalta töihin, puoliso tm-tuella, Viitamäki kuvio #14 & #15
-            lapsia=2    
-            paivahoidossa=1    
-            lapsia_kotihoidontuella=0    
-            alle3v=0    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==26: # 2+2, työmarkkinatuella, päivähoidossa 0
-            lapsia=2    
-            paivahoidossa=0    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0            
-        elif perhetyyppi==27: # 2+2, työmarkkinatuella, päivähoidossa 2
-            lapsia=2    
-            paivahoidossa=2    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0            
-        elif perhetyyppi==28: # 2+2, ei työmarkkinatuella, päivähoidossa 2
-            lapsia=2    
-            paivahoidossa=2    
-            aikuisia=2    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=2500    
-            puolison_vakiintunutpalkka=2500    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0            
-        elif perhetyyppi==29: # 1+1, työmarkkinatuelta töihin, Viitamäki HS 
-            lapsia=1    
-            paivahoidossa=1    
-            lapsia_kotihoidontuella=0    
-            alle3v=1    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=1    
-            puoliso_saa_ansiopaivarahaa=0                  
-        elif perhetyyppi==30: # 2+1, tmtuki, puoliso osapäivätyössä
-            lapsia=1    
-            paivahoidossa=1    
-            aikuisia=2    
-            vakiintunutpalkka=2500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=1250    
-            puolison_vakiintunutpalkka=1250    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0       
-        elif perhetyyppi==31: # 1+3, työmarkkinatuelta töihin, Viitamäki HS 
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=1    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=0    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0       
-        elif 32: # 1+1, työmarkkinatuelta töihin, Viitamäki HS 
-            lapsia=2    
-            paivahoidossa=2    
-            lapsia_kotihoidontuella=0    
-            alle3v=1    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0                
-        else: # 1+0
-            lapsia=0    
-            paivahoidossa=0    
-            aikuisia=1    
-            vakiintunutpalkka=1500    
-            tyoton=1    
-            saa_ansiopaivarahaa=1    
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-
-        # perhekoko          1   2   3   4    5
-        # luvut peräisin Viitamäeltä
-        vuokra_toimeentulo=np.array([440,660,850,980,1150]) # helsinki 675 800 919 1008 +115/hlo
-        vuokra_asumistuki =np.array([411,600,761,901,1024])
-        vuokra_yhdistetty =vuokra_toimeentulo    
-
-        asumismenot_toimeentulo=vuokra_toimeentulo[lapsia+aikuisia]
-        asumismenot_asumistuki=vuokra_asumistuki[lapsia+aikuisia]
-        asumismenot_yhdistetty=vuokra_yhdistetty[lapsia+aikuisia]
-        
-        selite="Perhe, jossa {aikuisia} aikuista".format(aikuisia=aikuisia)
-        if lapsia>0:
-            selite+=" ja {lapsia} lasta.".format(lapsia=lapsia)
-            if paivahoidossa>0:
-                selite+=" Lapsista {paiva} on päivähoidossa.".format(paiva=paivahoidossa)
-            if alle3v>0:
-                selite+=" Lapsista {alle3v}".format(alle3v=alle3v)
-            selite
-        else:
-            selite=selite+", ei lapsia."
-            
-            #lapsia_kotihoidontuella=0    
-            #vakiintunutpalkka=2500    
-            #tyoton=1    
-            #saa_ansiopaivarahaa=1    
-            #puolison_tulot=0    
-            #puolison_vakiintunutpalkka=2500    
-            #puoliso_tyoton=1    
-            #puoliso_saa_ansiopaivarahaa=0                  
-        
-    
-        if (aikuisia<2):
-            puolison_tulot=0    
-            puolison_vakiintunutpalkka=0    
-            puoliso_tyoton=0    
-            puoliso_saa_ansiopaivarahaa=0    
-
-        if (puoliso_tyoton>0):
-            puolison_tulot=0    
-
-        if (paivahoidossa>lapsia):
-            paivahoidossa=lapsia   
-        
-        return lapsia,paivahoidossa,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa, \
-        puolison_tulot,puolison_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa, \
-        asumismenot_asumistuki,asumismenot_toimeentulo,alle3v,asumismenot_yhdistetty 
-
+        fig,axs = plt.subplots()
+        axs.stackplot(palkka,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_verot,tva_pvhoito,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Verot','Päivähoito'))
+        axs.plot(tva,label='Vaihtoehto')
+        #axs.plot(tva_yht,label='Vaihtoehto2')
+        #axs.plot(tva_yht2,label='Vaihtoehto3')
+        axs.set_xlabel('Palkka (e/kk)')
+        axs.set_ylabel('Työllistymisveroaste (e/kk)')
+        axs.grid(True)
+        axs.set_xlim(0, max_salary)
+        axs.set_ylim(0, 120)
+        axs.legend(loc='upper right')
+        plt.show()
+                
+        return netto,eff,tva        

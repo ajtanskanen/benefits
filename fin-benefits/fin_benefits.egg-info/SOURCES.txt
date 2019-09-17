@@ -2,6 +2,7 @@ README.md
 setup.py
 fin_benefits/__init__.py
 fin_benefits/benefits.py
+fin_benefits/parameters.py
 fin_benefits.egg-info/PKG-INFO
 fin_benefits.egg-info/SOURCES.txt
 fin_benefits.egg-info/dependency_links.txt
