@@ -92,16 +92,22 @@ class Benefits():
         tuki=max(0,pvraha)    
     
         return tuki
+        
+    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka):
+        if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
+            return max(0,vakpalkka-tyotaikaisettulot) 
+            
+        return ansiopaivarahamaara   
 
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,ansiopvrahan_suojaosa,lapsikorotus,kesto,p,ansiokerroin=1.0):
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
     #def ansiopaivaraha(self,p,ansiokerroin=1.0):
         #tyoton=p['tyoton']
         #vakiintunutpalkka=p['vakiintunutpalkka']
         #lapsia=p['lapsia']
         #tyotaikaisettulot=p['tyotaikaisettulot']
         #saa_ansiopaivarahaa=p['saa_ansiopaivarahaa']
-        #ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
-        #lapsikorotus=p['lapsikorotus']
+        ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
+        lapsikorotus=p['ansiopvraha_lapsikorotus']
     
         if tyoton>0:
             if lapsikorotus<1:
@@ -128,9 +134,10 @@ class Benefits():
                     tuki2=max(.9*vakpalkka,perus)    
         
                 vahentavattulo=max(0,tyotaikaisettulot-suojaosa)    
-                ansiopaivarahamaara=max(0,tuki2-0.5*vahentavattulo)    
-                if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
-                    ansiopaivarahamaara=max(0,vakpalkka-tyotaikaisettulot)    
+                ansiopaivarahamaara=max(0,tuki2-0.5*vahentavattulo)  
+                ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
+                #if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
+                #    ansiopaivarahamaara=max(0,vakpalkka-tyotaikaisettulot)    
 
                 tuki=ansiopaivarahamaara    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)    
@@ -369,6 +376,49 @@ class Benefits():
         
         return vero
 
+    def laske_valtionvero_2019(self,tulot,p):
+
+        rajat=np.array([17600,26400,43500,76100])/12
+        pros=np.array([0.06,0.1725,0.2125,0.3125])
+
+        if p['piikit_pois']>0:
+            vero=0
+        else:
+            if tulot>=rajat[0]:
+                vero=8
+            else:
+                vero=0
+
+        for k in range(0,3):
+            vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
+
+        if tulot>rajat[3]:
+            vero=vero+(tulot-rajat[3])*pros[3]
+        
+        return vero
+
+    # ei-eläkeläinen
+    def laske_valtionvero_2020(self,tulot,p):
+        # tässä vielä 2019 tiedot
+        rajat=np.array([17600,26400,43500,76100])/12
+        pros=np.array([0.06,0.1725,0.2125,0.3125])
+
+        if p['piikit_pois']>0:
+            vero=0
+        else:
+            if tulot>=rajat[0]:
+                vero=8
+            else:
+                vero=0
+
+        for k in range(0,3):
+            vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
+
+        if tulot>rajat[3]:
+            vero=vero+(tulot-rajat[3])*pros[3]
+        
+        return vero
+
     def tyottomyysturva_suojaosa(self,suojaosamalli):
         if suojaosamalli==2:
             suojaosa=0
@@ -408,7 +458,7 @@ class Benefits():
         q={} # tulokset tänne
         q['elake']=elake
         if p['elakkeella']<0: # ei eläkkeellä
-            q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['ansiopvrahan_suojaosa'],p['ansiopvraha_lapsikorotus'],p['tyottomyyden_kesto'],p)
+            q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p)
             q['kokoelake']=0
         else: # eläkkeellä
             p['tyoton']=0
@@ -417,7 +467,7 @@ class Benefits():
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
 
         if (p['aikuisia']>1): # perheessä 2 aikuista
-            q['puolison_ansiopvraha'],_,_=self.ansiopaivaraha(p['puoliso_tyoton'],p['puolison_vakiintunutpalkka'],p['lapsia'],p['puolison_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['ansiopvrahan_suojaosa'],p['ansiopvraha_lapsikorotus'],p['puolison_tyottomyyden_kesto'],p)
+            q['puolison_ansiopvraha'],_,_=self.ansiopaivaraha(p['puoliso_tyoton'],p['puolison_vakiintunutpalkka'],p['lapsia'],p['puolison_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['puolison_tyottomyyden_kesto'],p)
         else: # perheessä 1 aikuinen
             q['puolison_ansiopvraha']=0
     
@@ -816,6 +866,8 @@ class Benefits():
                 tva[t]=(1-(n1-n0)/t)*100
             else:
                 tva[t]=0
+                
+        print(margansiopvraha)
                 
         fig,axs = plt.subplots()
         axs.stackplot(palkka,margasumistuki,margtoimeentulotuki,margansiopvraha,margverot,margpvhoito,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Verot','Päivähoito'))

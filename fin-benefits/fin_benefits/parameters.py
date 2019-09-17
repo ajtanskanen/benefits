@@ -488,15 +488,15 @@ def tee_selite(p):
 		if p['puoliso_tyoton']>0:
 			selite+=", puoliso työtön"
 			if p['puoliso_ansiopaivarahaa']>0:
-				selite+=" (ansiopaivaraha, vakiintunut ansio {v} e/kk)".format(v=p['puolison_vakiintunutpalkka'])
+				selite+=" (ansiopaivaraha, vakiintunut ansio {v} e/kk).".format(v=p['puolison_vakiintunutpalkka'])
 			else:
-				selite+=" (työmarkkinatuki)"
+				selite+=" (työmarkkinatuki)."
 		else:
 			selite+=", puoliso töissä"
-			selite+=" (palkka {p} e/kk)".format(p=p['puolison_tulot'])
+			selite+=" (palkka {p} e/kk).".format(p=p['puolison_tulot'])
 	else:
 		selite+=", ei puolisoa."
 		
-	selite+="Asumismenot asumistuessa {a} e/kk".format(a=p['asumismenot_toimeentulo'])
+	selite+=" Asumismenot asumistuessa {a} e/kk".format(a=p['asumismenot_toimeentulo'])
 			
 	return selite
