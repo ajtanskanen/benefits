@@ -417,9 +417,9 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
 	vuokra_asumistuki =np.array([411,600,761,901,1024])
 	vuokra_yhdistetty =vuokra_toimeentulo    
 
-	asumismenot_toimeentulo=vuokra_toimeentulo[lapsia+aikuisia]
-	asumismenot_asumistuki=vuokra_asumistuki[lapsia+aikuisia]
-	asumismenot_yhdistetty=vuokra_yhdistetty[lapsia+aikuisia]
+	asumismenot_toimeentulo=vuokra_toimeentulo[lapsia+aikuisia-1]
+	asumismenot_asumistuki=vuokra_asumistuki[lapsia+aikuisia-1]
+	asumismenot_yhdistetty=vuokra_yhdistetty[lapsia+aikuisia-1]
 	
 	if (aikuisia<2):
 		puolison_tulot=0    
@@ -487,7 +487,7 @@ def tee_selite(p):
 	if p['aikuisia']>1:
 		if p['puoliso_tyoton']>0:
 			selite+=", puoliso työtön"
-			if p['puoliso_ansiopaivarahaa']>0:
+			if p['puoliso_saa_ansiopaivarahaa']>0:
 				selite+=" (ansiopaivaraha, vakiintunut ansio {v} e/kk).".format(v=p['puolison_vakiintunutpalkka'])
 			else:
 				selite+=" (työmarkkinatuki)."

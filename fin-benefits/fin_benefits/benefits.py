@@ -26,7 +26,7 @@ class Benefits():
         omavastuu=omavastuuprosentti*asumismenot
         menot=max(0,asumismenot-omavastuu)+muutmenot
 
-        menot=asumismenot+muutmenot    
+        #menot=asumismenot+muutmenot    
         bruttopalkka=omabruttopalkka+puolison_bruttopalkka    
         palkkavero=omapalkkavero+puolison_palkkavero    
         palkkatulot=bruttopalkka-palkkavero    
@@ -115,7 +115,7 @@ class Benefits():
 
             lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
             sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
-            if saa_ansiopaivarahaa>0 & p['tyottomyydenkesto']<400: 
+            if saa_ansiopaivarahaa>0 & p['tyottomyyden_kesto']<400: 
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
                 vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
         
@@ -129,7 +129,7 @@ class Benefits():
                 tuki2=tuki2*ansiokerroin # mahdollinen porrastus tehdään tämän avulla
                 suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa)    
         
-                perus=peruspaivaraha(lapsia)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
+                perus=self.peruspaivaraha(lapsia)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
                 if tuki2>.9*vakpalkka:
                     tuki2=max(.9*vakpalkka,perus)    
         
@@ -457,7 +457,7 @@ class Benefits():
 
         q={} # tulokset tänne
         q['elake']=elake
-        if p['elakkeella']<0: # ei eläkkeellä
+        if p['elakkeella']<1: # ei eläkkeellä
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p)
             q['kokoelake']=0
         else: # eläkkeellä
@@ -677,7 +677,7 @@ class Benefits():
         
         return elake
     
-    def laske_kokonaiselake(self,ika,tyoelake,yksin):
+    def laske_kokonaiselake(self,ika,tyoelake,yksin=1):
         kansanelake=self.laske_kansanelake(ika,tyoelake,yksin)
         takuuelake=self.laske_takuuelake(ika,kansanelake,tyoelake)
         kokoelake=tyoelake+kansanelake+takuuelake
@@ -740,16 +740,17 @@ class Benefits():
         tva=np.zeros(max_salary+1)
         eff=np.zeros(max_salary+1)
         
-        if p==None:
+        if p is None:
             p=self.get_default_parameter()
 
-        p['t']=0 # palkka
-        n0,q0=self.laske_tulot(p,elake=0)
+        p2=p.copy()
+        p2['t']=0 # palkka
+        n0,q0=self.laske_tulot(p2,elake=0)
         for t in range(0,max_salary):
-            p['t']=t # palkka
-            n1,q1=self.laske_tulot(p,elake=0)
-            p['t']=t+dt # palkka
-            n2,q2=self.laske_tulot(p,elake=0)
+            p2['t']=t # palkka
+            n1,q1=self.laske_tulot(p2,elake=0)
+            p2['t']=t+dt # palkka
+            n2,q2=self.laske_tulot(p2,elake=0)
             netto[t]=n1
             palkka[t]=t
             eff[t]=(1-(n2-n1)/dt)*100
@@ -827,16 +828,18 @@ class Benefits():
         tva_yht=np.zeros(max_salary+1)        
         tva_yht2=np.zeros(max_salary+1)        
         
-        if p==None:
+        if p is None:
             p=self.get_default_parameter()
+            
+        p2=p.copy()
 
-        p['t']=0 # palkka
-        n0,q0=self.laske_tulot(p,elake=0)
+        p2['t']=0 # palkka
+        n0,q0=self.laske_tulot(p2,elake=0)
         for t in range(0,max_salary+1):
-            p['t']=t # palkka
-            n1,q1=self.laske_tulot(p,elake=0)
-            p['t']=t+dt # palkka
-            n2,q2=self.laske_tulot(p,elake=0)
+            p2['t']=t # palkka
+            n1,q1=self.laske_tulot(p2,elake=0)
+            p2['t']=t+dt # palkka
+            n2,q2=self.laske_tulot(p2,elake=0)
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
             tulot2,tvat=self.laske_marginaalit(q0,q1,t,laske_tyollistymisveroaste=1)
             netto[t]=n1
@@ -850,7 +853,7 @@ class Benefits():
             margyht2[t]=marg['marginaaliveroprosentti']
             asumistuki[t]=q1['asumistuki']
             toimeentulotuki[t]=q1['toimtuki']
-            ansiopvraha[t]=q1['ansiopvraha_nettonetto']
+            ansiopvraha[t]=q1['ansiopvraha_nettonetto']+q1['puolison_ansiopvraha_nettonetto']
             lapsilisa[t]=q1['lapsilisa']
             nettotulot[t]=tulot['tulotnetto']
             tva_asumistuki[t]=tvat['asumistuki']
@@ -866,8 +869,6 @@ class Benefits():
                 tva[t]=(1-(n1-n0)/t)*100
             else:
                 tva[t]=0
-                
-        print(margansiopvraha)
                 
         fig,axs = plt.subplots()
         axs.stackplot(palkka,margasumistuki,margtoimeentulotuki,margansiopvraha,margverot,margpvhoito,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Verot','Päivähoito'))
