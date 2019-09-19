@@ -68,9 +68,8 @@ class Benefits():
         # end
         tuki=max(0,tuki1+menot-max(0,omabruttopalkka-omaetuoikeutettuosa-omapalkkavero)\
                 -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero)-verot-muuttulot)    
-        if p['piikit_pois']<1: 
-            if tuki<10:
-                tuki=0    
+        if tuki<10:
+            tuki=0    
             
         return tuki
     
@@ -161,6 +160,18 @@ class Benefits():
         tuki=max(0,pvraha-0.5*vahentavattulo)
     
         return tuki
+        
+    def tyotulovahennys(self):
+        max_tyotulovahennys=1540/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja
+        ttulopros=np.array([0.120,0.0165,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def ansiotulovahennys(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
 
     def verotus2018(self,palkkatulot,muuttulot,elaketulot,lapsia,p):
     
@@ -171,7 +182,7 @@ class Benefits():
         lapsivahennys=0 # poistui 2018
     
         peritytverot=0
-        kk_jakaja=12
+        self.kk_jakaja=12
     
         kunnallisvero_pros=0.1984 # Viitamäen raportista
         tyottomyysvakuutusmaksu=0.0190 #
@@ -181,48 +192,41 @@ class Benefits():
         sairaanhoitomaksu=0.0
         #sairaanhoitomaksu_etuus=0.0147 # muut
         paivarahamaksu_pros=0.0153 # palkka
-        paivarahamaksu_raja=14020/kk_jakaja
+        paivarahamaksu_raja=14020/self.kk_jakaja
     
         # vähennetään sosiaaliturvamaksut
-        if p['piikit_pois']<1:
-            if palkkatulot>58.27:
-                ptel=(palkkatulot-58.27)*tyontekijan_maksu
-            else:
-                ptel=0
-        else:
+        if palkkatulot>58.27:
             ptel=(palkkatulot-58.27)*tyontekijan_maksu
+        else:
+            ptel=0
 
         tyotvakmaksu=palkkatulot*tyottomyysvakuutusmaksu
-        if p['piikit_pois']>0:
+        if palkkatulot>paivarahamaksu_raja:
             sairausvakuutus=palkkatulot*paivarahamaksu_pros
         else:
-            if palkkatulot>paivarahamaksu_raja:
-                sairausvakuutus=palkkatulot*paivarahamaksu_pros
-            else:
-                sairausvakuutus=0
+            sairausvakuutus=0
 
         peritytverot=peritytverot+sairausvakuutus+ptel+tyotvakmaksu
         palkkatulot=palkkatulot-sairausvakuutus-ptel-tyotvakmaksu 
-        tulot=palkkatulot+muuttulot
+        #tulot=palkkatulot+muuttulot
     
         # tulonhankkimisvähennys pienentää ansiotuloa
     
-        tulonhankkimisvahennys=750/kk_jakaja
+        tulonhankkimisvahennys=750/self.kk_jakaja
         palkkatulot=max(0,palkkatulot-tulonhankkimisvahennys) # puhdas ansiotulo
         tulot=palkkatulot+muuttulot+elaketulot
     
         # ylevero
     
         yleveropros=0.025
-        min_ylevero=0/kk_jakaja
-        max_ylevero=163/kk_jakaja
+        min_ylevero=0/self.kk_jakaja
+        max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14750
     
         ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
     
-        if p['piikit_pois']<1:
-            if ylevero<min_ylevero:
-                ylevero=0
+        if ylevero<min_ylevero:
+            ylevero=0
     
         valtionvero=ylevero
     
@@ -232,10 +236,12 @@ class Benefits():
         # työtulovähennys vähennetään valtionveroista
     
         #switch (p['veromalli)
-        max_tyotulovahennys=1540/kk_jakaja
-        ttulorajat=np.array([2500,33000,127000])/kk_jakaja
-        ttulopros=np.array([0.120,0.0165,0])
+        #max_tyotulovahennys=1540/kk_jakaja
+        #ttulorajat=np.array([2500,33000,127000])/kk_jakaja
+        #ttulopros=np.array([0.120,0.0165,0])
         #end
+        
+        max_tyotulovahennys,ttulorajat,ttulopros=self.tyotulovahennys()
     
         if palkkatulot>ttulorajat[1]:
             if palkkatulot>ttulorajat[2]:
@@ -244,7 +250,7 @@ class Benefits():
                 tyotulovahennys=min(max_tyotulovahennys,max(0,ttulopros[0]*max(0,palkkatulot-ttulorajat[0])))
         else:
             if palkkatulot>ttulorajat[0]:
-                tyotulovahennys=min(max_tyotulovahennys,max(0,ttulopros[0]*(palkkatulot-ttulorajat[0])))
+                tyotulovahennys=min(max_tyotulovahennys,max(0,ttulopros[0]*max(0,palkkatulot-ttulorajat[0])))
             else:
                 tyotulovahennys=0
 
@@ -252,12 +258,14 @@ class Benefits():
             if tulot>ttulorajat[2]:
                 tyotulovahennys=0
             else:
-                tyotulovahennys=max(0,tyotulovahennys-ttulopros[1]*max(0,tulot-ttulorajat[0]))
+                tyotulovahennys=max(0,tyotulovahennys-ttulopros[1]*max(0,tulot-ttulorajat[1]))
+
+        #tyotulovahennys=0
 
         # valtioverotus
         # varsinainen verotus
 
-        valtionvero=valtionvero+self.laske_valtionvero_2018(tulot,p)
+        valtionvero=valtionvero+self.laske_valtionvero(tulot,p)
         valtionveroperuste=tulot
     
         # työtulovähennys
@@ -275,9 +283,11 @@ class Benefits():
         # kunnallisverotus
     
         # ansiotulovahennys
-        rajat=np.array([2500,7230,14000])/kk_jakaja
-        maxvahennys=3570/kk_jakaja
-        ansvah=np.array([0.51,0.28,0.045])
+        #rajat=np.array([2500,7230,14000])/kk_jakaja
+        #maxvahennys=3570/kk_jakaja
+        #ansvah=np.array([0.51,0.28,0.045])
+        
+        rajat,maxvahennys,ansvah=self.ansiotulovahennys()
         if palkkatulot>rajat[1]:
             if palkkatulot>rajat[2]:
                 ansiotulovahennys=max(0,min(maxvahennys,ansvah[0]*(rajat[1]-rajat[0])+ansvah[1]*(rajat[2]-rajat[1])))
@@ -293,7 +303,8 @@ class Benefits():
             ansiotulovahennys=max(0,ansiotulovahennys-ansvah[2]*(palkkatulot-rajat[2]))
     
         # perusvähennys
-        max_perusvahennys=3020/kk_jakaja
+        #max_perusvahennys=3020/self.kk_jakaja
+        max_perusvahennys=3020/self.kk_jakaja
         if tulot-ansiotulovahennys<max_perusvahennys:
             perusvahennys=tulot-ansiotulovahennys
         else:
@@ -355,18 +366,21 @@ class Benefits():
         
         return arvo
     
-    def laske_valtionvero_2018(self,tulot,p):
-
-        rajat=np.array([17200,25700,42400,74200])/12
+    def valtionvero_asteikko_2018(self):
+        rajat=np.array([17200,25700,42400,74200])/self.kk_jakaja
         pros=np.array([0.06,0.1725,0.2125,0.3125])
+        return rajat,pros
+    
+    def laske_valtionvero(self,tulot,p):
 
-        if p['piikit_pois']>0:
-            vero=0
+        #rajat=np.array([17200,25700,42400,74200])/12
+        #pros=np.array([0.06,0.1725,0.2125,0.3125])
+        rajat,pros=self.valtionvero_asteikko_2018()
+
+        if tulot>=rajat[0]:
+            vero=8
         else:
-            if tulot>=rajat[0]:
-                vero=8
-            else:
-                vero=0
+            vero=0
 
         for k in range(0,3):
             vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
@@ -381,13 +395,10 @@ class Benefits():
         rajat=np.array([17600,26400,43500,76100])/12
         pros=np.array([0.06,0.1725,0.2125,0.3125])
 
-        if p['piikit_pois']>0:
-            vero=0
+        if tulot>=rajat[0]:
+            vero=8
         else:
-            if tulot>=rajat[0]:
-                vero=8
-            else:
-                vero=0
+            vero=0
 
         for k in range(0,3):
             vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
@@ -403,13 +414,10 @@ class Benefits():
         rajat=np.array([17600,26400,43500,76100])/12
         pros=np.array([0.06,0.1725,0.2125,0.3125])
 
-        if p['piikit_pois']>0:
-            vero=0
+        if tulot>=rajat[0]:
+            vero=8
         else:
-            if tulot>=rajat[0]:
-                vero=8
-            else:
-                vero=0
+            vero=0
 
         for k in range(0,3):
             vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
@@ -570,9 +578,8 @@ class Benefits():
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
-        if p['piikit_pois']<1:
-            if perusomavastuu<10:
-                perusomavastuu=0
+        if perusomavastuu<10:
+            perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
     
@@ -581,10 +588,7 @@ class Benefits():
 
     # hallituksen päätöksenmukaiset päivähoitomenot 2018
     def paivahoitomenot(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
-        if p['piikit_pois']>0:
-            minimimaksu=0
-        else:
-            minimimaksu=10
+        minimimaksu=10
 
         if prosentti1==None:
             prosentti1=0.107
@@ -706,6 +710,7 @@ class Benefits():
         marg['sairausvakuutus']=(-q1['sairausvakuutus']+q2['sairausvakuutus']-q1['puolison_sairausvakuutus']+q2['puolison_sairausvakuutus'])*100/dt
         marg['tyotvakmaksu']=(-q1['tyotvakmaksu']+q2['tyotvakmaksu']-q1['puolison_tyotvakmaksu']+q2['puolison_tyotvakmaksu'])*100/dt
         marg['perustulo']=(+q1['perustulo_netto']-q2['perustulo_netto']+q1['puolison_perustulo_netto']-q2['puolison_perustulo_netto'])*100/dt 
+        marg['puolison_verot']=(-q1['puolison_verot']+q2['puolison_verot'])*100/dt
     
         marg['sivukulut']=marg['tyotvakmaksu']+marg['sairausvakuutus']+marg['ptel'] # sisältyvät jo veroihin
         marg['etuudet']=marg['ansiopvraha']+marg['asumistuki']+marg['toimtuki']
@@ -871,7 +876,7 @@ class Benefits():
                 tva[t]=0
                 
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,margasumistuki,margtoimeentulotuki,margansiopvraha,margverot,margpvhoito,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Verot','Päivähoito'))
+        axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito'))
         axs.plot(eff,label='Vaihtoehto')
         #axs.plot(margyht,label='Vaihtoehto2')
         #axs.plot(margyht2,label='Vaihtoehto3')
@@ -895,7 +900,7 @@ class Benefits():
         plt.show()
 
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_verot,tva_pvhoito,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Verot','Päivähoito'))
+        axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito'))
         axs.plot(tva,label='Vaihtoehto')
         #axs.plot(tva_yht,label='Vaihtoehto2')
         #axs.plot(tva_yht2,label='Vaihtoehto3')
@@ -908,3 +913,58 @@ class Benefits():
         plt.show()
                 
         return netto,eff,tva        
+
+    def laske_ja_plottaa_veromarginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus"):
+        palkka=np.zeros(max_salary+1)
+        margtyotvakmaksu=np.zeros(max_salary+1)        
+        margsairausvakuutus=np.zeros(max_salary+1)
+        margptel=np.zeros(max_salary+1)
+        margtyotulovah=np.zeros(max_salary+1)
+        margansiotulovah=np.zeros(max_salary+1)        
+        margverot=np.zeros(max_salary+1)        
+        margkunnallisvero=np.zeros(max_salary+1)        
+        margvaltionvero=np.zeros(max_salary+1)  
+        margperusvahennys=np.zeros(max_salary+1)  
+        margpuolisonverot=np.zeros(max_salary+1)  
+        
+        if p is None:
+            p=self.get_default_parameter()
+            
+        p2=p.copy()
+
+        p2['t']=0 # palkka
+        n0,q0=self.laske_tulot(p2,elake=0)
+        for t in range(0,max_salary+1):
+            p2['t']=t # palkka
+            n1,q1=self.laske_tulot(p2,elake=0)
+            p2['t']=t+dt # palkka
+            n2,q2=self.laske_tulot(p2,elake=0)
+            palkka[t]=t
+            
+            tulot,marg=self.laske_marginaalit(q1,q2,dt)
+            margvaltionvero[t]=marg['valtionvero']
+            margkunnallisvero[t]=marg['kunnallisvero']
+            margverot[t]=marg['verot']
+            margansiotulovah[t]=marg['ansiotulovah']
+            margtyotulovah[t]=marg['tyotulovahennys']
+            margperusvahennys[t]=marg['perusvahennys']
+            margptel[t]=marg['ptel']
+            margsairausvakuutus[t]=marg['sairausvakuutus']
+            margtyotvakmaksu[t]=marg['tyotvakmaksu']
+            margpuolisonverot[t]=marg['puolison_verot']
+                
+        fig,axs = plt.subplots()
+        axs.stackplot(palkka,margvaltionvero,margkunnallisvero,margansiotulovah,margtyotulovah,margperusvahennys,margptel,margsairausvakuutus,margtyotvakmaksu,margpuolisonverot,\
+            labels=('Valtionvero','Kunnallisvero','Ansiotulovähennys','Työtulovähennys','Perusvähennys','PTEL','sairausvakuutus','työttömyysvakuutusmaksu','puolison verot'))
+        axs.plot(margverot,label='Yht')
+        #axs.plot(margyht,label='Vaihtoehto2')
+        #axs.plot(margyht2,label='Vaihtoehto3')
+        axs.set_xlabel('Palkka (e/kk)')
+        axs.set_ylabel('Eff.marginaalivero (%)')
+        axs.grid(True)
+        axs.set_xlim(0, max_salary)
+        axs.set_ylim(0, 120)
+        axs.legend(loc='upper left')
+        plt.show()
+                
+        #return netto,eff,tva        

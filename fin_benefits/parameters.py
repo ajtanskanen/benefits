@@ -9,7 +9,6 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
 	p['tyoton']=1
 	p['ika']=30
 	p['saa_ansiopaivarahaa']=1
-	p['piikit_pois']=0
 	p['t']=0
 	p['vakiintunutpalkka']=2500
 	p['elakkeella']=0
