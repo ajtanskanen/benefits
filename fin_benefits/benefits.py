@@ -172,7 +172,27 @@ class Benefits():
         maxvahennys=3570/self.kk_jakaja
         ansvah=np.array([0.51,0.28,0.045])
         return rajat,maxvahennys,ansvah
+        
+    def veroparam2018(self):
+        self.kunnallisvero_pros=0.1984 # Viitamäen raportista
+        self.tyottomyysvakuutusmaksu=0.0190 #
+        self.tyontekijan_maksu=0.0635 # PTEL
+    
+        # sairausvakuutus ??
+        self.sairaanhoitomaksu=0.0
+        #sairaanhoitomaksu_etuus=0.0147 # muut
+        
+        self.paivarahamaksu_pros=0.0153 # palkka
+        self.paivarahamaksu_raja=14020/self.kk_jakaja    
+        
+        self.elakemaksu_alaraja=58.27
+        self.tulonhankkimisvahennys=750/self.kk_jakaja
 
+    def perusvahennys(self):
+        perusvahennys_pros=0.18
+        perusvahennys_max_euroa=3020
+        return perusvahennys_pros,perusvahennys_max_euroa
+    
     def verotus2018(self,palkkatulot,muuttulot,elaketulot,lapsia,p):
     
         # tulot e/kk sisältää työttömyyskorvauksen, palkkatulot ei
@@ -183,26 +203,28 @@ class Benefits():
     
         peritytverot=0
         self.kk_jakaja=12
+        
+        self.veroparam2018()
     
-        kunnallisvero_pros=0.1984 # Viitamäen raportista
-        tyottomyysvakuutusmaksu=0.0190 #
-        tyontekijan_maksu=0.0635 # PTEL
+        #kunnallisvero_pros=0.1984 # Viitamäen raportista
+        #tyottomyysvakuutusmaksu=0.0190 #
+        #tyontekijan_maksu=0.0635 # PTEL
     
         # sairausvakuutus
         sairaanhoitomaksu=0.0
         #sairaanhoitomaksu_etuus=0.0147 # muut
-        paivarahamaksu_pros=0.0153 # palkka
-        paivarahamaksu_raja=14020/self.kk_jakaja
+        #paivarahamaksu_pros=0.0153 # palkka
+        #paivarahamaksu_raja=14020/self.kk_jakaja
     
         # vähennetään sosiaaliturvamaksut
-        if palkkatulot>58.27:
-            ptel=(palkkatulot-58.27)*tyontekijan_maksu
+        if palkkatulot>self.elakemaksu_alaraja:
+            ptel=(palkkatulot-self.elakemaksu_alaraja)*self.tyontekijan_maksu
         else:
             ptel=0
 
-        tyotvakmaksu=palkkatulot*tyottomyysvakuutusmaksu
-        if palkkatulot>paivarahamaksu_raja:
-            sairausvakuutus=palkkatulot*paivarahamaksu_pros
+        tyotvakmaksu=palkkatulot*self.tyottomyysvakuutusmaksu
+        if palkkatulot>self.paivarahamaksu_raja:
+            sairausvakuutus=palkkatulot*self.paivarahamaksu_pros
         else:
             sairausvakuutus=0
 
@@ -212,8 +234,8 @@ class Benefits():
     
         # tulonhankkimisvähennys pienentää ansiotuloa
     
-        tulonhankkimisvahennys=750/self.kk_jakaja
-        palkkatulot=max(0,palkkatulot-tulonhankkimisvahennys) # puhdas ansiotulo
+        #tulonhankkimisvahennys=750/self.kk_jakaja
+        palkkatulot=max(0,palkkatulot-self.tulonhankkimisvahennys) # puhdas ansiotulo
         tulot=palkkatulot+muuttulot+elaketulot
     
         # ylevero
@@ -309,18 +331,19 @@ class Benefits():
     
         # perusvähennys
         #max_perusvahennys=3020/self.kk_jakaja
-        max_perusvahennys=3020/self.kk_jakaja
+        perusvahennys_max_euroa,perusvahennys_pros=self.perusvahennys()
+        max_perusvahennys=perusvahennys_max_euroa/self.kk_jakaja
         if tulot-ansiotulovahennys<max_perusvahennys:
             perusvahennys=tulot-ansiotulovahennys
         else:
-            perusvahennys=max(0,max_perusvahennys-0.18*max(0,(elaketulot+max(0,tulot-elaketulot-ansiotulovahennys)-max_perusvahennys)))
+            perusvahennys=max(0,max_perusvahennys-perusvahennys_pros*max(0,(elaketulot+max(0,tulot-elaketulot-ansiotulovahennys)-max_perusvahennys)))
     
         # Yhteensä
         kunnallisveronperuste=max(0,elaketulot+max(0,tulot-elaketulot-ansiotulovahennys)-perusvahennys)
         peritty_sairaanhoitomaksu=kunnallisveronperuste*sairaanhoitomaksu 
     
         if tyotulovahennys_kunnallisveroon>0:
-            kunnallisvero_0=kunnallisveronperuste*kunnallisvero_pros
+            kunnallisvero_0=kunnallisveronperuste*self.kunnallisvero_pros
             if peritty_sairaanhoitomaksu+kunnallisvero_0>0:
                 kvhen=tyotulovahennys_kunnallisveroon*kunnallisvero_0/(peritty_sairaanhoitomaksu+kunnallisvero_0)
                 svhen=tyotulovahennys_kunnallisveroon*peritty_sairaanhoitomaksu/(peritty_sairaanhoitomaksu+kunnallisvero_0)
@@ -328,10 +351,10 @@ class Benefits():
                 kvhen=0
                 svhen=0
 
-            kunnallisvero=max((tulot-ansiotulovahennys-perusvahennys)*kunnallisvero_pros-kvhen,0)
+            kunnallisvero=max((tulot-ansiotulovahennys-perusvahennys)*self.kunnallisvero_pros-kvhen,0)
             peritty_sairaanhoitomaksu=max(0,kunnallisveronperuste*sairaanhoitomaksu-svhen)
         else:
-            kunnallisvero=kunnallisveronperuste*kunnallisvero_pros
+            kunnallisvero=kunnallisveronperuste*self.kunnallisvero_pros
 
         sairausvakuutus=sairausvakuutus+peritty_sairaanhoitomaksu
     
@@ -376,48 +399,13 @@ class Benefits():
         pros=np.array([0.06,0.1725,0.2125,0.3125])
         return rajat,pros
     
+    def valtionvero_asteikko_2019(self):
+        rajat=np.array([17600,26400,43500,76100])/self.kk_jakaja
+        pros=np.array([0.06,0.1725,0.2125,0.3125])
+        return rajat,pros
+    
     def laske_valtionvero(self,tulot,p):
-
-        #rajat=np.array([17200,25700,42400,74200])/12
-        #pros=np.array([0.06,0.1725,0.2125,0.3125])
         rajat,pros=self.valtionvero_asteikko_2018()
-
-        if tulot>=rajat[0]:
-            vero=8
-        else:
-            vero=0
-
-        for k in range(0,3):
-            vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
-
-        if tulot>rajat[3]:
-            vero=vero+(tulot-rajat[3])*pros[3]
-        
-        return vero
-
-    def laske_valtionvero_2019(self,tulot,p):
-
-        rajat=np.array([17600,26400,43500,76100])/12
-        pros=np.array([0.06,0.1725,0.2125,0.3125])
-
-        if tulot>=rajat[0]:
-            vero=8
-        else:
-            vero=0
-
-        for k in range(0,3):
-            vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
-
-        if tulot>rajat[3]:
-            vero=vero+(tulot-rajat[3])*pros[3]
-        
-        return vero
-
-    # ei-eläkeläinen
-    def laske_valtionvero_2020(self,tulot,p):
-        # tässä vielä 2019 tiedot
-        rajat=np.array([17600,26400,43500,76100])/12
-        pros=np.array([0.06,0.1725,0.2125,0.3125])
 
         if tulot>=rajat[0]:
             vero=8
@@ -445,9 +433,13 @@ class Benefits():
             suojaosa=300
         
         return suojaosa
+        
+    def lapsilisa2018(self):
+        lapsilisat=np.array([95.75,105.80,135.01,154.64,174.27])
+        return lapsilisat
     
     def laske_lapsilisa(self,lapsia):
-        lapsilisat=np.array([95.75,105.80,135.01,154.64,174.27])
+        lapsilisat=self.lapsilisa2018()
     
         if lapsia==0:
             tuki=0
@@ -483,8 +475,8 @@ class Benefits():
             q['elake_maksussa']=elake
             q['elake_tuleva']=0
             p['saa_ansiopaivarahaa']=0
-            #q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake'], 1)
-            q['kokoelake']=self.laske_kokonaiselake(100,q['elake_maksussa'], 1)
+            q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'], 1)
+            #q['kokoelake']=self.laske_kokonaiselake(100,q['elake_maksussa'], 1)
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
             #oletetaan että myös puoliso eläkkeellä
             q['puolison_ansiopvraha']=0
@@ -954,9 +946,8 @@ class Benefits():
         plt.show()
         
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,labels=('Asumistuki','Toimeentulotuki','Työttömyysturva','Palkka','Lapsilisä'))
+        axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,labels=('Nettopalkka','Asumistuki','Toimeentulotuki','Työttömyysturva','Lapsilisä'))
         axs.plot(netto)
-        
         axs.set_xlabel('Palkka (e/kk)')
         axs.set_ylabel('Käteen (e/kk)')
         axs.grid(True)
