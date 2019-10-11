@@ -11,7 +11,8 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
 	p['saa_ansiopaivarahaa']=1
 	p['t']=0
 	p['vakiintunutpalkka']=2500
-	p['elakkeella']=0
+	elakkeella=0
+	elake=0
 	p['asumismenot_toimeentulo']=500
 	p['asumismenot_asumistuki']=500
 	p['lapsia']=0
@@ -385,7 +386,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
 		puolison_vakiintunutpalkka=0    
 		puoliso_tyoton=0    
 		puoliso_saa_ansiopaivarahaa=0       
-	elif 32: # 1+1, työmarkkinatuelta töihin, Viitamäki HS 
+	elif perhetyyppi==32: # 1+1, työmarkkinatuelta töihin, Viitamäki HS 
 		lapsia=2    
 		paivahoidossa=2    
 		lapsia_kotihoidontuella=0    
@@ -394,6 +395,35 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
 		vakiintunutpalkka=1500    
 		tyoton=1    
 		saa_ansiopaivarahaa=1    
+		puolison_tulot=0    
+		puolison_vakiintunutpalkka=0    
+		puoliso_tyoton=0    
+		puoliso_saa_ansiopaivarahaa=0                
+	elif perhetyyppi==41: # 1+0, eläkkeellä
+		lapsia=0    
+		paivahoidossa=0
+		lapsia_kotihoidontuella=0    
+		alle3v=0
+		aikuisia=1    
+		vakiintunutpalkka=1500    
+		tyoton=0    
+		saa_ansiopaivarahaa=0
+		elakkeella=1
+		elake=1500
+		puolison_tulot=0    
+		puolison_vakiintunutpalkka=0    
+		puoliso_tyoton=0    
+		puoliso_saa_ansiopaivarahaa=0                
+	elif perhetyyppi==42: # 1+0, töissä
+		lapsia=0    
+		paivahoidossa=0
+		lapsia_kotihoidontuella=0    
+		alle3v=0
+		aikuisia=1    
+		vakiintunutpalkka=1500    
+		tyoton=0    
+		saa_ansiopaivarahaa=0
+		elakkeella=0
 		puolison_tulot=0    
 		puolison_vakiintunutpalkka=0    
 		puoliso_tyoton=0    
@@ -433,6 +463,11 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
 		paivahoidossa=lapsia   
 		
 	p['lapsia']=lapsia
+	p['elakkeella']=elakkeella
+	p['tyoelake']=elake
+	p['aitiysvapaalla']=0
+	p['isyysvapaalla']=0
+	p['kotihoidontuella']=0
 	p['paivahoidossa']=paivahoidossa
 	p['aikuisia']=aikuisia
 	p['vakiintunutpalkka']=vakiintunutpalkka
@@ -481,7 +516,7 @@ def tee_selite(p):
 		else:
 			selite+=" Töissä"
 	else:
-		selite+=" Eläkkeellä"
+		selite+=" Vanhuuseläkkeellä (työeläke {e} e/kk)".format(e=p['tyoelake'])
 		
 	if p['aikuisia']>1:
 		if p['puoliso_tyoton']>0:
