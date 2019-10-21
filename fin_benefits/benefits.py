@@ -17,8 +17,6 @@ class Benefits():
     """
     
     def __init__(self):
-        self.max_age=69
-        self.min_age=25
         self.vuosi=2018
         self.set_year(self.vuosi)
         
@@ -142,7 +140,7 @@ class Benefits():
                 sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
                 taite=3078.60    
                             
-            if saa_ansiopaivarahaa>0 & p['tyottomyyden_kesto']<400: 
+            if (saa_ansiopaivarahaa>0) & (kesto<400.0):
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
                 vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
         
@@ -654,7 +652,7 @@ class Benefits():
         #    q['elatustuki']+q['ansiopvraha_netto']+q['puolison_ansiopvraha_netto']+q['asumistuki']+q['lapsilisa'],0,\
         #    p['asumismenot_toimeentulo'],q['pvhoito']))
     
-        kateen=q['kokoelake']+p['puolison_tulot']+p['t']+q['asumistuki']+q['toimtuki']+q['ansiopvraha']+q['puolison_ansiopvraha']+q['elatustuki']-q['puolison_verot']-q['verot']-q['pvhoito']+q['lapsilisa']
+        kateen=q['kokoelake']+p['puolison_tulot']+p['t']++q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimtuki']+q['ansiopvraha']+q['puolison_ansiopvraha']+q['elatustuki']-q['puolison_verot']-q['verot']-q['pvhoito']+q['lapsilisa']
         q['kateen']=kateen
         q['perhetulot_netto']=p['puolison_tulot']+p['t']-q['verot_ilman_etuuksia']-q['puolison_verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
         q['omattulot_netto']=p['t']-q['verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
