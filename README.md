@@ -2,3 +2,15 @@
 
 This module implements the Finnish earning-related social security as a python module. The aim is to enable analysis of 
 the effective tax rate in the scheme easily. 
+
+# Ansiosidonnainen sosiaaliturva Python-modulina
+
+Tämä kirjasto tarjoaa rutiinit sosiaaliturvan tasolaskelmiin. 
+
+```
+
+```
+
+## Colab
+
+There's also a [Colab notebook](REF) showing how to setup CoinRun.
