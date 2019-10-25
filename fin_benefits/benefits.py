@@ -539,17 +539,18 @@ class Benefits():
                     q['puolison_ansiopvraha'],_,_=self.ansiopaivaraha(p['puoliso_tyoton'],p['puolison_vakiintunutpalkka'],p['lapsia'],p['puolison_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['puolison_tyottomyyden_kesto'],p)
                 else: # perheessä 1 aikuinen
                     q['puolison_ansiopvraha']=0 
-        else: # eläkkeellä
+        else: # vanhuuseläkkeellä
             p['tyoton']=0
             q['isyyspaivaraha'],q['aitiyspaivaraha'],q['kotihoidontuki']=(0,0,0)
             q['elake_maksussa']=p['tyoelake']
             q['elake_tuleva']=0
             p['saa_ansiopaivarahaa']=0
+            # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
             if (p['aikuisia']>1):
                 q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=0)
             else:
                 q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=1)
-            #q['kokoelake']=self.laske_kokonaiselake(100,q['elake_maksussa'], 1)
+
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
             #oletetaan että myös puoliso eläkkeellä
             q['puolison_ansiopvraha']=0
@@ -836,24 +837,34 @@ class Benefits():
             maara = max(0,maara-np.maximum(0,(tyoelake-55.54))/2)
         
             return maara
+        elif ika>=62: # varhennus
+            if yksin>0:
+                maara=628.85
+            else:
+                maara=557.79
+            
+            maara = 0.048*(65-ika)
+            maara = max(0,maara-np.maximum(0,(tyoelake-55.54))/2)
+        
+            return maara
         else:
             return 0
         
-    def laske_takuuelake(self,ika,kansanelake,tyoelake):
+    def laske_takuuelake(self,ika,muuelake):
         if ika<65:
             return 0
         
-        if kansanelake+tyoelake<777.84:
-            elake=784.52-kansanelake-tyoelake
+        if muuelake<777.84:
+            elake=784.52-muuelake
         else:
             elake=0
         
         return elake
     
-    def laske_kokonaiselake(self,ika,tyoelake,yksin=1):
-        kansanelake=self.laske_kansanelake(ika,tyoelake,yksin)
-        takuuelake=self.laske_takuuelake(ika,kansanelake,tyoelake)
-        kokoelake=tyoelake+kansanelake+takuuelake
+    def laske_kokonaiselake(self,ika,muuelake,yksin=1):
+        #kansanelake=self.laske_kansanelake(ika,tyoelake,yksin)
+        takuuelake=self.laske_takuuelake(ika,muuelake)
+        kokoelake=takuuelake+muuelake
     
         return kokoelake
         
