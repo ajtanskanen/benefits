@@ -534,7 +534,7 @@ class Benefits():
             elif p['kotihoidontuella']>0:
                 q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],p['alle_kouluikaisia'])
                 q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
-            else:
+            elif p['tyoton']>0:
                 q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p)
                 if (p['aikuisia']>1): # perheessä 2 aikuista
                     q['puolison_ansiopvraha'],_,_=self.ansiopaivaraha(p['puoliso_tyoton'],p['puolison_vakiintunutpalkka'],p['lapsia'],p['puolison_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['puolison_tyottomyyden_kesto'],p)
