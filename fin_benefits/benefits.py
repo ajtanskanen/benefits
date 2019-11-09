@@ -21,7 +21,7 @@ class Benefits():
         self.set_year(self.vuosi)
         
     def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,\
-                             muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0):
+                             muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0,alennus=0):
 
         omavastuu=omavastuuprosentti*asumismenot
         menot=max(0,asumismenot-omavastuu)+muutmenot
@@ -66,6 +66,9 @@ class Benefits():
         #     verot2=palkkavero+verot-max(0,(bruttopalkka-etuoikeutettuosa))    
         #     tuki=max(0,tuki1+menot-muuttulot+verot2)    
         # end
+        if alennus>0:
+            tuki1=tuki1*(1-alennus)
+        
         tuki=max(0,tuki1+menot-max(0,omabruttopalkka-omaetuoikeutettuosa-omapalkkavero)\
                 -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero)-verot-muuttulot)    
         if tuki<10:
@@ -517,7 +520,7 @@ class Benefits():
         
         return tuki
 
-    def laske_tulot(self,p):
+    def laske_tulot(self,p,tt_alennus=0):
         q={} # tulokset tänne
         if p['elakkeella']<1: # ei eläkkeellä
             q['kokoelake']=0
