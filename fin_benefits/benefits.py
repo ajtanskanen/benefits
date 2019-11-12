@@ -451,6 +451,11 @@ class Benefits():
         rajat=np.array([17600,26400,43500,76100])/self.kk_jakaja
         pros=np.array([0.06,0.1725,0.2125,0.3125])
         return rajat,pros
+
+    def valtionvero_asteikko_perustulo(self):
+        rajat=np.array([0,9999999,9999999,9999999])/self.kk_jakaja
+        pros=np.array([0.40,0.40,0.40,0.40])
+        return rajat,pros
     
     def laske_valtionvero(self,tulot,p):
         rajat,pros=self.valtionvero_asteikko()
