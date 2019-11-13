@@ -11,6 +11,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
 	p['saa_ansiopaivarahaa']=1
 	p['t']=0
 	p['vakiintunutpalkka']=2500
+	p['perustulo']=0
 	elakkeella=0
 	elake=0
 	p['asumismenot_toimeentulo']=500
