@@ -452,11 +452,6 @@ class Benefits():
         pros=np.array([0.06,0.1725,0.2125,0.3125])
         return rajat,pros
 
-    def valtionvero_asteikko_perustulo(self):
-        rajat=np.array([0,9999999,9999999,9999999])/self.kk_jakaja
-        pros=np.array([0.40,0.40,0.40,0.40])
-        return rajat,pros
-    
     def laske_valtionvero(self,tulot,p):
         rajat,pros=self.valtionvero_asteikko()
 
@@ -534,8 +529,6 @@ class Benefits():
         
         
     def check_p(self,p):
-        if 'perustulo' not in p:
-            p['perustulo']=0
         if 'toimeentulotuki_vahennys' not in p:
             p['toimeentulotuki_vahennys']=0
         if 'opiskelija' not in p:
@@ -621,17 +614,10 @@ class Benefits():
         q['elatustuki']=0
         #elatustuki=laske_elatustuki(p['lapsia'],p['aikuisia)
         
-        if p['perustulo']>0 and p['elakkeella']<1:
-            q['perustulo']=self.laske_perustulo_Kelamalli(ansiopvraha_netto) # yhteensovitus
-            q['puolison_perustulo']=self.laske_perustulo_Kelamalli(puolison_ansiopvraha_netto) # yhteensovitus
-        else:
-            q['perustulo']=0
-            q['puolison_perustulo']=0        
-
-        if p['elakkeella']>0: # ei perustuloa
+        if p['elakkeella']>0:
             q['asumistuki']=self.elakkeensaajan_asumistuki(p['puolison_tulot']+p['t'],q['kokoelake']+q['puolison_ansiopvraha'],p['asumismenot_asumistuki'],p)
         else:
-            q['asumistuki']=self.asumistuki(p['puolison_tulot']+p['t'],q['ansiopvraha']+q['puolison_ansiopvraha']+q['perustulo']+q['puolison_perustulo'],p['asumismenot_asumistuki'],p)
+            q['asumistuki']=self.asumistuki(p['puolison_tulot']+p['t'],q['ansiopvraha']+q['puolison_ansiopvraha'],p['asumismenot_asumistuki'],p)
             
         if p['lapsia']>0:
             q['pvhoito']=self.paivahoitomenot(p['paivahoidossa'],p['puolison_tulot']+p['t']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['puolison_ansiopvraha'],p)
@@ -681,9 +667,6 @@ class Benefits():
             q['ansiopvraha_nettonetto']=0
             q['puolison_ansiopvraha_nettonetto']=0
 
-        q['perustulo_netto']=q['perustulo']
-        q['puolison_perustulo_netto']=q['puolison_perustulo']
-
         #(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0)
         q['toimtuki']=self.toimeentulotuki(p['t'],q['verot_ilman_etuuksia'],p['puolison_tulot'],q['puolison_verot_ilman_etuuksia'],\
             q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['puolison_ansiopvraha_netto']+q['asumistuki']+q['lapsilisa']+q['kokoelake_netto'],0,\
@@ -697,13 +680,15 @@ class Benefits():
         #    q['elatustuki']+q['ansiopvraha_netto']+q['puolison_ansiopvraha_netto']+q['asumistuki']+q['lapsilisa'],0,\
         #    p['asumismenot_toimeentulo'],q['pvhoito']))
 
-        kateen=q['perustulo_netto']+q['puolison_perustulo_netto']+q['opintotuki']+q['kokoelake']+p['puolison_tulot']+p['t']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimtuki']+q['ansiopvraha']+q['puolison_ansiopvraha']+q['elatustuki']-q['puolison_verot']-q['verot']-q['pvhoito']+q['lapsilisa']
+        kateen=q['opintotuki']+q['kokoelake']+p['puolison_tulot']+p['t']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimtuki']+q['ansiopvraha']+q['puolison_ansiopvraha']+q['elatustuki']-q['puolison_verot']-q['verot']-q['pvhoito']+q['lapsilisa']
         q['kateen']=kateen
         q['perhetulot_netto']=p['puolison_tulot']+p['t']-q['verot_ilman_etuuksia']-q['puolison_verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
         q['omattulot_netto']=p['t']-q['verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
         q['palkkatulot']=p['t']
         q['puolison_palkkatulot']=p['puolison_tulot']
         q['puolison_tulot_netto']=p['puolison_tulot'] # verot??
+        q['perustulo']=0
+        q['puolison_perustulo']=0
 
         return kateen,q
 
@@ -979,7 +964,6 @@ class Benefits():
         marg['ptel']=(-q1['ptel']+q2['ptel']-q1['puolison_ptel']+q2['puolison_ptel'])*100/dt
         marg['sairausvakuutus']=(-q1['sairausvakuutus']+q2['sairausvakuutus']-q1['puolison_sairausvakuutus']+q2['puolison_sairausvakuutus'])*100/dt
         marg['tyotvakmaksu']=(-q1['tyotvakmaksu']+q2['tyotvakmaksu']-q1['puolison_tyotvakmaksu']+q2['puolison_tyotvakmaksu'])*100/dt
-        marg['perustulo']=(+q1['perustulo_netto']-q2['perustulo_netto']+q1['puolison_perustulo_netto']-q2['puolison_perustulo_netto'])*100/dt 
         marg['puolison_verot']=(-q1['puolison_verot']+q2['puolison_verot'])*100/dt
     
         marg['sivukulut']=marg['tyotvakmaksu']+marg['sairausvakuutus']+marg['ptel'] # sisältyvät jo veroihin
@@ -1090,7 +1074,6 @@ class Benefits():
         ansiopvraha=np.zeros(max_salary+1)
         nettotulot=np.zeros(max_salary+1)
         lapsilisa=np.zeros(max_salary+1)
-        perustulo=np.zeros(max_salary+1)
         elake=np.zeros(max_salary+1)    
         elatustuki=np.zeros(max_salary+1)
         margasumistuki=np.zeros(max_salary+1)
@@ -1303,7 +1286,6 @@ class Benefits():
         ansiopvraha=np.zeros(max_salary+1)
         nettotulot=np.zeros(max_salary+1)
         lapsilisa=np.zeros(max_salary+1)
-        perustulo=np.zeros(max_salary+1)
         elatustuki=np.zeros(max_salary+1)
         margasumistuki=np.zeros(max_salary+1)
         margtoimeentulotuki=np.zeros(max_salary+1)
@@ -1465,5 +1447,3 @@ class Benefits():
         else:
             print('Vuoden {v} aineisto puuttuu'.format(v=vuosi))
     
-    def laske_perustulo_Kelamalli(self,tyomarkkinatuki):
-        return max(0,560.0-tyomarkkinatuki)
