@@ -555,6 +555,7 @@ class Benefits():
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
             #oletetaan että myös puoliso eläkkeellä
             q['puolison_ansiopvraha']=0
+            q['opintotuki']=0
         elif p['opiskelija']>0:
             q['kokoelake']=0
             q['elake_maksussa']=p['tyoelake']
