@@ -3,7 +3,7 @@ import gym
 from gym import spaces, logger, utils, error
 from gym.utils import seeding
 import numpy as np
-import fin_benefits
+from .benefits import Benefits
 import random
 
 class BenefitsEK(Benefits):
@@ -15,7 +15,7 @@ class BenefitsEK(Benefits):
         AT
 
     """
-        def __init__(self,**kwargs):
+    def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.muuta_ansiopv_ylaraja=True
         self.ansiopvraha_kesto400=350/(12*21.5) # lyhennetty 50 pv
