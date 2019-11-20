@@ -1,4 +1,5 @@
 __pycache__/*
-finbenefits/__pycache__/*
-.ipynb_checkpoints/*
 *.pyc
+fin_benefits/__pycache__/*
+.ipynb_checkpoints/*
+fin_benefits.egg-info/*

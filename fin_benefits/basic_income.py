@@ -6,7 +6,7 @@ kokonaan.
 import numpy as np
 from .parameters import perheparametrit
 import matplotlib.pyplot as plt
-from fin_benefits import Benefits
+from .benefits import Benefits
 
 class BasicIncomeBenefits(Benefits):
     """

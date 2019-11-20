@@ -3,7 +3,7 @@ import gym
 from gym import spaces, logger, utils, error
 from gym.utils import seeding
 import numpy as np
-from fin_benefits import Benefits
+from .benefits import Benefits
 import random
 
 class BenefitsEK(Benefits):
