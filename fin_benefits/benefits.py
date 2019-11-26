@@ -669,9 +669,12 @@ class Benefits():
             q['puolison_ansiopvraha_nettonetto']=0
 
         #(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0)
-        q['toimtuki']=self.toimeentulotuki(p['t'],q['verot_ilman_etuuksia'],p['puolison_tulot'],q['puolison_verot_ilman_etuuksia'],\
-            q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['puolison_ansiopvraha_netto']+q['asumistuki']+q['lapsilisa']+q['kokoelake_netto'],0,\
-            p['asumismenot_toimeentulo'],q['pvhoito'],p)
+        if p['opiskelija']>0:
+            q['toimtuki']=0
+        else:
+            q['toimtuki']=self.toimeentulotuki(p['t'],q['verot_ilman_etuuksia'],p['puolison_tulot'],q['puolison_verot_ilman_etuuksia'],\
+                q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['puolison_ansiopvraha_netto']+q['asumistuki']+q['lapsilisa']+q['kokoelake_netto'],0,\
+                p['asumismenot_toimeentulo'],q['pvhoito'],p)
         #except:   
         #    print('error in toimtuki:') 
         #    print((p['t'],q['verot_ilman_etuuksia'],p['puolison_tulot'],q['puolison_verot_ilman_etuuksia'],\
