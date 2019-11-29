@@ -1,5 +1,10 @@
 """
-Etuuslajien funktioita
+
+    benefits
+    
+    implements social security and social insurance benefits in the Finnish social security schemes
+
+
 """
 
 import numpy as np
@@ -20,7 +25,7 @@ class Benefits():
         self.vuosi=2018
         self.set_year(self.vuosi)
         
-    def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,\
+    def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,
                              muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0,alennus=0):
 
         omavastuu=omavastuuprosentti*asumismenot
@@ -1133,7 +1138,7 @@ class Benefits():
                 tva[t]=0
                 
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,\
+        axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,
             labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'))
         axs.plot(eff)
         #axs.plot(margyht,label='Vaihtoehto2')
@@ -1148,7 +1153,7 @@ class Benefits():
         plt.show()
         
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,\
+        axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,
             labels=('Nettopalkka','Asumistuki','Toimeentulotuki','Työttömyysturva','Lapsilisä','Eläke'))
         axs.plot(netto)
         axs.set_xlabel('Palkka (e/kk)')
@@ -1160,7 +1165,7 @@ class Benefits():
         plt.show()
 
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,\
+        axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,
             labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'))
         axs.plot(tva,label='Vaihtoehto')
         #axs.plot(tva_yht,label='Vaihtoehto2')
@@ -1234,7 +1239,7 @@ class Benefits():
             
                 
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,margvaltionvero,margkunnallisvero,margptel,margsairausvakuutus,margtyotvakmaksu,margpuolisonverot,\
+        axs.stackplot(palkka,margvaltionvero,margkunnallisvero,margptel,margsairausvakuutus,margtyotvakmaksu,margpuolisonverot,
             labels=('Valtionvero','Kunnallisvero','PTEL','sairausvakuutus','työttömyysvakuutusmaksu','puolison verot'))
         axs.plot(margverot,label='Yht')
         #axs.plot(margyht,label='Vaihtoehto2')
@@ -1249,7 +1254,7 @@ class Benefits():
         plt.show()
         
         fig,axs = plt.subplots()
-        axs.stackplot(palkka,tyotvakmaksu,sairausvakuutus,ptel,kunnallisvero,valtionvero,puolisonverot,\
+        axs.stackplot(palkka,tyotvakmaksu,sairausvakuutus,ptel,kunnallisvero,valtionvero,puolisonverot,
             labels=('tyotvakmaksu','sairausvakuutus','ptel','kunnallisvero','valtionvero','puolisonverot'))
         #axs.plot(netto)
         axs.set_xlabel('Palkka (e/kk)')
