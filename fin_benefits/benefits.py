@@ -276,13 +276,13 @@ class Benefits():
         tulot=palkkatulot+muuttulot+elaketulot
     
         # vähennetään sosiaaliturvamaksut
-        if palkkatulot>self.elakemaksu_alaraja:
+        if palkkatulot>self.elakemaksu_alaraja: # FIXME lisää ikätarkastus
             ptel=(palkkatulot-self.elakemaksu_alaraja)*self.tyontekijan_maksu
         else:
             ptel=0
 
         tyotvakmaksu=palkkatulot*self.tyottomyysvakuutusmaksu
-        if palkkatulot>self.paivarahamaksu_raja:
+        if palkkatulot>self.paivarahamaksu_raja: # FIXME lisää ikätarkastus
             sairausvakuutus=palkkatulot*self.paivarahamaksu_pros
         else:
             sairausvakuutus=0
