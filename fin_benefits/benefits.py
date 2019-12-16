@@ -526,7 +526,11 @@ class Benefits():
         return tuki
         
     def opintoraha(self,palkka,p):
-        tuki=250.28
+        if p['lapsia']>0:
+            tuki=350.28+650 # opintolaina mukana
+        else:
+            tuki=250.28+650 # opintolainamukana
+            
         if palkka>667+222/12: # oletetaan että täysiaikainen opiskelija
             tuki=0
             
