@@ -1284,6 +1284,7 @@ class Benefits():
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
         eff=np.zeros(max_salary+1)
+        elake=np.zeros(max_salary+1)
         asumistuki=np.zeros(max_salary+1)
         toimeentulotuki=np.zeros(max_salary+1)
         kokoelake=np.zeros(max_salary+1)
@@ -1314,12 +1315,12 @@ class Benefits():
         p2=p.copy()
 
         p2['t']=0 # palkka
-        n0,q0=self.laske_tulot(p2,elake=0)
+        n0,q0=self.laske_tulot(p2) #,elake=0)
         for t in range(0,max_salary+1):
             p2['t']=t # palkka
-            n1,q1=self.laske_tulot(p2,elake=0)
+            n1,q1=self.laske_tulot(p2) #,,elake=0)
             p2['t']=t+dt # palkka
-            n2,q2=self.laske_tulot(p2,elake=0)
+            n2,q2=self.laske_tulot(p2) #,,elake=0)
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
             netto[t]=n1
             palkka[t]=t
@@ -1355,7 +1356,8 @@ class Benefits():
                 
         if type=='eff':
             #fig,axs = plt.subplots()
-            axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'))
+            axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,
+                labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'))
             axs.plot(eff)
             #axs.plot(margyht,label='Vaihtoehto2')
             #axs.plot(margyht2,label='Vaihtoehto3')
