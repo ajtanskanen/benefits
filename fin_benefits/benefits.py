@@ -757,6 +757,38 @@ class Benefits():
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
     
         return tuki
+
+        
+    def asumistuki2020(self,palkkatulot,muuttulot,vuokra,p):
+        # Ruokakunnan koko
+        # henkilöä    I kuntaryhmä,
+        # e/kk    II kuntaryhmä,
+        # e/kk    III kuntaryhmä,
+        # e/kk    IIII kuntaryhmä,
+        # e/kk
+        # 1    508    492    411    362
+        # 2    735    706    600    527
+        # 3    937    890    761    675
+        # 4    1095    1038    901    804
+        # + lisähenkilöä kohden, e/kk
+        # 
+        # 137    130    123    118
+        # enimmaismenot kuntaryhmittain kun hloita 1-4
+        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
+        max_lisa=np.array([137, 130, 123, 118])
+        # kuntaryhma=3
+
+        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+
+        prosentti=0.8 # vastaa 80 %
+        suojaosa=300*p['aikuisia']
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+        if perusomavastuu<10:
+            perusomavastuu=0
+            
+        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+    
+        return tuki
         
 
     def elakkeensaajan_asumistuki(self,palkkatulot,muuttulot,vuokra,p):
@@ -1284,6 +1316,7 @@ class Benefits():
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
         eff=np.zeros(max_salary+1)
+        elake=np.zeros(max_salary+1)
         asumistuki=np.zeros(max_salary+1)
         toimeentulotuki=np.zeros(max_salary+1)
         kokoelake=np.zeros(max_salary+1)
@@ -1314,12 +1347,12 @@ class Benefits():
         p2=p.copy()
 
         p2['t']=0 # palkka
-        n0,q0=self.laske_tulot(p2,elake=0)
+        n0,q0=self.laske_tulot(p2) #,elake=0)
         for t in range(0,max_salary+1):
             p2['t']=t # palkka
-            n1,q1=self.laske_tulot(p2,elake=0)
+            n1,q1=self.laske_tulot(p2) #,,elake=0)
             p2['t']=t+dt # palkka
-            n2,q2=self.laske_tulot(p2,elake=0)
+            n2,q2=self.laske_tulot(p2) #,,elake=0)
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
             netto[t]=n1
             palkka[t]=t
@@ -1355,7 +1388,8 @@ class Benefits():
                 
         if type=='eff':
             #fig,axs = plt.subplots()
-            axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'))
+            axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,
+                labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'))
             axs.plot(eff)
             #axs.plot(margyht,label='Vaihtoehto2')
             #axs.plot(margyht2,label='Vaihtoehto3')
@@ -1451,3 +1485,4 @@ class Benefits():
         else:
             print('Vuoden {v} aineisto puuttuu'.format(v=vuosi))
     
+5
