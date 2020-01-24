@@ -138,12 +138,16 @@ class Benefits():
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
                 sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
                 taite=3078.60    
+            elif self.vuosi==2020:
+                lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
+                sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
+                taite=3078.60    
             else:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
                 sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
                 taite=3078.60    
                             
-            if (saa_ansiopaivarahaa>0) & (kesto<400.0):
+            if (saa_ansiopaivarahaa>0): # & (kesto<400.0): # ei keston tarkastusta!
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
                 vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
         
