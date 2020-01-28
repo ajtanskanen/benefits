@@ -139,9 +139,13 @@ class Benefits():
                 sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
                 taite=3078.60    
             elif self.vuosi==2020:
-                lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
-                sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
-                taite=3078.60    
+                lapsikorotus=np.array([0,5.28,7.76,10.00])*21.5    
+                sotumaksu=0.0414     # 2015 0.0428 2016 0.0460
+                taite=3197.70    
+            elif self.vuosi==2021:
+                lapsikorotus=np.array([0,5.28,7.76,10.00])*21.5    
+                sotumaksu=0.0414     # 2015 0.0428 2016 0.0460
+                taite=3197.70    
             else:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
                 sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
@@ -172,7 +176,7 @@ class Benefits():
 
                 tuki=ansiopaivarahamaara    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)    
-                tuki=max(perus,tuki)     # voi tulla vastaan pienillä tasoilla
+                tuki=max(perus,tuki)     # voi tulla vastaan pienillä tasoilla4
             else:
                 ansiopaivarahamaara=0    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)    
@@ -207,6 +211,13 @@ class Benefits():
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
+    def elaketulovahennys2020(self,elaketulot,tulot):
+        max_elaketulovahennys_valtio=11590/self.kk_jakaja
+        elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
+        max_elaketulovahennys_kunnallis=9050/self.kk_jakaja
+        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
+        return elaketulovahennys_valtio,elaketulovahennys_kunnallis
+
     def tyotulovahennys2018(self):
         max_tyotulovahennys=1540/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja
@@ -217,6 +228,12 @@ class Benefits():
         max_tyotulovahennys=1630/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja
         ttulopros=np.array([0.120,0.0172,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2020(self):
+        max_tyotulovahennys=1770/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
+        ttulopros=np.array([0.122,0.0184,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def ansiotulovahennys2018(self):
@@ -231,10 +248,32 @@ class Benefits():
         ansvah=np.array([0.51,0.28,0.045])
         return rajat,maxvahennys,ansvah
         
+    def ansiotulovahennys2020(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+        
     def veroparam2018(self):
         self.kunnallisvero_pros=0.1984 # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0190 #
         self.tyontekijan_maksu=0.0635 # PTEL
+    
+        # sairausvakuutus ??
+        self.sairaanhoitomaksu=0.0
+        #sairaanhoitomaksu_etuus=0.0147 # muut
+        
+        self.paivarahamaksu_pros=0.0153 # palkka
+        self.paivarahamaksu_raja=14020/self.kk_jakaja    
+        
+        self.elakemaksu_alaraja=58.27
+        self.tulonhankkimisvahennys=750/self.kk_jakaja
+        
+    def veroparam2020(self):
+        self.kunnallisvero_pros=0.1984 # Viitamäen raportista
+        self.tyottomyysvakuutusmaksu=0.0125 #
+        self.tyontekijan_maksu=0.0715 # PTEL
+        self.tyontekijan_maksu_52=0.0865 # PTEL
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
@@ -267,6 +306,11 @@ class Benefits():
     def perusvahennys2019(self):
         perusvahennys_pros=0.18
         max_perusvahennys=3305/self.kk_jakaja
+        return perusvahennys_pros,max_perusvahennys
+    
+    def perusvahennys2020(self):
+        perusvahennys_pros=0.18
+        max_perusvahennys=3540/self.kk_jakaja
         return perusvahennys_pros,max_perusvahennys
     
     def verotus(self,palkkatulot,muuttulot,elaketulot,lapsia,p):
