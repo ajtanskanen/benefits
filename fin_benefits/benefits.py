@@ -76,6 +76,10 @@ class Benefits():
         
         tuki=max(0,tuki1+menot-max(0,omabruttopalkka-omaetuoikeutettuosa-omapalkkavero)\
                 -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero)-verot-muuttulot)
+                
+        if p['toimeentulotuki_vahennys']>0: # vähennetään 20%
+            tuki=tuki*0.8
+                
         if tuki<10:
             tuki=0    
             
