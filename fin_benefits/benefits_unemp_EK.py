@@ -32,7 +32,7 @@ class BenefitsEK(Benefits):
         else:
             return super().paivahoitomenot(hoidossa,tulot,p)
     
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
+    def ansiopaivaraha2018(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
         if tyoton>0:
             # porrastetaan ansio-osa keston mukaan
             if self.porrastus:
@@ -48,7 +48,7 @@ class BenefitsEK(Benefits):
             kerroin=0.0
 
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
-        return super().ansiopaivaraha(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin)
+        return super().ansiopaivaraha2018(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin)
 
     # yläraja 80% ansionalenemasta
     def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka):

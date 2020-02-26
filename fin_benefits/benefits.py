@@ -126,7 +126,7 @@ class Benefits():
             
         return ansiopaivarahamaara   
 
-    def ansiopaivaraha2018(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,kesto_400=True):
+    def ansiopaivaraha2018(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
     

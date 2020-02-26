@@ -93,7 +93,7 @@ class Benefits2020(Benefits):
     # yläraja 80% ansionalenemasta
     def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka):
         #if self.muuta_ansiopv_ylaraja:
-        return min(ansiopaivarahamaara,0.8*max(0,vakiintunutpalkka-tyotaikaisettulot))   
+        return min(ansiopaivarahamaara,0.4*max(0,vakiintunutpalkka-tyotaikaisettulot))   
         #else:
         #return super().ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)        
      
