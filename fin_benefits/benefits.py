@@ -175,8 +175,6 @@ class Benefits():
                 vahentavattulo=max(0,tyotaikaisettulot-suojaosa)    
                 ansiopaivarahamaara=max(0,tuki2-0.5*vahentavattulo)  
                 ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
-                #if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
-                #    ansiopaivarahamaara=max(0,vakpalkka-tyotaikaisettulot)    
 
                 tuki=ansiopaivarahamaara    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)    

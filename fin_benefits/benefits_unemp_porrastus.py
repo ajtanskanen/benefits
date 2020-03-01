@@ -9,7 +9,7 @@ import random
 class BenefitsPorrastus(Benefits):
     """
     Description:
-        Changes to unemployment benefits in the EK model
+        Reduces unemployment benefit in steps
 
     Source:
         AT
@@ -23,16 +23,18 @@ class BenefitsPorrastus(Benefits):
         if tyoton>0:
             # porrastetaan ansio-osa keston mukaan
             if self.porrastus:
-                if kesto>=6*21.5:
-                    kerroin=0.85
-                elif kesto>=3*21.5:
-                    kerroin=0.95
+                if kesto<3*21.5:
+                    kerroin=1.3 # 1.05
+                elif kesto<6*21.5:
+                    kerroin=1.0 # 0.95
                 else:
-                    kerroin=1.05
+                    kerroin=1.0 # 0.85
             else:
                 kerroin=1.0
         else:
             kerroin=0.0
+            
+        #print('kesto {} kerroin {}'.format(kesto,kerroin))
 
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
         return super().ansiopaivaraha2018(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin)
