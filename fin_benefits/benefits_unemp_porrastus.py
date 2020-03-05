@@ -24,11 +24,11 @@ class BenefitsPorrastus(Benefits):
             # porrastetaan ansio-osa keston mukaan
             if self.porrastus:
                 if kesto<3*21.5:
-                    kerroin=1.3 # 1.05
+                    kerroin=1.05 # 1.05
                 elif kesto<6*21.5:
-                    kerroin=1.0 # 0.95
+                    kerroin=0.95 # 0.95
                 else:
-                    kerroin=1.0 # 0.85
+                    kerroin=0.85 # 0.85
             else:
                 kerroin=1.0
         else:
