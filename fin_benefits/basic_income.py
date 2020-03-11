@@ -168,6 +168,88 @@ class BasicIncomeBenefits(Benefits):
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
                tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu
 
+    def tyotulovahennys2018(self):
+        max_tyotulovahennys=0/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja
+        ttulopros=np.array([0.120,0.0165,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2019(self):
+        max_tyotulovahennys=0/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja
+        ttulopros=np.array([0.120,0.0172,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2020(self):
+        max_tyotulovahennys=0/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
+        ttulopros=np.array([0.122,0.0184,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def ansiotulovahennys2018(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=0/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+        
+    def ansiotulovahennys2019(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=0/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+        
+    def ansiotulovahennys2020(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=0/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+
+    def perusvahennys2018(self):
+        perusvahennys_pros=0.18
+        max_perusvahennys=0/self.kk_jakaja
+        return perusvahennys_pros,max_perusvahennys
+    
+    def perusvahennys2019(self):
+        perusvahennys_pros=0.18
+        max_perusvahennys=0/self.kk_jakaja
+        return perusvahennys_pros,max_perusvahennys
+    
+    def perusvahennys2020(self):
+        perusvahennys_pros=0.18
+        max_perusvahennys=0/self.kk_jakaja
+        return perusvahennys_pros,max_perusvahennys
+
+    def veroparam2018(self):
+        self.kunnallisvero_pros=0.0
+        self.tyottomyysvakuutusmaksu=0.0190 #
+        self.tyontekijan_maksu=0.0635 # PTEL
+    
+        # sairausvakuutus ??
+        self.sairaanhoitomaksu=0.0
+        #sairaanhoitomaksu_etuus=0.0147 # muut
+        
+        self.paivarahamaksu_pros=0.0153 # palkka
+        self.paivarahamaksu_raja=14020/self.kk_jakaja    
+        
+        self.elakemaksu_alaraja=58.27
+        self.tulonhankkimisvahennys=750/self.kk_jakaja
+        
+    def veroparam2020(self):
+        self.kunnallisvero_pros=0.0
+        self.tyottomyysvakuutusmaksu=0.0125 #
+        self.tyontekijan_maksu=0.0715 # PTEL
+        self.tyontekijan_maksu_52=0.0865 # PTEL
+    
+        # sairausvakuutus ??
+        self.sairaanhoitomaksu=0.0
+        #sairaanhoitomaksu_etuus=0.0147 # muut
+        
+        self.paivarahamaksu_pros=0.0153 # palkka
+        self.paivarahamaksu_raja=14020/self.kk_jakaja    
+        
+        self.elakemaksu_alaraja=58.27
+        self.tulonhankkimisvahennys=750/self.kk_jakaja
+        
     def kotihoidontuki(self,lapsia,allekolmev,alle_kouluikaisia):
         # korvataan perustulolla
         return 0
@@ -456,4 +538,4 @@ class BasicIncomeBenefits(Benefits):
         return 0
 
     def peruspaivaraha2018(self,lapsia):
-        return 0
+        return 0 # pitäisikö olla sama kuin perustulon? Tällöin ansiosidonnaisena maksettaisiin vain ylimenevä osa
