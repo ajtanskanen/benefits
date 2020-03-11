@@ -21,7 +21,7 @@ class Benefits():
 
     """
     
-    def __init__(self):
+    def __init__(self,**kwargs):
         self.vuosi=2018
         self.set_year(self.vuosi)
         
