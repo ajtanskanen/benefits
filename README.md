@@ -5,15 +5,11 @@ the effective tax rate in the scheme easily.
 
 # Ansiosidonnainen sosiaaliturva Python-modulina
 
-Tämä kirjasto tarjoaa rutiinit sosiaaliturvan tasolaskelmiin. 
+Tämä Python-kirjasto tarjoaa rutiinit sosiaaliturvan tasolaskelmiin. Kirjastossa on toteutettu
+myös Suomen verotus, ja sen avulla on helppo laskea efektiivisiä marginaaliveroasteita ja
+työllistymisveroasteita esimerkkitapauksille.
 
 ```
-
-```
-
-## Colab
-
-There's also a [Colab notebook](REF) showing how to setup CoinRun.
 
 
 ## Viittaukset
