@@ -1,5 +1,5 @@
 from .benefits import Benefits
-from .parameters import perheparametrit, tee_selite
+from .parameters import perheparametrit, tee_selite, print_examples
 from .basic_income import BasicIncomeBenefits
 from .benefits_unemp_EK import BenefitsEK
 from .benefits_unemp_porrastus import BenefitsPorrastus

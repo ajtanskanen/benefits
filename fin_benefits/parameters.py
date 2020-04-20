@@ -430,7 +430,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0  
-    elif perhetyyppi==50: # opiskelija, asuu yksi              
+    elif perhetyyppi==43: # opiskelija, asuu yksi              
         lapsia=0    
         paivahoidossa=0
         lapsia_kotihoidontuella=0    
@@ -513,11 +513,19 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     return p,selite
 
 def tee_selite(p):
-    selite="Perhe, jossa {aikuisia} aikuista".format(aikuisia=p['aikuisia'])
+    if p['aikuisia']>1:
+        selite="Perhe, jossa {aikuisia} aikuista".format(aikuisia=p['aikuisia'])
+    elif p['aikuisia']>0:
+        selite="Perhe, jossa {aikuisia} aikuinen".format(aikuisia=p['aikuisia'])
+    else:
+        selite="Perhe, jossa ei aikuisia"
+        
     if p['lapsia']>0:
         selite+=" ja {lapsia} lasta.".format(lapsia=p['lapsia'])
         if p['paivahoidossa']>0:
             selite+=" Lapsista {paiva} on päivähoidossa.".format(paiva=p['paivahoidossa'])
+        if p['lapsia_kotihoidontuella']>0:
+            selite+=" Lapsista {paiva} kotihoidossa.".format(paiva=p['lapsia_kotihoidontuella'])
         if p['alle3v']>0:
             selite+=" Lapsista {alle3v}".format(alle3v=p['alle3v'])
         selite
@@ -554,3 +562,8 @@ def tee_selite(p):
     selite+=" Asumismenot asumistuessa {a} e/kk".format(a=p['asumismenot_toimeentulo'])
             
     return selite
+
+def print_examples():
+    for k in range(44):
+        p,selite=perheparametrit(perhetyyppi=k,tulosta=False)
+        print('Tapaus {}:\n{}\n'.format(k,selite))  
