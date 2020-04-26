@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='fin_benefits',
-    version='0.9.0',
+    version='1.0.0',
     #scripts=['fin_benefits/benefits.py'],   
 	install_requires=['numpy'],#And any other dependencies required
 	packages=setuptools.find_packages(),
