@@ -10,6 +10,7 @@
 import numpy as np
 from .parameters import perheparametrit
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 class Benefits():
     """
@@ -728,6 +729,8 @@ class Benefits():
             p['opiskelija']=0
         if 'elakkeella' not in p:
             p['elakkeella']=0
+        if 'tyoelake' not in p:
+            p['tyoelake']=0
         if 'sairauspaivarahalla' not in p:
             p['sairauspaivarahalla']=0
         return p
@@ -1526,7 +1529,8 @@ class Benefits():
     
         return tulot,marg
     
-    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True):
+    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,
+            dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -1596,7 +1600,11 @@ class Benefits():
         
         return netto,eff,tva
         
-    def laske_ja_plottaa_marginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,ret=False):
+    def laske_ja_plottaa_marginaalit(self,p=None,min_salary=0,max_salary=6000,
+                basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
+                otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,ret=False,
+                plot_tva=True,plot_eff=True,plot_netto=True,figname=None,grayscale=False,
+                incl_perustulo=True,incl_elake=True):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -1627,6 +1635,14 @@ class Benefits():
         tva_perustulo=np.zeros(max_salary+1)        
         tva_yht=np.zeros(max_salary+1)        
         tva_yht2=np.zeros(max_salary+1)        
+        
+        if grayscale:
+            plt.style.use('grayscale')
+            plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
+            pal=sns.dark_palette("darkgray", 6, reverse=True)
+            reverse=True
+        else:
+            pal=sns.color_palette()
         
         if p is None:
             p=self.get_default_parameter()
@@ -1676,47 +1692,103 @@ class Benefits():
             else:
                 tva[t]=0
                 
-        fig,axs = plt.subplots()
-        axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margperustulo,
-            labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke','Perustulo'))
-        axs.plot(eff)
-        #axs.plot(margyht,label='Vaihtoehto2')
-        #axs.plot(margyht2,label='Vaihtoehto3')
-        axs.set_xlabel('Palkka (e/kk)')
-        axs.set_ylabel('Eff.marginaalivero (%)')
-        axs.grid(True)
-        axs.set_xlim(0, max_salary)
-        axs.set_ylim(0, 120)
-        if selite:
-            axs.legend(loc='upper right')
-        plt.show()
+        if plot_eff:
+            sns.set()
+            fig,axs = plt.subplots()
+            if incl_perustulo:
+                axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margperustulo,
+                    labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke','Perustulo'),
+                    colors=pal)
+            else:
+                if incl_elake:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,
+                        labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,
+                        labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito'),
+                        colors=pal)
+                        
+            #axs.plot(eff)
+            #axs.plot(margyht,label='Vaihtoehto2')
+            #axs.plot(margyht2,label='Vaihtoehto3')
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Eff.marginaalivero (%)')
+            axs.grid(True,color='lightgray')
+            axs.set_xlim(0, max_salary)
+            axs.set_ylim(0, 120)
+            if selite:
+                #axs.legend(loc='upper right')
+                handles, labels = axs.get_legend_handles_labels()
+                lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
+            if figname is not None:
+                plt.savefig(figname+'_eff.png')
+            plt.show()
         
-        fig,axs = plt.subplots()
-        axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,perustulo,
-            labels=('Nettopalkka','Asumistuki','Toimeentulotuki','Työttömyysturva','Lapsilisä','Eläke','Perustulo'))
-        axs.plot(netto)
-        axs.set_xlabel('Palkka (e/kk)')
-        axs.set_ylabel('Käteen (e/kk)')
-        axs.grid(True)
-        axs.set_xlim(0, max_salary)
-        if selite:        
-            axs.legend(loc='lower right')
-        plt.show()
+        if plot_netto:
+            fig,axs = plt.subplots()
+            sns.set()
+            if incl_perustulo:
+                axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,perustulo,
+                    labels=('Nettopalkka','Asumistuki','Toimeentulotuki','Työttömyysturva','Lapsilisä','Eläke','Perustulo'),
+                    colors=pal)
+            else:
+                if incl_elake:
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,
+                        labels=('Nettopalkka','Asumistuki','Toimeentulotuki','Työttömyysturva','Lapsilisä','Eläke',),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,
+                        labels=('Nettopalkka','Asumistuki','Toimeentulotuki','Työttömyysturva','Lapsilisä'),
+                        colors=pal)
+            
+            #axs.plot(netto)
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Käteen (e/kk)')
+            axs.grid(True,color='lightgray')
+            axs.set_xlim(0, max_salary)
+            if selite:        
+                #axs.legend(loc='lower right')
+                handles, labels = axs.get_legend_handles_labels()
+                lgd=axs.legend(handles[::-1], labels[::-1], loc='lower right')
+                
+            if figname is not None:
+                plt.savefig(figname+'_netto.png')
+            plt.show()
 
-        fig,axs = plt.subplots()
-        axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_perustulo,
-            labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke','Perustulo'))
-        axs.plot(tva,label='Vaihtoehto')
-        #axs.plot(tva_yht,label='Vaihtoehto2')
-        #axs.plot(tva_yht2,label='Vaihtoehto3')
-        axs.set_xlabel('Palkka (e/kk)')
-        axs.set_ylabel('Työllistymisveroaste (e/kk)')
-        axs.grid(True)
-        axs.set_xlim(0, max_salary)
-        axs.set_ylim(0, 120)
-        if selite:
-            axs.legend(loc='upper right')
-        plt.show()
+        if plot_tva:
+            fig,axs = plt.subplots()
+            sns.set()
+            if incl_perustulo:
+                axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_perustulo,
+                    labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke','Perustulo'),
+                    colors=pal)
+            else:
+                if incl_elake:
+                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,
+                        labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke'),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,
+                        labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito'),
+                        colors=pal)
+
+            axs.plot(tva,label='Vaihtoehto')
+            #axs.plot(tva_yht,label='Vaihtoehto2')
+            #axs.plot(tva_yht2,label='Vaihtoehto3')
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Työllistymisveroaste (e/kk)')
+            axs.grid(True,color='lightgray')
+            axs.set_xlim(0, max_salary)
+            axs.set_ylim(0, 120)
+            if selite:
+                #axs.legend(loc='upper right')
+                handles, labels = axs.get_legend_handles_labels()
+                lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
+                
+            if figname is not None:
+                plt.savefig(figname+'_tva.png')
+            plt.show()
                
         if ret: 
             return netto,eff,tva        

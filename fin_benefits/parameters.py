@@ -26,12 +26,12 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['alle3v']=0
     p['ansiopvrahan_suojaosa']=1
     p['ansiopvraha_lapsikorotus']=1
-    p['puolison_tulot']=0
+    p['puoliso_tulot']=0
     p['puoliso_tyoton']=0  
     p['puoliso_vakiintunutpalkka']=0  
     p['puoliso_saa_ansiopaivarahaa']=0
-    p['puolison_tulot']=0
-    p['puolison_tyottomyyden_kesto']=100
+    p['puoliso_tulot']=0
+    p['puoliso_tyottomyyden_kesto']=100
     p['tyottomyyden_kesto']=10
     
     if perhetyyppi==1: # 1+0, töissä
@@ -491,8 +491,8 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['vakiintunutpalkka']=vakiintunutpalkka
     p['tyoton']=tyoton
     p['saa_ansiopaivarahaa']=saa_ansiopaivarahaa
-    p['puolison_tulot']=puolison_tulot
-    p['puolison_vakiintunutpalkka']=puolison_vakiintunutpalkka
+    p['puoliso_tulot']=puolison_tulot
+    p['puoliso_vakiintunutpalkka']=puolison_vakiintunutpalkka
     p['puoliso_tyoton']=puoliso_tyoton
     p['puoliso_saa_ansiopaivarahaa']=puoliso_saa_ansiopaivarahaa
     p['asumismenot_toimeentulo']=asumismenot_toimeentulo
@@ -500,6 +500,13 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['asumismenot_yhdistetty']=asumismenot_yhdistetty
     p['lapsia_kotihoidontuella']=lapsia_kotihoidontuella
     p['alle3v']=alle3v
+    p['puoliso_elakkeella']=0
+    p['puoliso_opiskelija']=0
+    p['puoliso_tyoelake']=0
+    p['puoliso_aitiysvapaalla']=0
+    p['puoliso_isyysvapaalla']=0
+    p['puoliso_sairauspaivarahalla']=0
+    p['puoliso_kotihoidontuella']=0
     
     #return lapsia,paivahoidossa,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa, \
     #puolison_tulot,puolison_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa, \
@@ -550,12 +557,12 @@ def tee_selite(p):
         if p['puoliso_tyoton']>0:
             selite+=", puoliso työtön"
             if p['puoliso_saa_ansiopaivarahaa']>0:
-                selite+=" (ansiopaivaraha, vakiintunut ansio {v} e/kk).".format(v=p['puolison_vakiintunutpalkka'])
+                selite+=" (ansiopaivaraha, vakiintunut ansio {v} e/kk).".format(v=p['puoliso_vakiintunutpalkka'])
             else:
                 selite+=" (työmarkkinatuki)."
         else:
             selite+=", puoliso töissä"
-            selite+=" (palkka {p} e/kk).".format(p=p['puolison_tulot'])
+            selite+=" (palkka {p} e/kk).".format(p=p['puoliso_tulot'])
     else:
         selite+=", ei puolisoa."
         
