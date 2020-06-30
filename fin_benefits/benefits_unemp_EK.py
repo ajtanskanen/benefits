@@ -32,7 +32,7 @@ class BenefitsEK(Benefits):
         else:
             return super().paivahoitomenot(hoidossa,tulot,p)
     
-    def ansiopaivaraha2018(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
         if tyoton>0:
             # porrastetaan ansio-osa keston mukaan
             if self.porrastus:

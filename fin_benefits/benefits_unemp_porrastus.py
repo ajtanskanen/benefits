@@ -48,7 +48,7 @@ class BenefitsPorrastus(Benefits):
                 if value is not None:
                     self.porrasta_2porras=value        
     
-    def ansiopaivaraha2018(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
         if tyoton>0:
             # porrastetaan ansio-osa keston mukaan
             if self.porrastus:
@@ -77,4 +77,4 @@ class BenefitsPorrastus(Benefits):
         #print('kesto {} kerroin {}'.format(kesto,kerroin))
 
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
-        return super().ansiopaivaraha2018(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin)
+        return super().ansiopaivaraha(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin)

@@ -25,7 +25,7 @@ class Benefits2020(Benefits):
         #self.muuta_ansiopv_ylaraja=True
         #self.muuta_pvhoito=True                  
 
-    def ansiopaivaraha2018(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,kesto_400=True):
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,kesto_400=True):
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
     

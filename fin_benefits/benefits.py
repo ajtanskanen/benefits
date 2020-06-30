@@ -222,7 +222,7 @@ class Benefits():
 
                 tuki2=tuki2+lapsikorotus[min(lapsia,3)]    
                 tuki2=tuki2*ansiokerroin # mahdollinen porrastus tehdään tämän avulla
-                suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa)    
+                suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa,p)    
         
                 perus=self.peruspaivaraha(lapsia)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
                 if tuki2>.9*vakpalkka:
@@ -233,11 +233,11 @@ class Benefits():
                 ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
 
                 tuki=ansiopaivarahamaara    
-                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)    
+                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
                 tuki=max(perus,tuki)     # voi tulla vastaan pienillä tasoilla4
             else:
                 ansiopaivarahamaara=0    
-                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)    
+                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
                 tuki=perus    
         else:
             perus=0    
@@ -246,8 +246,8 @@ class Benefits():
 
         return tuki,ansiopaivarahamaara,perus
 
-    def soviteltu_peruspaivaraha(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa):
-        suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa)
+    def soviteltu_peruspaivaraha(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p):
+        suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa,p)
 
         pvraha=self.peruspaivaraha(lapsia)
         vahentavattulo=max(0,tyotaikaisettulot-suojaosa)
@@ -651,7 +651,7 @@ class Benefits():
         
         return vero
 
-    def tyottomyysturva_suojaosa(self,suojaosamalli):
+    def tyottomyysturva_suojaosa(self,suojaosamalli,p=None):
         if suojaosamalli==2:
             suojaosa=0
         elif suojaosamalli==3:
@@ -660,7 +660,9 @@ class Benefits():
             suojaosa=500
         elif suojaosamalli==5:
             suojaosa=600
-        else:
+        elif suojaosamalli==0:
+            suojaosa=p['tyottomyysturva_suojaosa_taso']
+        else: # perusmallis
             suojaosa=300
         
         return suojaosa
@@ -1289,7 +1291,6 @@ class Benefits():
         if ika>=65:
             maara = max(0,maara-np.maximum(0,(tyoelake-55.54))/2)
         elif ika>=62: # varhennus
-            
             maara = max(0,0.048*(65-ika)-np.maximum(0,(tyoelake-55.54))/2)
         else:
             maara=0
@@ -1530,7 +1531,8 @@ class Benefits():
         return tulot,marg
     
     def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,
-            dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True):
+            dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
+            plot_tva=True,plot_eff=True,plot_netto=True):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -1556,45 +1558,48 @@ class Benefits():
                 tva[t]=0
                 
         if plottaa:
-            fig, axs = plt.subplots()
-            if basenetto is not None:
-                axs.plot(basenetto,label=otsikkobase)
-                axs.plot(netto,label=otsikko)
-                if selite:
-                    axs.legend(loc='upper right')
-            else:
-                axs.plot(netto)        
-            axs.set_xlabel('Palkka (e/kk)')
-            axs.set_ylabel('Käteen (e/kk)')
-            axs.grid(True)
-            axs.set_xlim(0, max_salary)
+            if plot_netto:
+                fig, axs = plt.subplots()
+                if basenetto is not None:
+                    axs.plot(basenetto,label=otsikkobase)
+                    axs.plot(netto,label=otsikko)
+                    if selite:
+                        axs.legend(loc='upper right')
+                else:
+                    axs.plot(netto)        
+                axs.set_xlabel('Palkka (e/kk)')
+                axs.set_ylabel('Käteen (e/kk)')
+                axs.grid(True)
+                axs.set_xlim(0, max_salary)
 
-            fig, axs = plt.subplots()
-            if baseeff is not None:
-                axs.plot(baseeff,label=otsikkobase)
-                axs.plot(eff,label=otsikko)
-                if selite:
-                    axs.legend(loc='upper right')
-            else:
-                axs.plot(eff)        
-            axs.set_xlabel('Palkka (e/kk)')
-            axs.set_ylabel('Eff.marg.veroaste (%)')
-            axs.grid(True)
-            axs.set_xlim(0, max_salary)
+            if plot_eff:
+                fig, axs = plt.subplots()
+                if baseeff is not None:
+                    axs.plot(baseeff,label=otsikkobase)
+                    axs.plot(eff,label=otsikko)
+                    if selite:
+                        axs.legend(loc='upper right')
+                else:
+                    axs.plot(eff)        
+                axs.set_xlabel('Palkka (e/kk)')
+                axs.set_ylabel('Eff.marg.veroaste (%)')
+                axs.grid(True)
+                axs.set_xlim(0, max_salary)
 
-            fig, axs = plt.subplots()
-            if basenetto is not None:
-                axs.plot(basetva,label=otsikkobase)
-                axs.plot(tva,label=otsikko)
-                if selite:
-                    axs.legend(loc='upper right')
-            else:
-                axs.plot(tva)
-            axs.set_xlabel('Palkka (e/kk)')
-            axs.set_ylabel('Työllistymisveroaste (%)')
-            axs.grid(True)
-            axs.set_xlim(0, max_salary)
-            axs.set_ylim(0, 120)
+            if plot_tva:
+                fig, axs = plt.subplots()
+                if basenetto is not None:
+                    axs.plot(basetva,label=otsikkobase)
+                    axs.plot(tva,label=otsikko)
+                    if selite:
+                        axs.legend(loc='upper right')
+                else:
+                    axs.plot(tva)
+                axs.set_xlabel('Palkka (e/kk)')
+                axs.set_ylabel('Työllistymisveroaste (%)')
+                axs.grid(True)
+                axs.set_xlim(0, max_salary)
+                axs.set_ylim(0, 120)
 
             plt.show()
         
@@ -1604,7 +1609,7 @@ class Benefits():
                 basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
                 otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,ret=False,
                 plot_tva=True,plot_eff=True,plot_netto=True,figname=None,grayscale=False,
-                incl_perustulo=True,incl_elake=True):
+                incl_perustulo=True,incl_elake=True,fig=None,ax=None):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -1694,7 +1699,11 @@ class Benefits():
                 
         if plot_eff:
             sns.set()
-            fig,axs = plt.subplots()
+            if fig is None:
+                figi,axs = plt.subplots()
+            else:
+                figi=fig
+                axs=ax
             if incl_perustulo:
                 axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margperustulo,
                     labels=('Verot','Asumistuki','Toimeentulotuki','Työttömyysturva','Päivähoito','Eläke','Perustulo'),
@@ -1726,7 +1735,11 @@ class Benefits():
             plt.show()
         
         if plot_netto:
-            fig,axs = plt.subplots()
+            if fig is None:
+                figi,axs = plt.subplots()
+            else:
+                figi=fig
+                axs=ax
             sns.set()
             if incl_perustulo:
                 axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,perustulo,
@@ -1757,7 +1770,11 @@ class Benefits():
             plt.show()
 
         if plot_tva:
-            fig,axs = plt.subplots()
+            if fig is None:
+                figi,axs = plt.subplots()
+            else:
+                figi=fig
+                axs=ax
             sns.set()
             if incl_perustulo:
                 axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_perustulo,
@@ -1777,7 +1794,7 @@ class Benefits():
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
             axs.set_xlabel('Palkka (e/kk)')
-            axs.set_ylabel('Työllistymisveroaste (e/kk)')
+            axs.set_ylabel('Työllistymisveroaste (%)')
             axs.grid(True,color='lightgray')
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 120)
@@ -1791,7 +1808,7 @@ class Benefits():
             plt.show()
                
         if ret: 
-            return netto,eff,tva        
+            return netto,eff,tva   
 
     def laske_ja_plottaa_veromarginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True):
         palkka=np.zeros(max_salary+1)
@@ -1991,7 +2008,7 @@ class Benefits():
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
             axs.set_xlabel('Palkka (e/kk)')
-            axs.set_ylabel('Työllistymisveroaste (e/kk)')
+            axs.set_ylabel('Työllistymisveroaste (%)')
             axs.grid(True)
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 120)
