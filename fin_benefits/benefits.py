@@ -707,7 +707,7 @@ class Benefits():
         elif lapsia==5:
             tuki=sum(lapsilisat[0:4])
         elif lapsia>5:
-            tuki=sum(lapsilisat[0:5])+(lapsia-5)*lapsilisat(5)
+            tuki=sum(lapsilisat[0:4])+(lapsia-5)*lapsilisat[4]
         else:
             error(1)
         
