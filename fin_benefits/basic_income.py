@@ -22,6 +22,7 @@ class BasicIncomeBenefits(Benefits):
     
         self.perustulomalli='Kela'
         self.osittainen_perustulo=True
+        self.koko_tyel_maksu=0.244
                 
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -127,10 +128,16 @@ class BasicIncomeBenefits(Benefits):
         tulot=palkkatulot+muuttulot+elaketulot
     
         # vähennetään sosiaaliturvamaksut
-        if palkkatulot>self.elakemaksu_alaraja:
-            ptel=(palkkatulot-self.elakemaksu_alaraja)*self.tyontekijan_maksu
+        if palkkatulot>self.elakemaksu_alaraja: # FIXME lisää ikätarkastus
+            if p['ika']<68 and palkkatulot>self.elakemaksu_alaraja:
+                ptel=palkkatulot*self.tyontekijan_maksu
+                koko_tyoelakemaksu=palkkatulot*self.koko_tyel_maksu
+            else:
+                ptel=0
+                koko_tyoelakemaksu=0
         else:
             ptel=0
+            koko_tyoelakemaksu=0
 
         tyotvakmaksu=palkkatulot*self.tyottomyysvakuutusmaksu
         if palkkatulot>self.paivarahamaksu_raja:
@@ -254,7 +261,7 @@ class BasicIncomeBenefits(Benefits):
     
         return netto,peritytverot,valtionvero,kunnallisvero,kunnallisveronperuste,\
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
-               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu
+               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,koko_tyoelakemaksu
 
     def tyotulovahennys2018(self):
         max_tyotulovahennys=self.max_tyotulovahennys/self.kk_jakaja
@@ -440,12 +447,20 @@ class BasicIncomeBenefits(Benefits):
             p['opiskelija']=0
         if 'elakkeella' not in p:
             p['elakkeella']=0
+        if 'tyoelake' not in p:
+            p['tyoelake']=0
+        if 'sairauspaivarahalla' not in p:
+            p['sairauspaivarahalla']=0
+        if 'disabled' not in p:
+            p['disabled']=0
         return p
 
-    def laske_tulot(self,p,tt_alennus=0):
+    def laske_tulot(self,p,tt_alennus=0,include_takuuelake=True):
         q={} # tulokset tänne
         p=self.check_p(p)
         q['sairauspaivaraha']=0
+        q['puhdas_tyoelake']=0
+        q['multiplier']=1
         if p['elakkeella']>0: # vanhuuseläkkeellä
             p['tyoton']=0
             q['perustulo']=0
@@ -464,6 +479,7 @@ class BasicIncomeBenefits(Benefits):
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
             #oletetaan että myös puoliso eläkkeellä
             q['puoliso_ansiopvraha']=0
+            q['puhdas_tyoelake']=self.laske_puhdas_tyoelake(p['ika'],p['tyoelake'],disability=p['disabled'])
         elif p['opiskelija']>0:
             q['kokoelake']=0
             q['elake_maksussa']=p['tyoelake']
@@ -574,14 +590,14 @@ class BasicIncomeBenefits(Benefits):
         # q['verot] sisältää kaikki veronluonteiset maksut
         _,q['verot'],q['valtionvero'],q['kunnallisvero'],q['kunnallisveronperuste'],q['valtionveroperuste'],\
             q['ansiotulovahennys'],q['perusvahennys'],q['tyotulovahennys'],q['tyotulovahennys_kunnallisveroon'],\
-            q['ptel'],q['sairausvakuutus'],q['tyotvakmaksu']=self.verotus(p['t'],\
+            q['ptel'],q['sairausvakuutus'],q['tyotvakmaksu'],q['tyel_kokomaksu']=self.verotus(p['t'],\
                 q['perustulo']+q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki'],\
                 q['kokoelake'],p['lapsia'],p)
         #_,q['verot_ilman_etuuksia_pl_pt'],_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],q['perustulo'],0,p['lapsia'],p)
-        _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,p['lapsia'],p)
+        _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,p['lapsia'],p)
         _,q['verot_ilman_etuuksia_pl_pt'],valtionvero,kunnallisvero,kunnallisveronperuste,\
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
-               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu=self.verotus(p['t'],q['perustulo'],0,p['lapsia'],p)
+               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,koko_tyelmaksu=self.verotus(p['t'],q['perustulo'],0,p['lapsia'],p)
         
         #print('split',valtionvero,kunnallisvero,kunnallisveronperuste,\
         #       valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
