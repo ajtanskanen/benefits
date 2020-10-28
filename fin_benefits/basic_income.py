@@ -78,6 +78,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
             self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_vihreat
+            self.peruspaivaraha=self.peruspaivaraha_vihreat
         elif self.perustulomalli=='tonni':        
             # Tonnin täysi perustulo
             self.perustulo=self.laske_perustulo_tonni
@@ -472,9 +473,9 @@ class BasicIncomeBenefits(Benefits):
             q['puoliso_perustulo']=0 
             # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
             if (p['aikuisia']>1):
-                q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=0)
+                q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=0,include_takuuelake=include_takuuelake,disability=p['disabled'])
             else:
-                q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=1)
+                q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=1,include_takuuelake=include_takuuelake,disability=p['disabled'])
 
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
             #oletetaan että myös puoliso eläkkeellä
@@ -822,6 +823,9 @@ class BasicIncomeBenefits(Benefits):
     
         return tuki
         
+    def peruspaivaraha_vihreat(self,lapsia):
+        return self.perustulo()
+        
     # tmtuki samankokoinen
     def peruspaivaraha2018(self,lapsia):
         if lapsia==0:
@@ -866,15 +870,6 @@ class BasicIncomeBenefits(Benefits):
     
         return pvraha
 
-    def soviteltu_peruspaivaraha(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa):
-        suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa)
-
-        pvraha=self.peruspaivaraha(lapsia)
-        vahentavattulo=max(0,tyotaikaisettulot-suojaosa)
-        tuki=max(self.perustulo(),pvraha-0.5*vahentavattulo)
-    
-        return tuki
-        
     def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,

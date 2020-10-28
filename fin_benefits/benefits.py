@@ -1399,7 +1399,7 @@ class Benefits():
         return elake
         
     def laske_puhdas_tyoelake(self,ika,elake,disability=False):
-        if False:
+        if True:
             return elake 
         else:
             kansanelake=self.laske_kansanelake(ika,elake,1,disability=disability)
