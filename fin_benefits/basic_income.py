@@ -388,7 +388,7 @@ class BasicIncomeBenefits(Benefits):
     
     def valtionvero_asteikko_perustulo_vihreat(self):
         rajat=np.array([12*600,50000,9999999,9999999])/self.kk_jakaja
-        pros=np.array([0.4575,0.4575,0.4575,0.4575]) # 600 e/kk
+        pros=np.array([0.4575,0.4575,0.4575,0.4575]) # 600 e/kk Vai 44,75 %??
         return rajat,pros
     
     def valtionvero_asteikko_perustulo_vasemmistoliitto(self):
