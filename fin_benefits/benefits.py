@@ -826,7 +826,7 @@ class Benefits():
             elif p['isyysvapaalla']>0:
                 q['isyyspaivaraha']=self.isyysraha(p['vakiintunutpalkka'])
             elif p['kotihoidontuella']>0:
-                q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],p['alle_kouluikaisia'])
+                q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
             else:
                 q['opintotuki']=self.opintoraha(0,p)
         else: # ei eläkkeellä     
@@ -844,7 +844,7 @@ class Benefits():
             elif p['sairauspaivarahalla']>0:
                 q['sairauspaivaraha']=self.sairauspaivaraha(p['vakiintunutpalkka'])
             elif p['kotihoidontuella']>0:
-                q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],p['alle_kouluikaisia'])
+                q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
             elif p['tyoton']>0:
                 q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p)
                 
@@ -871,7 +871,7 @@ class Benefits():
                 elif p['puoliso_isyysvapaalla']>0:
                     q['puoliso_isyyspaivaraha']=self.isyysraha(p['puoliso_vakiintunutpalkka'])
                 elif p['puoliso_kotihoidontuella']>0:
-                    q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],p['alle_kouluikaisia'])
+                    q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
                 else:
                     q['puoliso_opintotuki']=self.opintoraha(0,p)
             else: # ei eläkkeellä     
@@ -889,7 +889,7 @@ class Benefits():
                 elif p['puoliso_sairauspaivarahalla']>0:
                     q['puoliso_sairauspaivaraha']=self.sairauspaivaraha(p['puoliso_vakiintunutpalkka'])
                 elif p['puoliso_kotihoidontuella']>0:
-                    q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['puoliso_lapsia_kotihoidontuella'],p['puoliso_alle3v'],p['puoliso_alle_kouluikaisia'])
+                    q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['puoliso_lapsia_kotihoidontuella'],p['puoliso_alle_3v'],p['puoliso_alle_kouluikaisia'])
                 elif p['puoliso_tyoton']>0:
                     q['puoliso_ansiopvraha'],q['puoliso_puhdasansiopvraha'],q['puoliso_peruspvraha']=self.ansiopaivaraha(p['puoliso_tyoton'],p['puoliso_vakiintunutpalkka'],p['lapsia'],p['puoliso_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['puoliso_tyottomyyden_kesto'],p)
             
@@ -921,11 +921,11 @@ class Benefits():
             q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t'],q['ansiopvraha']+q['puoliso_ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha'],p['asumismenot_asumistuki'],p)
             
         if p['lapsia']>0:
-            q['pvhoito']=self.paivahoitomenot(p['paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['puoliso_ansiopvraha']+q['sairauspaivaraha'],p)
+            q['pvhoito']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['puoliso_ansiopvraha']+q['sairauspaivaraha'],p)
             if (p['lapsia_kotihoidontuella']>0):
-                alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['alle3v'])
-                q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],alle_kouluikaisia)) # ok?
-            q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki'],p)
+                alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['lapsia_alle_3v'])
+                q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
+            q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki'],p)
             q['lapsilisa']=self.laske_lapsilisa(p['lapsia'])
         else:
             q['pvhoito']=0
