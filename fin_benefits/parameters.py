@@ -33,6 +33,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['puoliso_tulot']=0
     p['puoliso_tyottomyyden_kesto']=100
     p['tyottomyyden_kesto']=10
+    p['lapsia_paivahoidossa']=0
     
     if perhetyyppi==1: # 1+0, töissä
         lapsia=0    
@@ -486,7 +487,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['aitiysvapaalla']=0
     p['isyysvapaalla']=0
     p['kotihoidontuella']=0
-    p['paivahoidossa']=paivahoidossa
+    p['lapsia_paivahoidossa']=paivahoidossa
     p['aikuisia']=aikuisia
     p['vakiintunutpalkka']=vakiintunutpalkka
     p['tyoton']=tyoton

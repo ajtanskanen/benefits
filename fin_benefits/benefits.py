@@ -334,10 +334,10 @@ class Benefits():
         return rajat,maxvahennys,ansvah
         
     def veroparam2018(self):
-        self.kunnallisvero_pros=0.1984+self.additional_kunnallisvero # Viitamäen raportista
+        self.kunnallisvero_pros=0.1984+self.additional_kunnallisvero # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
         self.tyottomyysvakuutusmaksu=0.0190 #
         self.tyontekijan_maksu=0.0635+self.additional_tyel_premium # PTEL
-        self.tyontekijan_maksu_52=0.0865+self.additional_tyel_premium # PTEL
+        self.tyontekijan_maksu_52=0.0785+self.additional_tyel_premium # PTEL
         self.koko_tyel_maksu=0.2440+self.additional_tyel_premium # PTEL 
     
         # sairausvakuutus ??
@@ -351,7 +351,7 @@ class Benefits():
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
     def veroparam2019(self):
-        self.kunnallisvero_pros=0.1984+self.additional_kunnallisvero # Viitamäen raportista
+        self.kunnallisvero_pros=0.1988+self.additional_kunnallisvero # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
         self.tyontekijan_maksu=0.0715+self.additional_tyel_premium # PTEL
         self.tyontekijan_maksu_52=0.0865+self.additional_tyel_premium # PTEL
@@ -369,6 +369,23 @@ class Benefits():
         
     def veroparam2020(self):
         self.kunnallisvero_pros=0.1997+self.additional_kunnallisvero # Viitamäen raportista
+        self.tyottomyysvakuutusmaksu=0.0125 #
+        self.tyontekijan_maksu=0.0715+self.additional_tyel_premium # PTEL
+        self.tyontekijan_maksu_52=0.0865+self.additional_tyel_premium # PTEL
+        self.koko_tyel_maksu=0.2440+self.additional_tyel_premium # PTEL
+    
+        # sairausvakuutus ??
+        self.sairaanhoitomaksu=0.0068
+        self.sairaanhoitomaksu_etuus=0.0161 # muut
+        
+        self.paivarahamaksu_pros=0.0118 # palkka
+        self.paivarahamaksu_raja=14574/self.kk_jakaja    
+        
+        self.elakemaksu_alaraja=60.57
+        self.tulonhankkimisvahennys=750/self.kk_jakaja
+        
+    def veroparam2021(self):
+        self.kunnallisvero_pros=0.2002+self.additional_kunnallisvero # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
         self.tyontekijan_maksu=0.0715+self.additional_tyel_premium # PTEL
         self.tyontekijan_maksu_52=0.0865+self.additional_tyel_premium # PTEL
@@ -449,7 +466,7 @@ class Benefits():
         tulot=palkkatulot+muuttulot+elaketulot
     
         # vähennetään sosiaaliturvamaksut
-        if palkkatulot>self.elakemaksu_alaraja: # FIXME lisää ikätarkastus
+        if palkkatulot>self.elakemaksu_alaraja: 
             if p['ika']<68 and palkkatulot>self.elakemaksu_alaraja:
                 if p['ika']>=52 and p['ika']<63:
                     ptel=palkkatulot*self.tyontekijan_maksu_52
@@ -535,7 +552,7 @@ class Benefits():
         # varsinainen verotus
         valtionveroperuste=tulot_valtio
         valtionvero=self.laske_valtionvero(valtionveroperuste,p)
-    
+        
         # työtulovähennys
         valtionvero=max(0,valtionvero-lapsivahennys)
         if tyotulovahennys>valtionvero:
@@ -545,6 +562,8 @@ class Benefits():
         else:
             tyotulovahennys_kunnallisveroon=0
             valtionvero=max(0,valtionvero-tyotulovahennys)
+
+        #print('palkka {} valtionveroperuste {} valtionvero {} ptel {} tyotulovahennys {} sairausvakuutus {}'.format(palkkatulot,valtionveroperuste,valtionvero,ptel,tyotulovahennys,sairausvakuutus))
 
         peritytverot += valtionvero
 
@@ -576,8 +595,9 @@ class Benefits():
         kunnallisveronperuste=max(0,peruste-perusvahennys)
         
         # korotettu maksuperuste puuttuu? =max(0,palkkatulot-peritty_sairaanhoitomaksu)*korotus
-        peritty_sairaanhoitomaksu=kunnallisveronperuste*self.sairaanhoitomaksu
+        peritty_sairaanhoitomaksu=max(0,palkkatulot_puhdas-perusvahennys)*self.sairaanhoitomaksu+(muuttulot+elaketulot_kunnallis)*self.sairaanhoitomaksu_etuus
         
+        # etuuksista peritty sairaanhoitomaksu puuttuu
         if tyotulovahennys_kunnallisveroon>0:
             kunnallisvero_0=kunnallisveronperuste*self.kunnallisvero_pros
             if peritty_sairaanhoitomaksu+kunnallisvero_0>0:
@@ -588,7 +608,7 @@ class Benefits():
                 svhen=0
 
             kunnallisvero=max(0,kunnallisveronperuste*self.kunnallisvero_pros-kvhen)
-            peritty_sairaanhoitomaksu=max(0,kunnallisveronperuste*self.sairaanhoitomaksu-svhen)
+            peritty_sairaanhoitomaksu=max(0,peritty_sairaanhoitomaksu*self.sairaanhoitomaksu-svhen)
         else:
             kunnallisvero=kunnallisveronperuste*self.kunnallisvero_pros
             
@@ -605,7 +625,7 @@ class Benefits():
     
         return netto,peritytverot,valtionvero,kunnallisvero,kunnallisveronperuste,\
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
-               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,koko_tyoelakemaksu
+               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,koko_tyoelakemaksu,ylevero
 
     def kotihoidontuki2018(self,lapsia,allekolmev,alle_kouluikaisia):
         if lapsia<1:
@@ -689,7 +709,7 @@ class Benefits():
         rajat,pros=self.valtionvero_asteikko()
 
         if tulot>=rajat[0]:
-            vero=8
+            vero=8/self.kk_jakaja
         else:
             vero=0
 
@@ -734,6 +754,14 @@ class Benefits():
         return lapsilisat
     
     def lapsilisa2020(self,yksinhuoltajakorotus=False):
+        lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
+        if yksinhuoltajakorotus:
+            # yksinhuoltajakorotus 53,30 e/lapsi
+            lapsilisat += 63.3
+            
+        return lapsilisat
+    
+    def lapsilisa2021(self,yksinhuoltajakorotus=False):
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
             # yksinhuoltajakorotus 53,30 e/lapsi
@@ -896,15 +924,15 @@ class Benefits():
         # q['verot] sisältää kaikki veronluonteiset maksut
         _,q['verot'],q['valtionvero'],q['kunnallisvero'],q['kunnallisveronperuste'],q['valtionveroperuste'],\
             q['ansiotulovahennys'],q['perusvahennys'],q['tyotulovahennys'],q['tyotulovahennys_kunnallisveroon'],\
-            q['ptel'],q['sairausvakuutus'],q['tyotvakmaksu'],q['tyel_kokomaksu']=self.verotus(p['t'],
-                q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha'],
+            q['ptel'],q['sairausvakuutus'],q['tyotvakmaksu'],q['tyel_kokomaksu'],q['ylevero']=self.verotus(p['t'],
+                q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
                 q['kokoelake'],p['lapsia'],p)
-        _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,p['lapsia'],p)
+        _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,p['lapsia'],p)
 
         if (p['aikuisia']>1):
             _,q['puoliso_verot'],_,_,_,_,_,_,_,_,q['puoliso_ptel'],q['puoliso_sairausvakuutus'],\
-                q['puoliso_tyotvakmaksu'],q['puoliso_tyel_kokomaksu']=self.verotus(p['puoliso_tulot'],q['puoliso_ansiopvraha'],0,0,p) # onko oikein että lapsia 0 tässä????
-            _,q['puoliso_verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],0,0,0,p)
+                q['puoliso_tyotvakmaksu'],q['puoliso_tyel_kokomaksu'],q['puolison_ylevero']=self.verotus(p['puoliso_tulot'],q['puoliso_ansiopvraha'],0,0,p) # onko oikein että lapsia 0 tässä????
+            _,q['puoliso_verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],0,0,0,p)
         else:
             q['puoliso_verot_ilman_etuuksia']=0
             q['puoliso_verot']=0
@@ -916,9 +944,9 @@ class Benefits():
         #elatustuki=laske_elatustuki(p['lapsia'],p['aikuisia)
         
         if p['elakkeella']>0:
-            q['asumistuki']=self.elakkeensaajan_asumistuki(p['puoliso_tulot']+p['t'],q['kokoelake']+q['puoliso_ansiopvraha'],p['asumismenot_asumistuki'],p)
+            q['asumistuki']=self.elakkeensaajan_asumistuki(p['puoliso_tulot']+p['t'],q['kokoelake'],p['asumismenot_asumistuki'],p)
         else:
-            q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t'],q['ansiopvraha']+q['puoliso_ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha'],p['asumismenot_asumistuki'],p)
+            q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t'],q['ansiopvraha']+q['puoliso_ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],p['asumismenot_asumistuki'],p)
             
         if p['lapsia']>0:
             q['pvhoito']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['puoliso_ansiopvraha']+q['sairauspaivaraha'],p)
@@ -975,10 +1003,10 @@ class Benefits():
         q['kateen']=kateen
         q['perhetulot_netto']=p['puoliso_tulot']+p['t']-q['verot_ilman_etuuksia']-q['puoliso_verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
         q['omattulot_netto']=p['t']-q['verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
-        q['etuustulo_netto']=q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']\
+        q['etuustulo_netto']=q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['opintotuki']\
             +q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
             +q['toimtuki']-(q['pvhoito_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'])
-        q['etuustulo_brutto']=q['ansiopvraha']+q['puoliso_ansiopvraha']\
+        q['etuustulo_brutto']=q['ansiopvraha']+q['puoliso_ansiopvraha']+q['opintotuki']\
             +q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
             +q['toimtuki']+q['kokoelake']
         
@@ -1022,6 +1050,8 @@ class Benefits():
             perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+        
+        #print('palkka {:.1f} muuttulot {:.1f} perusomavastuu {:.1f} vuokra {:.1f} max_meno {:.1f} tuki {:.1f}'.format(palkkatulot,muuttulot,perusomavastuu,vuokra,max_meno,tuki))
     
         return tuki
         
@@ -1112,7 +1142,6 @@ class Benefits():
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.85 # vastaa 85 %
-        suojaosa=300*p['aikuisia']
         perusomavastuu=50.87 # e/kk, 2019
         if p['aikuisia']<2:
             tuloraja=8_676/12
@@ -1448,7 +1477,7 @@ class Benefits():
     
         return kokoelake
         
-    def isyysraha2019(self,vakiintunutpalkka):
+    def isyysraha_perus(self,vakiintunutpalkka):
         if self.year==2018:
             minimi=27.86*25
             sotumaksu=0.0448
@@ -1461,27 +1490,6 @@ class Benefits():
             taite2=58_252/12  
         else:
             minimi=27.86*25
-            sotumaksu=0.0448
-            taite1=37_861/12  
-            taite2=58_252/12  
-                        
-        raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
-
-        return raha
-        
-    def isyysraha2020(self,vakiintunutpalkka):
-        if self.year==2018:
-            minimi=27.86*25
-            sotumaksu=0.0448
-            taite1=37_861/12  
-            taite2=58_252/12  
-        elif self.year==2019:
-            minimi=27.86*25
-            sotumaksu=0.0448
-            taite1=37_861/12  
-            taite2=58_252/12  
-        else:
-            minimi=28.94*25
             sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12  
@@ -2119,26 +2127,26 @@ class Benefits():
             self.laske_kansanelake=self.laske_kansanelake2019
             self.laske_takuuelake=self.laske_takuuelake2019
             self.aitiysraha=self.aitiysraha2019
-            self.isyysraha=self.isyysraha2019
-            self.peruspaivaraha=self.peruspaivaraha2018
+            self.isyysraha=self.isyysraha_perus
+            self.peruspaivaraha=self.peruspaivaraha2019
             self.veroparam=self.veroparam2019          
             self.valtionvero_asteikko=self.valtionvero_asteikko_2019
-            self.laske_ylevero=self.laske_ylevero2018
-            self.elaketulovahennys=self.elaketulovahennys2018
+            self.laske_ylevero=self.laske_ylevero2019
+            self.elaketulovahennys=self.elaketulovahennys2019
             self.tyotulovahennys=self.tyotulovahennys2019
             self.ansiotulovahennys=self.ansiotulovahennys2019
             self.perusvahennys=self.perusvahennys2019
             self.lapsilisa=self.lapsilisa2019
             self.asumistuki=self.asumistuki2019
             self.kotihoidontuki=self.kotihoidontuki2019
-            self.paivahoitomenot=self.paivahoitomenot2018
+            self.paivahoitomenot=self.paivahoitomenot2019
             self.sairauspaivaraha=self.sairauspaivaraha2019
             self.toimeentulotuki_param=self.toimeentulotuki_param2019
         elif vuosi==2020:
             self.laske_kansanelake=self.laske_kansanelake2020
             self.laske_takuuelake=self.laske_takuuelake2020
             self.aitiysraha=self.aitiysraha2020
-            self.isyysraha=self.isyysraha2020
+            self.isyysraha=self.isyysraha_perus
             self.peruspaivaraha=self.peruspaivaraha2020
             self.valtionvero_asteikko=self.valtionvero_asteikko_2020
             self.laske_ylevero=self.laske_ylevero2020
@@ -2157,7 +2165,7 @@ class Benefits():
             self.laske_kansanelake=self.laske_kansanelake2021
             self.laske_takuuelake=self.laske_takuuelake2021
             self.aitiysraha=self.aitiysraha2021
-            self.isyysraha=self.isyysraha2021
+            self.isyysraha=self.isyysraha_perus
             self.peruspaivaraha=self.peruspaivaraha2021
             self.valtionvero_asteikko=self.valtionvero_asteikko_2021
             self.laske_ylevero=self.laske_ylevero2021
@@ -2176,7 +2184,7 @@ class Benefits():
             self.laske_kansanelake=self.laske_kansanelake2018
             self.laske_takuuelake=self.laske_takuuelake2018
             self.aitiysraha=self.aitiysraha2019
-            self.isyysraha=self.isyysraha2019
+            self.isyysraha=self.isyysraha_perus
             self.peruspaivaraha=self.peruspaivaraha2018
             self.veroparam=self.veroparam2018            
             self.elaketulovahennys=self.elaketulovahennys2018

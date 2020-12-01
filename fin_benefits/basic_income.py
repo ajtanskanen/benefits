@@ -972,3 +972,42 @@ class BasicIncomeBenefits(Benefits):
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
     
         return tuki
+        
+    def aitiysraha2019(self,vakiintunutpalkka,kesto):
+        if kesto<56/260:
+            minimi=self.perustulo()
+            sotumaksu=0.0448
+            taite1=37_861/12  
+            taite2=58_252/12 
+                
+            raha=max(minimi,0.9*min(taite1,vakiintunutpalkka)+0.325*max(vakiintunutpalkka-taite1,0))
+        else: 
+            minimi=self.perustulo()
+            sotumaksu=0.0448
+            taite1=37_861/12  
+            taite2=58_252/12 
+                        
+            raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
+
+        return raha        
+        
+    def isyysraha_perus(self,vakiintunutpalkka):
+        if self.year==2018:
+            minimi=self.perustulo() #27.86*25
+            sotumaksu=0.0448
+            taite1=37_861/12  
+            taite2=58_252/12  
+        elif self.year==2019:
+            minimi=self.perustulo() #27.86*25
+            sotumaksu=0.0448
+            taite1=37_861/12  
+            taite2=58_252/12  
+        else:
+            minimi=self.perustulo() #27.86*25
+            sotumaksu=0.0448
+            taite1=37_861/12  
+            taite2=58_252/12  
+                        
+        raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
+
+        return raha        
