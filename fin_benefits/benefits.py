@@ -203,7 +203,7 @@ class Benefits():
             
         return ansiopaivarahamaara   
 
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0):
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
     
@@ -232,7 +232,7 @@ class Benefits():
                 sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
                 taite=3078.60    
                             
-            if (saa_ansiopaivarahaa>0): # & (kesto<400.0): # ei keston tarkastusta!
+            if saa_ansiopaivarahaa>0: # & (kesto<400.0): # ei keston tarkastusta!
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
                 vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
         
@@ -255,11 +255,11 @@ class Benefits():
 
                 tuki=ansiopaivarahamaara    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
-                tuki=max(perus,tuki)     # voi tulla vastaan pienillä tasoilla4
+                tuki=omavastuukerroin*max(perus,tuki)     # voi tulla vastaan pienillä tasoilla4
             else:
                 ansiopaivarahamaara=0    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
-                tuki=perus    
+                tuki=omavastuukerroin*perus    
         else:
             perus=0    
             tuki=0    
@@ -874,7 +874,11 @@ class Benefits():
             elif p['kotihoidontuella']>0:
                 q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
             elif p['tyoton']>0:
-                q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p)
+                if 'omavastuukerroin' in p:
+                    omavastuukerroin=p['omavastuukerroin']
+                else:
+                    omavastuukerroin=1.0
+                q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p,omavastuukerroin=omavastuukerroin)
                 
         if p['aikuisia']>1:
             if p['puoliso_elakkeella']>0: # vanhuuseläkkeellä
