@@ -213,23 +213,23 @@ class Benefits():
 
             if self.year==2018:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
-                sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
+                sotumaksu=0.0448+0.6*self.additional_tyel_premium
                 taite=3078.60    
             elif self.year==2019:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
-                sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
+                sotumaksu=0.0448+0.6*self.additional_tyel_premium
                 taite=3078.60    
             elif self.year==2020:
                 lapsikorotus=np.array([0,5.28,7.76,10.00])*21.5    
-                sotumaksu=0.0414     # 2015 0.0428 2016 0.0460
+                sotumaksu=0.0414+0.6*self.additional_tyel_premium
                 taite=3197.70    
             elif self.year==2021:
                 lapsikorotus=np.array([0,5.28,7.76,10.00])*21.5    
-                sotumaksu=0.0414     # 2015 0.0428 2016 0.0460
+                sotumaksu=0.0414+0.6*self.additional_tyel_premium
                 taite=3197.70    
             else:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
-                sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
+                sotumaksu=0.0448+0.6*self.additional_tyel_premium
                 taite=3078.60    
                             
             if saa_ansiopaivarahaa>0: # & (kesto<400.0): # ei keston tarkastusta!
@@ -334,11 +334,11 @@ class Benefits():
         return rajat,maxvahennys,ansvah
         
     def veroparam2018(self):
-        self.kunnallisvero_pros=0.1984+self.additional_kunnallisvero # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
+        self.kunnallisvero_pros=max(0,0.1984+self.additional_kunnallisvero) # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
         self.tyottomyysvakuutusmaksu=0.0190 #
-        self.tyontekijan_maksu=0.0635+self.additional_tyel_premium # PTEL
-        self.tyontekijan_maksu_52=0.0785+self.additional_tyel_premium # PTEL
-        self.koko_tyel_maksu=0.2440+self.additional_tyel_premium # PTEL 
+        self.tyontekijan_maksu=max(0,0.0635+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0785+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL 
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
@@ -351,11 +351,11 @@ class Benefits():
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
     def veroparam2019(self):
-        self.kunnallisvero_pros=0.1988+self.additional_kunnallisvero # Viitamäen raportista
+        self.kunnallisvero_pros=max(0,0.1988+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
-        self.tyontekijan_maksu=0.0715+self.additional_tyel_premium # PTEL
-        self.tyontekijan_maksu_52=0.0865+self.additional_tyel_premium # PTEL
-        self.koko_tyel_maksu=0.2440+self.additional_tyel_premium # PTEL
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
@@ -368,11 +368,11 @@ class Benefits():
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
     def veroparam2020(self):
-        self.kunnallisvero_pros=0.1997+self.additional_kunnallisvero # Viitamäen raportista
+        self.kunnallisvero_pros=max(0,0.1997+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
-        self.tyontekijan_maksu=0.0715+self.additional_tyel_premium # PTEL
-        self.tyontekijan_maksu_52=0.0865+self.additional_tyel_premium # PTEL
-        self.koko_tyel_maksu=0.2440+self.additional_tyel_premium # PTEL
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0068
@@ -385,11 +385,11 @@ class Benefits():
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
     def veroparam2021(self):
-        self.kunnallisvero_pros=0.2002+self.additional_kunnallisvero # Viitamäen raportista
+        self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
-        self.tyontekijan_maksu=0.0715+self.additional_tyel_premium # PTEL
-        self.tyontekijan_maksu_52=0.0865+self.additional_tyel_premium # PTEL
-        self.koko_tyel_maksu=0.2440+self.additional_tyel_premium # PTEL
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0068
@@ -1623,80 +1623,138 @@ class Benefits():
     
         return tulot,marg
     
-    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,
+    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,step_salary=1,
+            basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
-            plot_tva=True,plot_eff=True,plot_netto=True):
-        netto=np.zeros(max_salary+1)
-        palkka=np.zeros(max_salary+1)
-        tva=np.zeros(max_salary+1)
-        eff=np.zeros(max_salary+1)
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
+            figname=None):
+            
+        netto,eff,tva,osa_tva=comp_insentives(self,p=None,min_salary=min_salary,
+                                                max_salary=max_salary,step_salary=step_salary,dt=dt)
+                
+        if plottaa:
+            plot_insentives(netto,eff,tva,osa_tva,min_salary=min_salary,max_salary=max_salary,
+                step_salary=step_salary,
+                basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
+                dt=st,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
+                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
+                figname=figname)
+        
+        return netto,eff,tva,osa_tva
+        
+    def plot_insentives(self,netto,eff,tva,osa_tva,
+            min_salary=0,max_salary=6000,step_salary=1,
+            basenetto=None,baseeff=None,basetva=None,baseosatva=None,
+            dt=100,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
+            figname=None):
+            
+        x=np.arange(min_salary,max_salary,step_salary)
+        if plot_netto:
+            fig, axs = plt.subplots()
+            if basenetto is not None:
+                axs.plot(x,basenetto,label=otsikkobase)
+                axs.plot(x.netto,label=otsikko)
+                if selite:
+                    axs.legend(loc='upper right')
+            else:
+                axs.plot(x,netto)        
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Käteen (e/kk)')
+            axs.grid(True)
+            axs.set_xlim(0, max_salary)
+            if figname is not None:
+                plt.savefig(figname+'_netto.eps', format='eps')
+            plt.show()
+
+        if plot_eff:
+            fig, axs = plt.subplots()
+            if baseeff is not None:
+                axs.plot(x,baseeff,label=otsikkobase)
+                axs.plot(x,eff,label=otsikko)
+                if selite:
+                    axs.legend(loc='upper right')
+            else:
+                axs.plot(x,eff)        
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Eff.marg.veroaste (%)')
+            axs.grid(True)
+            axs.set_xlim(0, max_salary)
+            if figname is not None:
+                plt.savefig(figname+'_effmarg.eps', format='eps')
+            plt.show()
+
+        if plot_tva:
+            fig, axs = plt.subplots()
+            if basenetto is not None:
+                axs.plot(x,basetva,label=otsikkobase)
+                axs.plot(x,tva,label=otsikko)
+                if selite:
+                    axs.legend(loc='upper right')
+            else:
+                axs.plot(x,tva)
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Työllistymisveroaste (%)')
+            axs.grid(True)
+            axs.set_xlim(0, max_salary)
+            axs.set_ylim(0, 120)
+            if figname is not None:
+                plt.savefig(figname+'_tva.eps', format='eps')
+            plt.show()
+
+        if plot_osaeff:
+            fig, axs = plt.subplots()
+            if baseeff is not None:
+                axs.plot(x,baseosatva,label=otsikkobase)
+                axs.plot(x,osa_tva,label=otsikko)
+                if selite:
+                    axs.legend(loc='upper right')
+            else:
+                axs.plot(x,osa_tva)        
+            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.marg.vero (%)')
+            axs.grid(True)
+            axs.set_xlim(0, max_salary)
+            if figname is not None:
+                plt.savefig(figname+'_osatva.eps', format='eps')
+            plt.show()    
+        
+    def comp_insentives(self,p=None,p2=None,min_salary=0,max_salary=6000,step_salary=1,dt=100):
+        n_salary=int((max_salary-min_salary)/step_salary)
+        netto=np.zeros(n_salary)
+        palkka=np.zeros(n_salary)
+        tva=np.zeros(n_salary)
+        osa_tva=np.zeros(n_salary)
+        eff=np.zeros(n_salary)
         
         if p is None:
             p=self.get_default_parameter()
 
-        p2=p.copy()
-        p2['t']=0 # palkka
+        if p2 is None:
+            p2=p.copy()
+            p2['t']=0 # palkka
+        p3=p.copy()
         n0,q0=self.laske_tulot(p2)
-        for t in range(0,max_salary):
-            p2['t']=t # palkka
-            n1,q1=self.laske_tulot(p2)
-            p2['t']=t+dt # palkka
-            n2,q2=self.laske_tulot(p2)
-            netto[t]=n1
-            palkka[t]=t
-            eff[t]=(1-(n2-n1)/dt)*100
+        k=0
+        for t in np.arange(0,max_salary,step_salary):
+            p3['t']=t # palkka
+            n1,q1=self.laske_tulot(p3)
+            p3['t']=t+dt # palkka
+            n2,q2=self.laske_tulot(p3)
+            p3['t']=2*t # palkka
+            n3,q3=self.laske_tulot(p3)
+            netto[k]=n1
+            palkka[k]=t
+            eff[k]=(1-(n2-n1)/dt)*100
             if t>0:
-                tva[t]=(1-(n1-n0)/t)*100
+                tva[k]=(1-(n1-n0)/t)*100
+                osa_tva[k]=(1-(n3-n1)/t)*100
             else:
-                tva[t]=0
-                
-        if plottaa:
-            if plot_netto:
-                fig, axs = plt.subplots()
-                if basenetto is not None:
-                    axs.plot(basenetto,label=otsikkobase)
-                    axs.plot(netto,label=otsikko)
-                    if selite:
-                        axs.legend(loc='upper right')
-                else:
-                    axs.plot(netto)        
-                axs.set_xlabel('Palkka (e/kk)')
-                axs.set_ylabel('Käteen (e/kk)')
-                axs.grid(True)
-                axs.set_xlim(0, max_salary)
-
-            if plot_eff:
-                fig, axs = plt.subplots()
-                if baseeff is not None:
-                    axs.plot(baseeff,label=otsikkobase)
-                    axs.plot(eff,label=otsikko)
-                    if selite:
-                        axs.legend(loc='upper right')
-                else:
-                    axs.plot(eff)        
-                axs.set_xlabel('Palkka (e/kk)')
-                axs.set_ylabel('Eff.marg.veroaste (%)')
-                axs.grid(True)
-                axs.set_xlim(0, max_salary)
-
-            if plot_tva:
-                fig, axs = plt.subplots()
-                if basenetto is not None:
-                    axs.plot(basetva,label=otsikkobase)
-                    axs.plot(tva,label=otsikko)
-                    if selite:
-                        axs.legend(loc='upper right')
-                else:
-                    axs.plot(tva)
-                axs.set_xlabel('Palkka (e/kk)')
-                axs.set_ylabel('Työllistymisveroaste (%)')
-                axs.grid(True)
-                axs.set_xlim(0, max_salary)
-                axs.set_ylim(0, 120)
-
-            plt.show()
-        
-        return netto,eff,tva
+                tva[k]=0
+                osa_tva[k]=0
+            k=k+1
+            
+        return netto,eff,tva,osa_tva
         
     def laske_ja_plottaa_marginaalit(self,p=None,min_salary=0,max_salary=6000,
                 basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,

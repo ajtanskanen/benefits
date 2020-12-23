@@ -1,6 +1,8 @@
 """
-Pohja perustulo-mallille. Ei läheskään täysin toiminnallinen. Verotus kirjoittamatta
-kokonaan.
+Pohja perustulo-mallille. 
+
+Päivitä vastaamaan uusinta benefits-tiedostoa.
+
 """
 
 import numpy as np
@@ -23,6 +25,7 @@ class BasicIncomeBenefits(Benefits):
         self.perustulomalli='Kela'
         self.osittainen_perustulo=True
         self.koko_tyel_maksu=0.244
+        self.kk_jakaja=12
                 
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -60,7 +63,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
             self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_Kela
-        elif self.perustulomalli=='vasemmistoliitto':        
+        elif self.perustulomalli in set(['vasemmistoliitto','Vasemmistoliitto']):        
             # Vasemmistoliitto
             self.perustulo=self.laske_perustulo_vasemmistoliitto
             self.asumistuen_suojaosa=600
@@ -69,7 +72,7 @@ class BasicIncomeBenefits(Benefits):
             self.veroparam2018=self.veroparam2018_perustulo
             self.max_ansiotulovahennys=0
             self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_vasemmistoliitto
-        elif self.perustulomalli=='vihreat':        
+        elif self.perustulomalli in set (['vihreat','Vihreät','vihreät','Vihreat']):
             # Vasemmistoliitto
             self.perustulo=self.laske_perustulo_vihreat
             self.asumistuen_suojaosa=600
@@ -122,16 +125,18 @@ class BasicIncomeBenefits(Benefits):
         lapsivahennys=0 # poistui 2018
     
         peritytverot=0
-        self.kk_jakaja=12
         
         self.veroparam()
         
         tulot=palkkatulot+muuttulot+elaketulot
     
         # vähennetään sosiaaliturvamaksut
-        if palkkatulot>self.elakemaksu_alaraja: # FIXME lisää ikätarkastus
+        if palkkatulot>self.elakemaksu_alaraja: 
             if p['ika']<68 and palkkatulot>self.elakemaksu_alaraja:
-                ptel=palkkatulot*self.tyontekijan_maksu
+                if p['ika']>=52 and p['ika']<63:
+                    ptel=palkkatulot*self.tyontekijan_maksu_52
+                else:
+                    ptel=palkkatulot*self.tyontekijan_maksu
                 koko_tyoelakemaksu=palkkatulot*self.koko_tyel_maksu
             else:
                 ptel=0
@@ -139,6 +144,22 @@ class BasicIncomeBenefits(Benefits):
         else:
             ptel=0
             koko_tyoelakemaksu=0
+
+        if p['tyoton']>0:
+            if p['saa_ansiopaivarahaa']>0:
+                koko_tyoelakemaksu+=p['vakiintunutpalkka']*self.koko_tyel_maksu
+            #else:
+            #    koko_tyoelakemaksu+=1413.75*self.koko_tyel_maksu
+
+        if p['isyysvapaalla']>0:
+            koko_tyoelakemaksu+=p['vakiintunutpalkka']*self.koko_tyel_maksu
+        
+        if p['aitiysvapaalla']>0:
+            koko_tyoelakemaksu+=p['vakiintunutpalkka']*self.koko_tyel_maksu
+
+        if p['kotihoidontuella']>0:
+            koko_tyoelakemaksu+=719.0*self.koko_tyel_maksu
+
 
         tyotvakmaksu=palkkatulot*self.tyottomyysvakuutusmaksu
         if palkkatulot>self.paivarahamaksu_raja:
@@ -235,7 +256,7 @@ class BasicIncomeBenefits(Benefits):
         
         # Yhteensä
         kunnallisveronperuste=max(0,peruste-perusvahennys)
-        peritty_sairaanhoitomaksu=kunnallisveronperuste*self.sairaanhoitomaksu
+        peritty_sairaanhoitomaksu=max(0,palkkatulot_puhdas-perusvahennys)*self.sairaanhoitomaksu+(muuttulot+elaketulot_kunnallis)*self.sairaanhoitomaksu_etuus
         
         if tyotulovahennys_kunnallisveroon>0:
             kunnallisvero_0=kunnallisveronperuste*self.kunnallisvero_pros
@@ -247,7 +268,7 @@ class BasicIncomeBenefits(Benefits):
                 svhen=0
 
             kunnallisvero=max(0,kunnallisveronperuste*self.kunnallisvero_pros-kvhen)
-            peritty_sairaanhoitomaksu=max(0,kunnallisveronperuste*self.sairaanhoitomaksu-svhen)
+            peritty_sairaanhoitomaksu=max(0,peritty_sairaanhoitomaksu*self.sairaanhoitomaksu-svhen)
         else:
             kunnallisvero=kunnallisveronperuste*self.kunnallisvero_pros
             
@@ -262,7 +283,7 @@ class BasicIncomeBenefits(Benefits):
     
         return netto,peritytverot,valtionvero,kunnallisvero,kunnallisveronperuste,\
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
-               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,koko_tyoelakemaksu
+               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,koko_tyoelakemaksu,ylevero
 
     def tyotulovahennys2018(self):
         max_tyotulovahennys=self.max_tyotulovahennys/self.kk_jakaja
@@ -319,6 +340,8 @@ class BasicIncomeBenefits(Benefits):
         self.kunnallisvero_pros=0.1984 # Viitamäen raportista            
         self.tyottomyysvakuutusmaksu=0.0190 #
         self.tyontekijan_maksu=0.0635 # PTEL
+        self.tyontekijan_maksu_52=0.0785+self.additional_tyel_premium # PTEL
+        self.koko_tyel_maksu=0.2440+self.additional_tyel_premium # PTEL 
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
@@ -334,6 +357,8 @@ class BasicIncomeBenefits(Benefits):
         self.kunnallisvero_pros=0.0 # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0190 #
         self.tyontekijan_maksu=0.0635 # PTEL
+        self.tyontekijan_maksu_52=0.0785
+        self.koko_tyel_maksu=0.2440
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
@@ -350,6 +375,7 @@ class BasicIncomeBenefits(Benefits):
         self.tyottomyysvakuutusmaksu=0.0125 #
         self.tyontekijan_maksu=0.0715 # PTEL
         self.tyontekijan_maksu_52=0.0865 # PTEL
+        self.koko_tyel_maksu=0.2440
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
@@ -366,6 +392,7 @@ class BasicIncomeBenefits(Benefits):
         self.tyottomyysvakuutusmaksu=0.0125 #
         self.tyontekijan_maksu=0.0715 # PTEL
         self.tyontekijan_maksu_52=0.0865 # PTEL
+        self.koko_tyel_maksu=0.2440
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0068
@@ -388,7 +415,9 @@ class BasicIncomeBenefits(Benefits):
     
     def valtionvero_asteikko_perustulo_vihreat(self):
         rajat=np.array([12*600,50000,9999999,9999999])/self.kk_jakaja
-        pros=np.array([0.4575,0.4575,0.4575,0.4575]) # 600 e/kk Vai 44,75 %??
+        #pros=np.array([0.4575,0.4575,0.4575,0.4575]) # 600 e/kk Vai 44,75 %??
+        pros=np.array([0.4825,0.4825,0.4825,0.4825]) # 600 e/kk Vai 44,75 %??
+        #pros=np.array([0.49,0.49,0.49,0.49]) # 600 e/kk Vai 44,75 %??
         return rajat,pros
     
     def valtionvero_asteikko_perustulo_vasemmistoliitto(self):
@@ -410,7 +439,7 @@ class BasicIncomeBenefits(Benefits):
         rajat,pros=self.valtionvero_asteikko_perustulo()
 
         if tulot>=rajat[0]:
-            vero=8
+            vero=8/self.kk_jakaja
         else:
             vero=0
 
@@ -436,26 +465,6 @@ class BasicIncomeBenefits(Benefits):
         
         return suojaosa
                 
-    def opintoraha(self,palkka,p):
-        tuki=0
-            
-        return tuki
-        
-    def check_p(self,p):
-        if 'toimeentulotuki_vahennys' not in p:
-            p['toimeentulotuki_vahennys']=0
-        if 'opiskelija' not in p:
-            p['opiskelija']=0
-        if 'elakkeella' not in p:
-            p['elakkeella']=0
-        if 'tyoelake' not in p:
-            p['tyoelake']=0
-        if 'sairauspaivarahalla' not in p:
-            p['sairauspaivarahalla']=0
-        if 'disabled' not in p:
-            p['disabled']=0
-        return p
-
     def laske_tulot(self,p,tt_alennus=0,include_takuuelake=True):
         q={} # tulokset tänne
         p=self.check_p(p)
@@ -497,7 +506,7 @@ class BasicIncomeBenefits(Benefits):
                 elif p['isyysvapaalla']>0:
                     q['isyyspaivaraha']=self.isyysraha(p['vakiintunutpalkka'])
                 elif p['kotihoidontuella']>0:
-                    q['kotihoidontuki']=0 #self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],p['alle_kouluikaisia'])
+                    q['kotihoidontuki']=0 #self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['alle_kouluikaisia'])
                     q['perustulo']=self.perustulo()
                 else:
                     q['perustulo']=self.perustulo() # ei opiskelijoille?
@@ -521,10 +530,14 @@ class BasicIncomeBenefits(Benefits):
                 elif p['isyysvapaalla']>0:
                     q['isyyspaivaraha']=self.isyysraha(p['vakiintunutpalkka'])
                 elif p['kotihoidontuella']>0:
-                    q['kotihoidontuki']=0 #self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],p['alle_kouluikaisia'])
+                    q['kotihoidontuki']=0 #self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['alle_kouluikaisia'])
                     q['perustulo']=self.perustulo()
                 elif p['tyoton']>0:
-                    q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p)
+                    if 'omavastuukerroin' in p:
+                        omavastuukerroin=p['omavastuukerroin']
+                    else:
+                        omavastuukerroin=1.0
+                    q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p,omavastuukerroin=omavastuukerroin)
                     q['ansiopvraha']=max(0,q['ansiopvraha']-self.perustulo())
                     q['perustulo']=self.perustulo()
                 else:
@@ -591,14 +604,15 @@ class BasicIncomeBenefits(Benefits):
         # q['verot] sisältää kaikki veronluonteiset maksut
         _,q['verot'],q['valtionvero'],q['kunnallisvero'],q['kunnallisveronperuste'],q['valtionveroperuste'],\
             q['ansiotulovahennys'],q['perusvahennys'],q['tyotulovahennys'],q['tyotulovahennys_kunnallisveroon'],\
-            q['ptel'],q['sairausvakuutus'],q['tyotvakmaksu'],q['tyel_kokomaksu']=self.verotus(p['t'],\
+            q['ptel'],q['sairausvakuutus'],q['tyotvakmaksu'],q['tyel_kokomaksu'],q['ylevero']=self.verotus(p['t'],\
                 q['perustulo']+q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki'],\
                 q['kokoelake'],p['lapsia'],p)
         #_,q['verot_ilman_etuuksia_pl_pt'],_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],q['perustulo'],0,p['lapsia'],p)
-        _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,p['lapsia'],p)
+        _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,p['lapsia'],p)
         _,q['verot_ilman_etuuksia_pl_pt'],valtionvero,kunnallisvero,kunnallisveronperuste,\
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
-               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,koko_tyelmaksu=self.verotus(p['t'],q['perustulo'],0,p['lapsia'],p)
+               tyotulovahennys_kunnallisveroon,ptel,sairausvakuutus,tyotvakmaksu,\
+               koko_tyelmaksu,ylevero=self.verotus(p['t'],q['perustulo'],0,p['lapsia'],p)
         
         #print('split',valtionvero,kunnallisvero,kunnallisveronperuste,\
         #       valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
@@ -606,9 +620,9 @@ class BasicIncomeBenefits(Benefits):
 
         if (p['aikuisia']>1):
             _,q['puoliso_verot'],_,_,_,_,_,_,_,_,q['puoliso_ptel'],q['puoliso_sairausvakuutus'],\
-                q['puoliso_tyotvakmaksu']=self.verotus(p['puoliso_tulot'],q['puoliso_perustulo']+q['puoliso_ansiopvraha'],0,0,p) # onko oikein että lapsia 0 tässä????
-            _,q['puoliso_verot_ilman_etuuksia_pl_pt'],_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],q['puoliso_perustulo'],0,0,p)
-            _,q['puoliso_verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],0,0,0,p)
+                q['puoliso_tyotvakmaksu'],_,_=self.verotus(p['puoliso_tulot'],q['puoliso_perustulo']+q['puoliso_ansiopvraha'],0,0,p) # onko oikein että lapsia 0 tässä????
+            _,q['puoliso_verot_ilman_etuuksia_pl_pt'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],q['puoliso_perustulo'],0,0,p)
+            _,q['puoliso_verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],0,0,0,p)
         else:
             q['puoliso_verot_ilman_etuuksia']=0
             q['puoliso_verot_ilman_etuuksia_pl_pt']=0
@@ -628,13 +642,13 @@ class BasicIncomeBenefits(Benefits):
             #q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t'],q['ansiopvraha']+q['puoliso_ansiopvraha'],p['asumismenot_asumistuki'],p)
             
         if p['lapsia']>0:
-            q['pvhoito']=self.paivahoitomenot(p['paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']
+            q['pvhoito']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']
                 +q['ansiopvraha']+q['puoliso_ansiopvraha']+q['perustulo']+q['puoliso_perustulo'],p)
             if (p['lapsia_kotihoidontuella']>0):
-                alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['alle3v'])
-                q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['alle3v'],alle_kouluikaisia)) # ok?
-            q['pvhoito_ilman_etuuksia_pl_pt']=self.paivahoitomenot(p['paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki']+q['perustulo']+q['puoliso_perustulo'],p)
-            q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki'],p)
+                alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['lapsia_alle_3v'])
+                q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
+            q['pvhoito_ilman_etuuksia_pl_pt']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki']+q['perustulo']+q['puoliso_perustulo'],p)
+            q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki'],p)
             q['lapsilisa']=self.laske_lapsilisa(p['lapsia'])
         else:
             q['pvhoito']=0
@@ -743,7 +757,7 @@ class BasicIncomeBenefits(Benefits):
             
         return tuki
                 
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=None):
         if not self.osittainen_perustulo:
             perus=self.perustulo()
             tuki=self.perustulo()
@@ -779,7 +793,7 @@ class BasicIncomeBenefits(Benefits):
                 sotumaksu=0.0448     # 2015 0.0428 2016 0.0460
                 taite=3078.60    
                             
-            if (saa_ansiopaivarahaa>0): # & (kesto<400.0): # ei keston tarkastusta!
+            if saa_ansiopaivarahaa>0: 
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
                 vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
         
