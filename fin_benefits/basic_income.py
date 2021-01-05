@@ -42,7 +42,13 @@ class BasicIncomeBenefits(Benefits):
         print('Perustulomalli {}'.format(self.perustulomalli))
                     
         super().__init__(**kwargs)
+        self.setup_basic_income()
         
+    def set_year(self,vuosi):
+        super().set_year(vuosi)
+        self.setup_basic_income()
+        
+    def setup_basic_income(self):
         if self.perustulomalli=='perustulokokeilu':
             # Kela-malli
             self.perustulo=self.laske_perustulo_Kelamalli
@@ -72,6 +78,16 @@ class BasicIncomeBenefits(Benefits):
             self.veroparam2018=self.veroparam2018_perustulo
             self.max_ansiotulovahennys=0
             self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_vasemmistoliitto
+        elif self.perustulomalli in set (['696']):
+            # Vasemmistoliitto
+            self.perustulo=self.laske_perustulo_696
+            self.asumistuen_suojaosa=696.6
+            self.max_tyotulovahennys=0
+            self.max_perusvahennys=0
+            self.max_ansiotulovahennys=0
+            self.veroparam2018=self.veroparam2018_perustulo
+            self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_vihreat
+            self.peruspaivaraha=self.peruspaivaraha_bi
         elif self.perustulomalli in set (['vihreat','Vihreät','vihreät','Vihreat']):
             # Vasemmistoliitto
             self.perustulo=self.laske_perustulo_vihreat
@@ -81,7 +97,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
             self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_vihreat
-            self.peruspaivaraha=self.peruspaivaraha_vihreat
+            self.peruspaivaraha=self.peruspaivaraha_bi
         elif self.perustulomalli=='tonni':        
             # Tonnin täysi perustulo
             self.perustulo=self.laske_perustulo_tonni
@@ -111,6 +127,9 @@ class BasicIncomeBenefits(Benefits):
         
     def laske_perustulo_vihreat(self):
         return 600
+        
+    def laske_perustulo_696(self):
+        return 696.6
         
     def laske_perustulo_vasemmistoliitto(self):
         return 800.0
@@ -537,7 +556,10 @@ class BasicIncomeBenefits(Benefits):
                         omavastuukerroin=p['omavastuukerroin']
                     else:
                         omavastuukerroin=1.0
-                    q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p,omavastuukerroin=omavastuukerroin)
+                    q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=\
+                        self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],
+                                            p['tyottomyyden_kesto'],p,omavastuukerroin=omavastuukerroin)
+                    q['peruspvraha']=0
                     q['ansiopvraha']=max(0,q['ansiopvraha']-self.perustulo())
                     q['perustulo']=self.perustulo()
                 else:
@@ -639,7 +661,6 @@ class BasicIncomeBenefits(Benefits):
         else:
             q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t'],q['ansiopvraha']+q['puoliso_ansiopvraha']+q['perustulo']+q['puoliso_perustulo'],p['asumismenot_asumistuki'],p)
             #q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t']+q['perustulo']+q['puoliso_perustulo'],q['ansiopvraha']+q['puoliso_ansiopvraha'],p['asumismenot_asumistuki'],p)
-            #q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t'],q['ansiopvraha']+q['puoliso_ansiopvraha'],p['asumismenot_asumistuki'],p)
             
         if p['lapsia']>0:
             q['pvhoito']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']
@@ -804,9 +825,9 @@ class BasicIncomeBenefits(Benefits):
 
                 tuki2=tuki2+lapsikorotus[min(lapsia,3)]    
                 tuki2=tuki2*ansiokerroin # mahdollinen porrastus tehdään tämän avulla
-                suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa)    
+                suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa,p)    
         
-                perus=self.peruspaivaraha(lapsia)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
+                perus=self.perustulo()     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
                 if tuki2>.9*vakpalkka:
                     tuki2=max(.9*vakpalkka,perus)    
         
@@ -815,11 +836,11 @@ class BasicIncomeBenefits(Benefits):
                 ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
 
                 tuki=ansiopaivarahamaara
-                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)
+                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)
                 tuki=max(perus,tuki)     # voi tulla vastaan pienillä tasoilla4
             else:
                 ansiopaivarahamaara=0    
-                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa)
+                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)
                 tuki=perus    
         else:
             perus=self.perustulo()
@@ -836,8 +857,8 @@ class BasicIncomeBenefits(Benefits):
         tuki=max(self.perustulo(),max(0,pvraha-0.5*vahentavattulo))
     
         return tuki
-        
-    def peruspaivaraha_vihreat(self,lapsia):
+
+    def peruspaivaraha_bi(self,lapsia):
         return self.perustulo()
         
     # tmtuki samankokoinen

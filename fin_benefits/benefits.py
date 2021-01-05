@@ -339,6 +339,7 @@ class Benefits():
         self.tyontekijan_maksu=max(0,0.0635+self.additional_tyel_premium) # PTEL
         self.tyontekijan_maksu_52=max(0,0.0785+self.additional_tyel_premium) # PTEL
         self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL 
+        self.tyonantajan_sivukulut=max(0,0.6*0.0065+0.4*0.205+0.0007+0.1695+0.0134+0.01) # työttömyysvakuutusmaksu, ryhmähv, tyel, sv, työtapaturma
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
@@ -1629,14 +1630,14 @@ class Benefits():
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
             figname=None):
             
-        netto,eff,tva,osa_tva=comp_insentives(self,p=None,min_salary=min_salary,
+        netto,eff,tva,osa_tva=self.comp_insentives(p=p,p2=None,min_salary=min_salary,
                                                 max_salary=max_salary,step_salary=step_salary,dt=dt)
                 
         if plottaa:
-            plot_insentives(netto,eff,tva,osa_tva,min_salary=min_salary,max_salary=max_salary,
+            self.plot_insentives(netto,eff,tva,osa_tva,min_salary=min_salary,max_salary=max_salary,
                 step_salary=step_salary,
                 basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
-                dt=st,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
+                dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
                 plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
                 figname=figname)
         
@@ -1654,7 +1655,7 @@ class Benefits():
             fig, axs = plt.subplots()
             if basenetto is not None:
                 axs.plot(x,basenetto,label=otsikkobase)
-                axs.plot(x.netto,label=otsikko)
+                axs.plot(x,netto,label=otsikko)
                 if selite:
                     axs.legend(loc='upper right')
             else:
@@ -1711,7 +1712,7 @@ class Benefits():
                     axs.legend(loc='upper right')
             else:
                 axs.plot(x,osa_tva)        
-            axs.set_xlabel('Palkka (e/kk)')
+            axs.set_xlabel('Osatyön palkka (e/kk)')
             axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.marg.vero (%)')
             axs.grid(True)
             axs.set_xlim(0, max_salary)

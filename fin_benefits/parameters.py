@@ -500,7 +500,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['asumismenot_asumistuki']=asumismenot_asumistuki
     p['asumismenot_yhdistetty']=asumismenot_yhdistetty
     p['lapsia_kotihoidontuella']=lapsia_kotihoidontuella
-    p['alle3v']=alle3v
+    p['lapsia_alle_3v']=alle3v
     p['puoliso_elakkeella']=0
     p['puoliso_opiskelija']=0
     p['puoliso_tyoelake']=0
