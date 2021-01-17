@@ -5,6 +5,7 @@ fin_benefits/basic_income.py
 fin_benefits/benefits.py
 fin_benefits/benefits_unemp_EK.py
 fin_benefits/benefits_unemp_EK2020.py
+fin_benefits/benefits_unemp_korotus.py
 fin_benefits/benefits_unemp_porrastus.py
 fin_benefits/parameters.py
 fin_benefits.egg-info/PKG-INFO
