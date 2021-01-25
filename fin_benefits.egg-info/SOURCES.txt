@@ -7,6 +7,8 @@ fin_benefits/benefits_unemp_EK.py
 fin_benefits/benefits_unemp_EK2020.py
 fin_benefits/benefits_unemp_korotus.py
 fin_benefits/benefits_unemp_porrastus.py
+fin_benefits/cybenefits.c
+fin_benefits/cybenefits.pyx
 fin_benefits/parameters.py
 fin_benefits.egg-info/PKG-INFO
 fin_benefits.egg-info/SOURCES.txt

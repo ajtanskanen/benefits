@@ -788,7 +788,7 @@ class Benefits():
         elif lapsia>5:
             tuki=sum(lapsilisat[0:4])+(lapsia-5)*lapsilisat[4]
         else:
-            error(1)
+            print('error(1))')
         
         return tuki
         
