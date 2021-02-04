@@ -334,11 +334,11 @@ class Benefits():
         return rajat,maxvahennys,ansvah
         
     def veroparam2018(self):
-        self.kunnallisvero_pros=max(0,0.1984+self.additional_kunnallisvero) # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
+        self.kunnallisvero_pros=max(0,max(0,0.1984+self.additional_kunnallisvero)) # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
         self.tyottomyysvakuutusmaksu=0.0190 #
-        self.tyontekijan_maksu=max(0,0.0635+self.additional_tyel_premium) # PTEL
-        self.tyontekijan_maksu_52=max(0,0.0785+self.additional_tyel_premium) # PTEL
-        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL 
+        self.tyontekijan_maksu=max(0,max(0,0.0635+self.additional_tyel_premium)) # PTEL
+        self.tyontekijan_maksu_52=max(0,max(0,0.0785+self.additional_tyel_premium)) # PTEL
+        self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium)) # PTEL 
         self.tyonantajan_sivukulut=max(0,0.6*0.0065+0.4*0.205+0.0007+0.1695+0.0134+0.01) # työttömyysvakuutusmaksu, ryhmähv, tyel, sv, työtapaturma
     
         # sairausvakuutus ??
