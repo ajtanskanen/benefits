@@ -71,24 +71,35 @@ class Benefits():
     
     def toimeentulotuki_param2019(self):
         min_etuoikeutettuosa=150
-        lapsi1=305.87     # e/kk     alle 10v lapsi
-        lapsi2=281.59     # e/kk
-        lapsi3=257.32     # e/kk
+        lapsi1=313.29     # e/kk     alle 10v lapsi
+        lapsi2=288.43     # e/kk
+        lapsi3=263.56     # e/kk
         yksinhuoltaja=547.02     # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
-        muu=412.68    
+        muu=422.70    
         yksinasuva=497.29
         return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
 
     def toimeentulotuki_param2020(self):
         min_etuoikeutettuosa=150
-        lapsi1=305.87     # e/kk     alle 10v lapsi
-        lapsi2=281.59     # e/kk
-        lapsi3=257.32     # e/kk
+        lapsi1=317.56     # e/kk     alle 10v lapsi
+        lapsi2=292.35     # e/kk
+        lapsi3=267.15     # e/kk
         yksinhuoltaja=572.52     # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=412.68    
         yksinasuva=502.21
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        
+    def toimeentulotuki_param2021(self):
+        min_etuoikeutettuosa=150
+        lapsi1=317.56     # e/kk     alle 10v lapsi
+        lapsi2=292.35     # e/kk
+        lapsi3=267.15     # e/kk
+        yksinhuoltaja=574.63     # e/kk
+        # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
+        muu=428.45
+        yksinasuva=504.16
         return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
         
     def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,
@@ -192,7 +203,23 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.60+lisa)    
+        pvraha=21.5*(33.66+lisa)    
+        tuki=max(0,pvraha)    
+    
+        return tuki
+
+    # tmtuki samankokoinen
+    def peruspaivaraha2021(self,lapsia):
+        if lapsia==0:
+            lisa=0    
+        elif lapsia==1:
+            lisa=5.28     # e/pv
+        elif lapsia==2:
+            lisa=7.76     # e/pv
+        else:
+            lisa=10.00     # e/pv
+        
+        pvraha=21.5*(33.66+lisa)    
         tuki=max(0,pvraha)    
     
         return tuki
@@ -312,7 +339,13 @@ class Benefits():
     def tyotulovahennys2020(self):
         max_tyotulovahennys=1770/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
-        ttulopros=np.array([0.122,0.0184,0])
+        ttulopros=np.array([0.125,0.0184,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2021(self):
+        max_tyotulovahennys=1840/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
+        ttulopros=np.array([0.127,0.0189,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def ansiotulovahennys2018(self):
@@ -328,6 +361,12 @@ class Benefits():
         return rajat,maxvahennys,ansvah
         
     def ansiotulovahennys2020(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3540/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+        
+    def ansiotulovahennys2021(self):
         rajat=np.array([2500,7230,14000])/self.kk_jakaja
         maxvahennys=3570/self.kk_jakaja
         ansvah=np.array([0.51,0.28,0.045])
