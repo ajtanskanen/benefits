@@ -304,9 +304,9 @@ class Benefits():
         return tuki
         
     def elaketulovahennys2018(self,elaketulot,tulot):
-        max_elaketulovahennys_valtio=11590/self.kk_jakaja
+        max_elaketulovahennys_valtio=11560/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
-        max_elaketulovahennys_kunnallis=9050/self.kk_jakaja
+        max_elaketulovahennys_kunnallis=9040/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
@@ -318,9 +318,16 @@ class Benefits():
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
     def elaketulovahennys2020(self,elaketulot,tulot):
-        max_elaketulovahennys_valtio=11590/self.kk_jakaja
+        max_elaketulovahennys_valtio=11540/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
-        max_elaketulovahennys_kunnallis=9050/self.kk_jakaja
+        max_elaketulovahennys_kunnallis=9230/self.kk_jakaja
+        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
+        return elaketulovahennys_valtio,elaketulovahennys_kunnallis
+
+    def elaketulovahennys2021(self,elaketulot,tulot):
+        max_elaketulovahennys_valtio=11150/self.kk_jakaja
+        elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
+        max_elaketulovahennys_kunnallis=9270/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
@@ -362,7 +369,7 @@ class Benefits():
         
     def ansiotulovahennys2020(self):
         rajat=np.array([2500,7230,14000])/self.kk_jakaja
-        maxvahennys=3540/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
         ansvah=np.array([0.51,0.28,0.045])
         return rajat,maxvahennys,ansvah
         
@@ -433,10 +440,10 @@ class Benefits():
     
         # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0068
-        self.sairaanhoitomaksu_etuus=0.0161 # muut
+        self.sairaanhoitomaksu_etuus=0.0165 # muut
         
-        self.paivarahamaksu_pros=0.0118 # palkka
-        self.paivarahamaksu_raja=14574/self.kk_jakaja    
+        self.paivarahamaksu_pros=0.0136 # palkka
+        self.paivarahamaksu_raja=14766/self.kk_jakaja    
         
         self.elakemaksu_alaraja=60.57
         self.tulonhankkimisvahennys=750/self.kk_jakaja
@@ -882,8 +889,8 @@ class Benefits():
             q['opintotuki']=0
             q['puhdas_tyoelake']=self.laske_puhdas_tyoelake(p['ika'],p['tyoelake'],disability=p['disabled'])
         elif p['opiskelija']>0:
-            q['kokoelake']=0
             q['elake_maksussa']=p['tyoelake']
+            q['kokoelake']=p['tyoelake']
             q['elake_tuleva']=0
             q['puoliso_ansiopvraha']=0
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
@@ -898,9 +905,9 @@ class Benefits():
             else:
                 q['opintotuki']=self.opintoraha(0,p)
         else: # ei eläkkeellä     
-            q['kokoelake']=0
             q['opintotuki']=0
             q['elake_maksussa']=p['tyoelake']
+            q['kokoelake']=p['tyoelake']
             q['elake_tuleva']=0
             q['puoliso_ansiopvraha']=0
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
