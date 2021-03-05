@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 
 
 extensions = [
-    Extension('fin_benefits.*', ['fin_benefits/cybenefits.pyx']),
+    Extension('fin_benefits.*', ['fin_benefits/benefits.py']),
 ]
 cython_excludes = ['**/__init__.py']
 
