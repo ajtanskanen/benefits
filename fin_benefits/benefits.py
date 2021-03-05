@@ -29,6 +29,7 @@ class Benefits():
         self.additional_tyel_premium=0.0
         self.additional_kunnallisvero=0.0
         self.additional_income_tax_high=0.0
+        self.language='Finnish' # 'English'
         
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -740,16 +741,25 @@ class Benefits():
     def valtionvero_asteikko_2018(self):
         rajat=np.array([17200,25700,42400,74200])/self.kk_jakaja
         pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
     
     def valtionvero_asteikko_2019(self):
         rajat=np.array([17600,26400,43500,76100])/self.kk_jakaja
         pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
 
     def valtionvero_asteikko_2020(self):
         rajat=np.array([18100,27200,44800,78500])/self.kk_jakaja
         pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+
+    def valtionvero_asteikko_2021(self):
+        rajat=np.array([18600,27900,45900,80500])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
 
     def laske_valtionvero(self,tulot,p):
