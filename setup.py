@@ -11,9 +11,6 @@ setup(
     name='fin_benefits',
     version='1.0.0',
     packages=find_packages(),
-    ext_modules=cythonize(extensions, exclude=cython_excludes,
-                          compiler_directives={'language_level' : "3"}),
-    cmdclass={'build_py': build_py},
     install_requires=['numpy'],
     
     # metadata to display on PyPI
