@@ -17,13 +17,14 @@ class BenefitsEK(Benefits):
     """
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.muuta_ansiopv_ylaraja=True
-        self.ansiopvraha_kesto400=350/(12*21.5) # lyhennetty 50 pv
-        self.ansiopvraha_kesto300=250/(12*21.5)   
-        self.toe_vaatimus=1.0 # työssäoloehto väh 12kk   
+        #self.muuta_ansiopv_ylaraja=True
+        #self.ansiopvraha_kesto400=350/(12*21.5) # lyhennetty 50 pv
+        #self.ansiopvraha_kesto300=250/(12*21.5)   
+        #self.toe_vaatimus=1.0 # työssäoloehto väh 12kk   
         self.porrastus=True
-        self.muuta_ansiopv_ylaraja=True
-        self.muuta_pvhoito=True                  
+        self.muuta_ansiopv_ylaraja=False
+        self.muuta_pvhoito=False
+        self.muuta_toimeentulotuki=True
 
     def paivahoitomenot(self,hoidossa,tulot,p):
         if self.muuta_pvhoito:
@@ -32,23 +33,22 @@ class BenefitsEK(Benefits):
         else:
             return super().paivahoitomenot(hoidossa,tulot,p)
     
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0):
-        if tyoton>0:
-            # porrastetaan ansio-osa keston mukaan
-            if self.porrastus:
-                if kesto>6*25:
-                    kerroin=0.85
-                elif kesto>3*25:
-                    kerroin=0.95
-                else:
-                    kerroin=1.05
+    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0):
+        # porrastetaan ansio-osa keston mukaan
+        if self.porrastus:
+            if kesto>6*25:
+                kerroin=0.85
+            elif kesto>3*25:
+                kerroin=0.95
             else:
-                kerroin=1.0
+                kerroin=1.05
         else:
-            kerroin=0.0
+            kerroin=1.0
+            
+        #print(f'kesto {kesto} kerroin {kerroin}')
 
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
-        return super().ansiopaivaraha2018(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin)
+        return super().ansiopaivaraha(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin,omavastuukerroin=omavastuukerroin)
 
     # yläraja 80% ansionalenemasta
     def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka):
@@ -58,7 +58,10 @@ class BenefitsEK(Benefits):
             return super().ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)        
      
     def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.07):
-        return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=omavastuuprosentti)
+        if self.muuta_toimeentulotuki:
+            return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=omavastuuprosentti)
+        else:
+            return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0)
      
     #def tyotulovahennys(self):
     #    max_tyotulovahennys=3000/self.kk_jakaja

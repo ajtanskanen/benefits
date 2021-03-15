@@ -6,7 +6,7 @@ import numpy as np
 from .benefits import Benefits
 import random
 
-class Benefits2020(Benefits):
+class BenefitsEK2020(Benefits):
     """
     Description:
         Changes to unemployment benefits in the EK model

@@ -534,6 +534,19 @@ class Benefits():
             
         return ylevero    
 
+    def laske_ylevero2021(self,palkkatulot,elaketulot):
+        yleveropros=0.025
+        min_ylevero=0/self.kk_jakaja
+        max_ylevero=163/self.kk_jakaja
+        ylevero_alaraja=14000/self.kk_jakaja
+    
+        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+    
+        if ylevero<min_ylevero:
+            ylevero=0
+            
+        return ylevero    
+
     def perusvahennys2018(self):
         perusvahennys_pros=0.18
         max_perusvahennys=3020/self.kk_jakaja
@@ -1807,13 +1820,14 @@ class Benefits():
 
         if plot_osaeff:
             fig, axs = plt.subplots()
-            if baseeff is not None:
+            if baseosatva is not None:
                 axs.plot(x,baseosatva,label=otsikkobase)
                 axs.plot(x,osa_tva,label=otsikko)
                 if selite:
                     axs.legend(loc='upper right')
             else:
-                axs.plot(x,osa_tva)        
+                axs.plot(x,osa_tva) 
+                       
             axs.set_xlabel('Osatyön palkka (e/kk)')
             axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.marg.vero (%)')
             axs.grid(True)
