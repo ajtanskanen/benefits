@@ -29,6 +29,7 @@ class Benefits():
         self.additional_tyel_premium=0.0
         self.additional_kunnallisvero=0.0
         self.additional_income_tax_high=0.0
+        self.extra_ppr=1.0 # kerroin peruspäivärahalle
         self.language='Finnish' # 'English'
         
         if 'kwargs' in kwargs:
@@ -58,6 +59,9 @@ class Benefits():
             elif key=='additional_kunnallisvero':
                 if value is not None:
                     self.additional_kunnallisvero=value
+            elif key=='extra_ppr':
+                if value is not None:
+                    self.extra_ppr=value
     
         # choose the correct set of benefit functions for computations
         self.set_year(self.year)
@@ -218,7 +222,7 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa)    
+        pvraha=21.5*(32.40+lisa)*self.extra_ppr
         tuki=max(0,pvraha)    
     
         return tuki
@@ -234,7 +238,7 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa)    
+        pvraha=21.5*(32.40+lisa)*self.extra_ppr
         tuki=max(0,pvraha)    
     
         return tuki
@@ -250,7 +254,7 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.66+lisa)    
+        pvraha=21.5*(33.66+lisa)*self.extra_ppr
         tuki=max(0,pvraha)    
     
         return tuki
@@ -266,7 +270,7 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.66+lisa)    
+        pvraha=21.5*(33.66+lisa)*self.extra_ppr
         tuki=max(0,pvraha)    
     
         return tuki
@@ -603,8 +607,12 @@ class Benefits():
             koko_tyoelakemaksu+=719.0*self.koko_tyel_maksu
 
 
-        tyotvakmaksu=palkkatulot*self.tyottomyysvakuutusmaksu
-        if palkkatulot>self.paivarahamaksu_raja: # FIXME lisää ikätarkastus
+        if p['ika']<65:
+            tyotvakmaksu=palkkatulot*self.tyottomyysvakuutusmaksu
+        else:
+            tyotvakmaksu=0
+        
+        if palkkatulot>self.paivarahamaksu_raja and p['ika']<68:
             sairausvakuutus=palkkatulot*self.paivarahamaksu_pros
         else:
             sairausvakuutus=0
@@ -1131,6 +1139,11 @@ class Benefits():
             +q['toimtuki']+q['kokoelake']
         
         q['palkkatulot']=p['t']
+        if p['elakkeella']<1:
+            q['palkkatulot_eielakkeella']=p['t']
+        else:
+            q['palkkatulot_eielakkeella']=0
+            
         q['puoliso_palkkatulot']=p['puoliso_tulot']
         q['puoliso_tulot_netto']=p['puoliso_tulot']-q['puoliso_verot_ilman_etuuksia']
         q['perustulo']=0
@@ -1498,7 +1511,7 @@ class Benefits():
             if ika>=65:
                 maara = max(0,maara-np.maximum(0,(tyoelake-55.54))/2)
             elif ika>=62: # varhennus
-                maara = max(0,0.048*(65-ika)-np.maximum(0,(tyoelake-55.54))/2)
+                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-55.54))/2)
             else:
                 maara=0
             
@@ -1515,8 +1528,7 @@ class Benefits():
             if ika>=65:
                 maara = max(0,maara-np.maximum(0,(tyoelake-55.54))/2)
             elif ika>=62: # varhennus
-            
-                maara = max(0,0.048*(65-ika)-np.maximum(0,(tyoelake-55.54))/2)
+                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-55.54))/2)
             else:
                 maara=0
             
@@ -1533,7 +1545,7 @@ class Benefits():
             if ika>=65:
                 maara = max(0,maara-np.maximum(0,(tyoelake-55.54))/2)
             elif ika>=62: # varhennus
-                maara = max(0,0.048*(65-ika)-np.maximum(0,(tyoelake-55.54))/2)
+                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-55.54))/2)
             else:
                 maara=0
             
@@ -1743,7 +1755,7 @@ class Benefits():
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
-            figname=None):
+            figname=None,grayscale=None):
             
         netto,eff,tva,osa_tva=self.comp_insentives(p=p,p2=None,min_salary=min_salary,
                                                 max_salary=max_salary,step_salary=step_salary,dt=dt)
@@ -1754,7 +1766,7 @@ class Benefits():
                 basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
                 dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
                 plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
-                figname=figname)
+                figname=figname,grayscale=grayscale)
         
         return netto,eff,tva,osa_tva
         
@@ -1763,7 +1775,15 @@ class Benefits():
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=False,
-            figname=None):
+            figname=None,grayscale=False):
+            
+        if grayscale:
+            plt.style.use('grayscale')
+            plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
+            pal=sns.dark_palette("darkgray", 6, reverse=True)
+            reverse=True
+        else:
+            pal=sns.color_palette()            
             
         x=np.arange(min_salary,max_salary,step_salary)
         if plot_netto:
@@ -1777,7 +1797,7 @@ class Benefits():
                 axs.plot(x,netto)        
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel('Käteen (e/kk)')
-            axs.grid(True)
+            axs.grid(False)
             axs.set_xlim(0, max_salary)
             if figname is not None:
                 plt.savefig(figname+'_netto.eps', format='eps')
@@ -1853,7 +1873,7 @@ class Benefits():
         p3=p.copy()
         n0,q0=self.laske_tulot(p2)
         k=0
-        for t in np.arange(0,max_salary+step_salary,step_salary):
+        for t in np.arange(min_salary,max_salary+step_salary,step_salary):
             p3['t']=t # palkka
             n1,q1=self.laske_tulot(p3)
             p3['t']=t+dt # palkka
@@ -1872,6 +1892,16 @@ class Benefits():
             k=k+1
             
         return netto,eff,tva,osa_tva
+        
+    def comp_top_marginaali(self,p=None):
+    
+        if p==None:
+            p,selite=perheparametrit(perhetyyppi=1)
+        salary=150_000/12.5
+        n,eff,_,_=self.comp_insentives(p=p,min_salary=salary,max_salary=salary+1,step_salary=1,dt=100)
+        #print(n,eff)
+        
+        return eff[0]
         
     def laske_ja_plottaa_marginaalit(self,p=None,min_salary=0,max_salary=6000,
                 basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
@@ -1913,6 +1943,7 @@ class Benefits():
             plt.style.use('grayscale')
             plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
             pal=sns.dark_palette("darkgray", 6, reverse=True)
+            plt.grid(b=False)
             reverse=True
         else:
             pal=sns.color_palette()
@@ -1965,7 +1996,7 @@ class Benefits():
             else:
                 tva[t]=0
                 
-        if plot_eff:
+        if plot_eff and plottaa:
             sns.set()
             if fig is None:
                 figi,axs = plt.subplots()
@@ -1999,7 +2030,7 @@ class Benefits():
                 plt.savefig(figname+'_eff.png')
             plt.show()
         
-        if plot_netto:
+        if plot_netto and plottaa:
             if fig is None:
                 figi,axs = plt.subplots()
             else:
@@ -2034,7 +2065,7 @@ class Benefits():
                 plt.savefig(figname+'_netto.png')
             plt.show()
 
-        if plot_tva:
+        if plot_tva and plottaa:
             if fig is None:
                 figi,axs = plt.subplots()
             else:
