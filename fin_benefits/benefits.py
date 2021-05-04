@@ -1552,7 +1552,7 @@ class Benefits():
         return maara
         
     def laske_takuuelake2018(self,ika,muuelake,disability=False):
-        if ika<65 and not disability:
+        if ika<63 and not disability:
             return 0
         
         if muuelake<777.84:
@@ -1563,7 +1563,7 @@ class Benefits():
         return elake
     
     def laske_takuuelake2019(self,ika,muuelake,disability=False):
-        if ika<65 and not disability:
+        if ika<63 and not disability:
             return 0
         
         if muuelake<777.84:
@@ -1574,7 +1574,7 @@ class Benefits():
         return elake
     
     def laske_takuuelake2020(self,ika,muuelake,disability=False):
-        if ika<65 and not disability:
+        if ika<63 and not disability:
             return 0
         
         if muuelake<834.52:
@@ -1591,12 +1591,15 @@ class Benefits():
             kansanelake=self.laske_kansanelake(ika,elake,1,disability=disability)
             self.elakeindeksi=(0*1+1.0*1.0/1.016)**0.25
             indeksi=self.elakeindeksi**max(0,ika-40) # 2020-1980=40
-            if ika>=65 or disability:
+            if ika>=63 or disability:
                 return max(0,elake-(self.laske_takuuelake(ika,0,disability=disability)-kansanelake)*indeksi)
             else:
                 return max(0,elake-self.laske_kansanelake(ika,0,1)*indeksi)
     
     def laske_kokonaiselake(self,ika,muuelake,yksin=1,include_takuuelake=True,include_kansanelake=False,disability=False):
+        '''
+        by default, kansaneläke is not included, since this function is called annually
+        '''
         if include_kansanelake:
             kansanelake=self.laske_kansanelake(ika,muuelake,yksin,disability=disability)
             muuelake=muuelake+kansanelake

@@ -21,10 +21,11 @@ class BenefitsEK(Benefits):
         #self.ansiopvraha_kesto400=350/(12*21.5) # lyhennetty 50 pv
         #self.ansiopvraha_kesto300=250/(12*21.5)   
         #self.toe_vaatimus=1.0 # työssäoloehto väh 12kk   
-        self.porrastus=True
+        self.porrastus=False
         self.muuta_ansiopv_ylaraja=False
         self.muuta_pvhoito=False
         self.muuta_toimeentulotuki=True
+        self.muuta_asumistuki=True
 
     def paivahoitomenot(self,hoidossa,tulot,p):
         if self.muuta_pvhoito:
@@ -45,8 +46,6 @@ class BenefitsEK(Benefits):
         else:
             kerroin=1.0
             
-        #print(f'kesto {kesto} kerroin {kerroin}')
-
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
         return super().ansiopaivaraha(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin,omavastuukerroin=omavastuukerroin)
 
@@ -63,6 +62,44 @@ class BenefitsEK(Benefits):
         else:
             return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0)
      
+    def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p):
+        # Ruokakunnan koko
+        # henkilöä    I kuntaryhmä,
+        # e/kk    II kuntaryhmä,
+        # e/kk    III kuntaryhmä,
+        # e/kk    IIII kuntaryhmä,
+        # e/kk
+        # 1    508    492    411    362
+        # 2    735    706    600    527
+        # 3    937    890    761    675
+        # 4    1095    1038    901    804
+        # + lisähenkilöä kohden, e/kk
+        # 
+        # 137    130    123    118
+        # enimmaismenot kuntaryhmittain kun hloita 1-4
+        
+        if self.muuta_asumistuki:
+            max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
+            max_lisa=np.array([137, 130, 123, 118])
+            # kuntaryhma=3
+
+            max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+
+            prosentti=0.7 # vastaa 70 %
+            suojaosa=300*p['aikuisia']
+            perusomavastuu=max(0,0.42*(0.8*max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+            if perusomavastuu<10:
+                perusomavastuu=0
+            
+            tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+        
+            print('palkka {:.1f} muuttulot {:.1f} perusomavastuu {:.1f} vuokra {:.1f} max_meno {:.1f} tuki {:.1f}'.format(palkkatulot,muuttulot,perusomavastuu,vuokra,max_meno,tuki))
+    
+            return tuki
+        else:
+            super().asumistuki2018(palkkatulot,muuttulot,vuokra,p)
+        
+
     #def tyotulovahennys(self):
     #    max_tyotulovahennys=3000/self.kk_jakaja
     #    ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja

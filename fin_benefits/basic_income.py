@@ -22,8 +22,9 @@ class BasicIncomeBenefits(Benefits):
     
     def __init__(self,**kwargs):
     
-        self.perustulomalli='Kela'
+        self.perustulomalli='BI'
         self.osittainen_perustulo=True
+        self.perustulo_korvaa_toimeentulotuen=False
         self.koko_tyel_maksu=0.244
         self.kk_jakaja=12
                 
@@ -44,8 +45,11 @@ class BasicIncomeBenefits(Benefits):
             elif key=='perustulo_asetettava':
                 if value is not None:
                     self.perustulo_asetettava=value
+            elif key=='perustulo_korvaa_toimeentulotuen':
+                if value is not None:
+                    self.perustulo_korvaa_toimeentulotuen=value
                     
-        print('Perustulomalli {}'.format(self.perustulomalli))
+        print(f'UBI-model {self.perustulomalli}\nPartial UBI {self.osittainen_perustulo}\nperustulo_korvaa_toimeentulotuen {self.perustulo_korvaa_toimeentulotuen}')
                     
         super().__init__(**kwargs)
         self.setup_basic_income()
@@ -75,6 +79,15 @@ class BasicIncomeBenefits(Benefits):
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
             self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_Kela
+        elif self.perustulomalli=='BI':
+            # Artikkelin BI-malli
+            self.perustulo=self.laske_perustulo_BI
+            self.asumistuen_suojaosa=600
+            self.max_tyotulovahennys=0
+            self.max_perusvahennys=0
+            self.max_ansiotulovahennys=0
+            self.veroparam2018=self.veroparam2018_perustulo
+            self.valtionvero_asteikko_perustulo=self.valtionvero_asteikko_perustulo_BI
         elif self.perustulomalli in set(['vasemmistoliitto','Vasemmistoliitto']):        
             # Vasemmistoliitto
             self.perustulo=self.laske_perustulo_vasemmistoliitto
@@ -128,6 +141,12 @@ class BasicIncomeBenefits(Benefits):
         
     def laske_perustulo_Kelamalli(self):
         return 560.0
+        
+    def laske_perustulo_BI(self):
+        '''
+        Artikkelia varten
+        '''
+        return 600.0
         
     def laske_perustulo_tm(self):
         return 660
@@ -442,6 +461,11 @@ class BasicIncomeBenefits(Benefits):
         pros=np.array([0.43,0.43,0.43,0.43]) # 560 e/kk
         return rajat,pros
     
+    def valtionvero_asteikko_perustulo_BI(self):
+        rajat=np.array([12*600,50000,9999999,9999999])/self.kk_jakaja
+        pros=np.array([0.40,0.40,0.40,0.40]) # 500 e/kk
+        return rajat,pros
+    
     def valtionvero_asteikko_perustulo_vihreat(self):
         rajat=np.array([12*600,50000,9999999,9999999])/self.kk_jakaja
         #pros=np.array([0.4575,0.4575,0.4575,0.4575]) # 600 e/kk Vai 44,75 %??
@@ -742,7 +766,7 @@ class BasicIncomeBenefits(Benefits):
             q['perustulo_nettonetto']=0
             q['puoliso_perustulo_nettonetto']=0
 
-        if not self.osittainen_perustulo: # toimeentulotuki korvattu perustulolla
+        if (not self.osittainen_perustulo) or self.perustulo_korvaa_toimeentulotuen: # toimeentulotuki korvattu perustulolla
             q['toimtuki']=0
         else: # ei korvattu
             if p['opiskelija']>0:
