@@ -24,8 +24,8 @@ class BenefitsEK(Benefits):
         self.porrastus=False
         self.muuta_ansiopv_ylaraja=False
         self.muuta_pvhoito=False
-        self.muuta_toimeentulotuki=True
-        self.muuta_asumistuki=True
+        self.muuta_toimeentulotuki=False
+        self.muuta_asumistuki=False
 
     def paivahoitomenot(self,hoidossa,tulot,p):
         if self.muuta_pvhoito:
@@ -62,7 +62,7 @@ class BenefitsEK(Benefits):
         else:
             return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0)
      
-    def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p):
+    def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p,debug=False):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -93,11 +93,12 @@ class BenefitsEK(Benefits):
             
             tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
         
-            print('palkka {:.1f} muuttulot {:.1f} perusomavastuu {:.1f} vuokra {:.1f} max_meno {:.1f} tuki {:.1f}'.format(palkkatulot,muuttulot,perusomavastuu,vuokra,max_meno,tuki))
+            if debug:
+                print('palkka {:.1f} muuttulot {:.1f} perusomavastuu {:.1f} vuokra {:.1f} max_meno {:.1f} tuki {:.1f}'.format(palkkatulot,muuttulot,perusomavastuu,vuokra,max_meno,tuki))
     
             return tuki
         else:
-            super().asumistuki2018(palkkatulot,muuttulot,vuokra,p)
+            return super().asumistuki2018(palkkatulot,muuttulot,vuokra,p)
         
 
     #def tyotulovahennys(self):

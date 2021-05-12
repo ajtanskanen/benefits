@@ -1252,6 +1252,38 @@ class Benefits():
         return tuki
         
 
+    def asumistuki2021(self,palkkatulot,muuttulot,vuokra,p):
+        # Ruokakunnan koko
+        # henkilöä    I kuntaryhmä,
+        # e/kk    II kuntaryhmä,
+        # e/kk    III kuntaryhmä,
+        # e/kk    IIII kuntaryhmä,
+        # e/kk
+        # 1    508    492    411    362
+        # 2    735    706    600    527
+        # 3    937    890    761    675
+        # 4    1095    1038    901    804
+        # + lisähenkilöä kohden, e/kk
+        # 
+        # 137    130    123    118
+        # enimmaismenot kuntaryhmittain kun hloita 1-4
+        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
+        max_lisa=np.array([137, 130, 123, 118])
+        # kuntaryhma=3
+
+        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+
+        prosentti=0.8 # vastaa 80 %
+        suojaosa=300*p['aikuisia']
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+        if perusomavastuu<10:
+            perusomavastuu=0
+            
+        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+    
+        return tuki
+        
+
     def elakkeensaajan_asumistuki(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
