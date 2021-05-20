@@ -29,7 +29,7 @@ class Benefits():
         self.additional_tyel_premium=0.0
         self.additional_kunnallisvero=0.0
         self.additional_income_tax_high=0.0
-        self.extra_ppr=1.0 # kerroin peruspäivärahalle
+        self.extra_ppr_factor=1.0 # kerroin peruspäivärahalle
         self.language='Finnish' # 'English'
         
         if 'kwargs' in kwargs:
@@ -61,7 +61,7 @@ class Benefits():
                     self.additional_kunnallisvero=value
             elif key=='extra_ppr':
                 if value is not None:
-                    self.extra_ppr=value
+                    self.extra_ppr_factor+=value
     
         # choose the correct set of benefit functions for computations
         self.set_year(self.year)
@@ -222,7 +222,7 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa)*self.extra_ppr
+        pvraha=21.5*(32.40+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -238,7 +238,7 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa)*self.extra_ppr
+        pvraha=21.5*(32.40+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -254,7 +254,7 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.66+lisa)*self.extra_ppr
+        pvraha=21.5*(33.66+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -270,7 +270,7 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.66+lisa)*self.extra_ppr
+        pvraha=21.5*(33.66+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -302,22 +302,25 @@ class Benefits():
                 sotumaksu=0.0414+0.6*self.additional_tyel_premium
                 taite=3197.70    
             elif self.year==2021:
-                lapsikorotus=np.array([0,5.28,7.76,10.00])*21.5    
-                sotumaksu=0.0414+0.6*self.additional_tyel_premium
-                taite=3197.70    
+                lapsikorotus=np.array([0,5.30,7.80,10.03])*21.5    
+                sotumaksu=0.0434+0.6*self.additional_tyel_premium
+                taite=3209.10    
             else:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
                 sotumaksu=0.0448+0.6*self.additional_tyel_premium
                 taite=3078.60    
                             
             if saa_ansiopaivarahaa>0: # & (kesto<400.0): # ei keston tarkastusta!
+                #print(f'tyoton {tyoton} vakiintunutpalkka {vakiintunutpalkka} lapsia {lapsia} tyotaikaisettulot {tyotaikaisettulot} saa_ansiopaivarahaa {saa_ansiopaivarahaa} kesto {kesto} ansiokerroin {ansiokerroin} omavastuukerroin {omavastuukerroin}')
+            
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
                 vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
-        
+                #print(f'vakpalkka {vakpalkka}')
                 if vakpalkka>taite:
                     tuki2=0.2*max(0,vakpalkka-taite)+0.45*max(0,taite-perus)+perus    
                 else:
-                    tuki2=0.45*max(0,vakpalkka-perus)+perus    
+                    tuki2=0.45*max(0,vakpalkka-perus)+perus
+                #print(f'tuki2 {tuki2} taite {taite} perus {perus} vakpalkka {vakpalkka}')
 
                 tuki2=tuki2+lapsikorotus[min(lapsia,3)]    
                 tuki2=tuki2*ansiokerroin # mahdollinen porrastus tehdään tämän avulla
@@ -326,10 +329,12 @@ class Benefits():
                 perus=self.peruspaivaraha(lapsia)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
                 if tuki2>.9*vakpalkka:
                     tuki2=max(.9*vakpalkka,perus)    
+                #print(f'tuki2 {tuki2}')
         
                 vahentavattulo=max(0,tyotaikaisettulot-suojaosa)    
                 ansiopaivarahamaara=max(0,tuki2-0.5*vahentavattulo)  
                 ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
+                #print(f'ansiopaivarahamaara {ansiopaivarahamaara}')
 
                 tuki=ansiopaivarahamaara    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
@@ -1611,6 +1616,17 @@ class Benefits():
         
         if muuelake<834.52:
             elake=834.52-muuelake
+        else:
+            elake=0
+        
+        return elake
+        
+    def laske_takuuelake2021(self,ika,muuelake,disability=False):
+        if ika<63 and not disability:
+            return 0
+        
+        if muuelake<837.59:
+            elake=837.59-muuelake
         else:
             elake=0
         
