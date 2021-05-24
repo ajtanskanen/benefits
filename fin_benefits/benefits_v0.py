@@ -222,7 +222,7 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa) #*self.extra_ppr_factor
+        pvraha=21.5*(32.40+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -238,7 +238,7 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa) #*self.extra_ppr_factor
+        pvraha=21.5*(32.40+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -254,7 +254,7 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.66+lisa) #*self.extra_ppr_factor
+        pvraha=21.5*(33.66+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -270,7 +270,7 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.66+lisa) #*self.extra_ppr_factor
+        pvraha=21.5*(33.66+lisa)*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
