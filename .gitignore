@@ -3,3 +3,5 @@ __pycache__/*
 fin_benefits/__pycache__/*
 .ipynb_checkpoints/*
 fin_benefits.egg-info/*
+.DS_store
+.ipynb_checkpoints/*.ipynb
