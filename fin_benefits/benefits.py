@@ -165,8 +165,12 @@ class Benefits():
         bruttopalkka=omabruttopalkka+puolison_bruttopalkka    
         palkkavero=omapalkkavero+puolison_palkkavero    
         palkkatulot=bruttopalkka-palkkavero    
-        omaetuoikeutettuosa=min(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
-        puolison_etuoikeutettuosa=min(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
+        if True: # lain mukainen
+            omaetuoikeutettuosa=min(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
+            puolison_etuoikeutettuosa=min(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
+        else: # Kelan tulkinta
+            omaetuoikeutettuosa=min_etuoikeutettuosa
+            puolison_etuoikeutettuosa=min_etuoikeutettuosa
         etuoikeutettuosa=omaetuoikeutettuosa+puolison_etuoikeutettuosa    
 
         if p['aikuisia']<2:
@@ -443,7 +447,6 @@ class Benefits():
         self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium)) # PTEL 
         self.tyonantajan_sivukulut=max(0,0.6*0.0065+0.4*0.205+0.0007+0.1695+0.0134+0.01) # työttömyysvakuutusmaksu, ryhmähv, tyel, sv, työtapaturma
     
-        # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
         self.sairaanhoitomaksu_etuus=0.0147 # muut
         
@@ -460,7 +463,6 @@ class Benefits():
         self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
         self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
     
-        # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0
         self.sairaanhoitomaksu_etuus=0.0161 # muut
         
@@ -477,7 +479,6 @@ class Benefits():
         self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
         self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
     
-        # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0068
         self.sairaanhoitomaksu_etuus=0.0161 # muut
         
@@ -489,19 +490,18 @@ class Benefits():
         
     def veroparam2021(self):
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
-        self.tyottomyysvakuutusmaksu=0.0125 #
+        self.tyottomyysvakuutusmaksu=0.0140 #
         self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
         self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
         self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
     
-        # sairausvakuutus ??
         self.sairaanhoitomaksu=0.0068
         self.sairaanhoitomaksu_etuus=0.0165 # muut
         
         self.paivarahamaksu_pros=0.0136 # palkka
         self.paivarahamaksu_raja=14766/self.kk_jakaja    
         
-        self.elakemaksu_alaraja=60.57
+        self.elakemaksu_alaraja=61.37
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
     def laske_ylevero2018(self,palkkatulot,elaketulot):
@@ -569,6 +569,11 @@ class Benefits():
     def perusvahennys2020(self):
         perusvahennys_pros=0.18
         max_perusvahennys=3540/self.kk_jakaja
+        return perusvahennys_pros,max_perusvahennys
+    
+    def perusvahennys2021(self):
+        perusvahennys_pros=0.18
+        max_perusvahennys=3630/self.kk_jakaja
         return perusvahennys_pros,max_perusvahennys
     
     def verotus(self,palkkatulot,muuttulot,elaketulot,lapsia,p):
@@ -2241,7 +2246,7 @@ class Benefits():
         plt.show()
 
     def laske_ja_plottaa_hila(self,min_salary=0,max_salary=6000,type='eff',dt=100):
-        fig,axs = plt.subplots(10,3)
+        fig,axs = plt.subplots(10,5)
         for k in range(1,31):
             ax=plt.subplot(10,3,k)
             p,_=perheparametrit(k)
