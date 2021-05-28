@@ -3,7 +3,7 @@
 This repository implements the Finnish social security as a Python module. 
 The aim is to enable analysis of the scheme easily, e.g., computation of the effective tax rate.
 
-To see an executable examples, see <a href='https://colab.research.google.com/drive/1mn6e3EEulFXpQppHKbphRGaA4ujTAx-J#scrollTo=J9Z67ShBbdy8'https://colab.research.google.com/drive/1mn6e3EEulFXpQppHKbphRGaA4ujTAx-J#scrollTo=J9Z67ShBbdy8</a>
+To see an executable examples, see <a href='https://colab.research.google.com/drive/1mn6e3EEulFXpQppHKbphRGaA4ujTAx-J#scrollTo=J9Z67ShBbdy8'>Google Colab workbook</a>.
 ```
 
 ## References
