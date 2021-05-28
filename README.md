@@ -7,10 +7,12 @@ Further, the code is implemented in a modular way to enable embedding in a more 
 To see an executable example, see <a href='https://colab.research.google.com/drive/1mn6e3EEulFXpQppHKbphRGaA4ujTAx-J#scrollTo=J9Z67ShBbdy8'>Google Colab workbook</a>.
 
 <p>
-<img src='kuvat/verkkoon_gs__netto.png'>Figure 1. Net income as a function of wage taking into account social security benefits and taxation.
+<img src='kuvat/verkkoon_gs__netto.png'>
+Figure 1. Net income as a function of wage taking into account social security benefits and taxation.
 
 <p>
-<img src='kuvat/verkkoon_gs__eff.png'>Figure 2. Effective marginal tax rate as a function of wage taking into account social security benefits and taxation.
+<img src='kuvat/verkkoon_gs__eff.png'>
+Figure 2. Effective marginal tax rate as a function of wage taking into account social security benefits and taxation.
 
 ## References
 
