@@ -1,15 +1,24 @@
-# Analysis of social security made easy
+# Benefits - Python module that makes analysis of social security easy
 
-This repository implements the Finnish earning-related social security as a python module. 
+Benefits implements Finnish social security as a Python module. It enables analysis of benefits and incentives via example cases.
 The aim is to enable analysis of the scheme easily, e.g., computation of the effective tax rate.
+Further, the code is implemented in a modular way to enable embedding in a more comprehensive model, such as a life cycle model.
 
-```
+To see an executable example, see <a href='https://colab.research.google.com/drive/1mn6e3EEulFXpQppHKbphRGaA4ujTAx-J#scrollTo=J9Z67ShBbdy8'>Google Colab workbook</a>.
+
+<p>
+<img src='kuvat/verkkoon_gs__netto.png'>
+Figure 1. Net income as a function of wage taking into account social security benefits and taxation.
+
+<p>
+<img src='kuvat/verkkoon_gs__eff.png'>
+Figure 2. Effective marginal tax rate as a function of wage taking into account social security benefits and taxation.
 
 ## References
 
 	@misc{fin_benefits,
 	  author = {Antti J. Tanskanen},
-	  title = {Analysis of social security made easy},
+	  title = {Benefits - Python module that makes analysis of social security easy},
 	  year = {2019},
 	  publisher = {GitHub},
 	  journal = {GitHub repository},

@@ -18,7 +18,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['asumismenot_toimeentulo']=500
     p['asumismenot_asumistuki']=500
     p['lapsia']=0
-    p['paivahoidossa']=0
+    p['lapsia_paivahoidossa']=0
     p['aikuisia']=1
     p['veromalli']=0
     p['kuntaryhma']=2 # vastaa 3:sta matlabissa
@@ -30,10 +30,8 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['puoliso_tyoton']=0  
     p['puoliso_vakiintunutpalkka']=0  
     p['puoliso_saa_ansiopaivarahaa']=0
-    p['puoliso_tulot']=0
     p['puoliso_tyottomyyden_kesto']=100
     p['tyottomyyden_kesto']=10
-    p['lapsia_paivahoidossa']=0
     
     if perhetyyppi==1: # 1+0, töissä
         lapsia=0    
@@ -530,8 +528,8 @@ def tee_selite(p):
         
     if p['lapsia']>0:
         selite+=" ja {lapsia} lasta.".format(lapsia=p['lapsia'])
-        if p['paivahoidossa']>0:
-            selite+=" Lapsista {paiva} on päivähoidossa.".format(paiva=p['paivahoidossa'])
+        if p['lapsia_paivahoidossa']>0:
+            selite+=" Lapsista {paiva} on päivähoidossa.".format(paiva=p['lapsia_paivahoidossa'])
         if p['lapsia_kotihoidontuella']>0:
             selite+=" Lapsista {paiva} kotihoidossa.".format(paiva=p['lapsia_kotihoidontuella'])
         if p['alle3v']>0:
