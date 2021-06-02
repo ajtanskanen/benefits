@@ -400,7 +400,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0                
-    elif perhetyyppi==41: # 1+0, eläkkeellä
+    elif perhetyyppi==33: # 1+0, eläkkeellä
         lapsia=0    
         paivahoidossa=0
         lapsia_kotihoidontuella=0    
@@ -415,7 +415,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0                
-    elif perhetyyppi==42: # 1+0, töissä
+    elif perhetyyppi==34: # 1+0, töissä
         lapsia=0    
         paivahoidossa=0
         lapsia_kotihoidontuella=0    
@@ -429,7 +429,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0  
-    elif perhetyyppi==43: # opiskelija, asuu yksi              
+    elif perhetyyppi==35: # opiskelija, asuu yksin
         lapsia=0    
         paivahoidossa=0
         lapsia_kotihoidontuella=0    
