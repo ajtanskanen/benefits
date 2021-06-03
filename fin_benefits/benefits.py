@@ -224,6 +224,9 @@ class Benefits():
             
         return tuki
         
+    def perheparametrit(self,perhetyyppi=10,tulosta=False):
+        return perheparametrit(perhetyyppi=perhetyyppi,tulosta=tulosta)
+        
     def get_default_parameter(self):
         return perheparametrit(perhetyyppi=1)
     
@@ -2279,7 +2282,8 @@ class Benefits():
             self.lp_marginaalit_apu(axs[y,x],otsikko='Tapaus '+str(k),p=p,min_salary=min_salary,max_salary=max_salary,type=type,dt=dt)
 
         if dire is not None:
-            fig.savefig(dire+'multiple_'+type+'.eps',type='eps')
+            fig.savefig(dire+'multiple_'+type+'.eps',bbox_inches='tight')
+            fig.savefig(dire+'multiple_'+type+'.png',bbox_inches='tight')
 
         plt.show()
 
