@@ -25,7 +25,7 @@ class BenefitsEK(Benefits):
         self.muuta_ansiopv_ylaraja=False
         self.muuta_pvhoito=False
         self.muuta_toimeentulotuki=True
-        self.muuta_asumistuki=True
+        self.muuta_asumistuki=False
 
     def paivahoitomenot(self,hoidossa,tulot,p):
         if self.muuta_pvhoito:

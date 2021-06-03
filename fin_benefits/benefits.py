@@ -165,12 +165,14 @@ class Benefits():
         bruttopalkka=omabruttopalkka+puolison_bruttopalkka    
         palkkavero=omapalkkavero+puolison_palkkavero    
         palkkatulot=bruttopalkka-palkkavero    
-        if True: # lain mukainen
+        
+        if False: # lain mukainen tiukka tulkinta
             omaetuoikeutettuosa=min(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
             puolison_etuoikeutettuosa=min(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
-        else: # Kelan tulkinta
+        else: # Kelan tulkinta: aina 150e
             omaetuoikeutettuosa=min_etuoikeutettuosa
             puolison_etuoikeutettuosa=min_etuoikeutettuosa
+            
         etuoikeutettuosa=omaetuoikeutettuosa+puolison_etuoikeutettuosa    
 
         if p['aikuisia']<2:
