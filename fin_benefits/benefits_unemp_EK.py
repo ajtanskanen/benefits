@@ -25,7 +25,7 @@ class BenefitsEK(Benefits):
         self.muuta_ansiopv_ylaraja=False
         self.muuta_pvhoito=False
         self.muuta_toimeentulotuki=True
-        self.muuta_asumistuki=False
+        self.muuta_asumistuki=True
 
     def paivahoitomenot(self,hoidossa,tulot,p):
         if self.muuta_pvhoito:
@@ -56,7 +56,7 @@ class BenefitsEK(Benefits):
         else:
             return super().ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)        
      
-    def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.07):
+    def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.10):
         if self.muuta_toimeentulotuki:
             return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=omavastuuprosentti)
         else:
@@ -87,7 +87,8 @@ class BenefitsEK(Benefits):
 
             prosentti=0.7 # vastaa 70 %
             suojaosa=300*p['aikuisia']
-            perusomavastuu=max(0,0.42*(0.8*max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+            #perusomavastuu=max(0,0.42*(0.8*max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+            perusomavastuu=max(0,0.5*(0.8*max(0,palkkatulot-suojaosa)+muuttulot-(500+100*p['aikuisia']+275*p['lapsia'])))
             if perusomavastuu<10:
                 perusomavastuu=0
             
