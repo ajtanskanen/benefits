@@ -283,13 +283,13 @@ class Benefits():
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
-            lisa=5.28     # e/pv
+            lisa=5.30     # e/pv
         elif lapsia==2:
-            lisa=7.76     # e/pv
+            lisa=7.78     # e/pv
         else:
-            lisa=10.00     # e/pv
+            lisa=10.03     # e/pv
         
-        pvraha=21.5*(33.66+lisa) #*self.extra_ppr_factor
+        pvraha=21.5*(33.78+lisa) #*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -459,8 +459,15 @@ class Benefits():
         self.tyottomyysvakuutusmaksu=0.0190 #
         self.tyontekijan_maksu=max(0,max(0,0.0635+self.additional_tyel_premium)) # PTEL
         self.tyontekijan_maksu_52=max(0,max(0,0.0785+self.additional_tyel_premium)) # PTEL
-        self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium)) # PTEL 
-        self.tyonantajan_sivukulut=max(0,0.6*0.0065+0.4*0.205+0.0007+0.1695+0.0134+0.01) # työttömyysvakuutusmaksu, ryhmähv, tyel, sv, työtapaturma
+        self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium))
+
+        self.tyonantajan_sairausvakuutusmaksu=0.0086
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
+        self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
+        self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+            +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0
         self.sairaanhoitomaksu_etuus=0.0147 # muut
@@ -477,6 +484,14 @@ class Benefits():
         self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
         self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
         self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+
+        self.tyonantajan_sairausvakuutusmaksu=0.0077
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
+        self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
+        self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+            +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0
         self.sairaanhoitomaksu_etuus=0.0161 # muut
@@ -493,6 +508,14 @@ class Benefits():
         self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
         self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
         self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+
+        self.tyonantajan_sairausvakuutusmaksu=0.0134
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
+        self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
+        self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+            +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0068
         self.sairaanhoitomaksu_etuus=0.0161 # muut
@@ -509,8 +532,16 @@ class Benefits():
         self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
         self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
         self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+
+        self.tyonantajan_sairausvakuutusmaksu=0.0153
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
+        self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
+        self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+            +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
-        self.sairaanhoitomaksu=0.0068
+        self.sairaanhoitomaksu=0.0066
         self.sairaanhoitomaksu_etuus=0.0165 # muut
         
         self.paivarahamaksu_pros=0.0136 # palkka
@@ -724,13 +755,13 @@ class Benefits():
             ansiotulovahennys=max(0,ansiotulovahennys-ansvah[2]*(puhdas_ansiotulo-rajat[2]))
         
         # perusvähennys
-        max_perusvahennys,perusvahennys_pros=self.perusvahennys()
+        perusvahennys_pros,max_perusvahennys=self.perusvahennys()
         peruste=max(0,tulot_kunnallis-ansiotulovahennys)
         if peruste<max_perusvahennys:
             perusvahennys=peruste
         else:
             perusvahennys=max(0,max_perusvahennys-perusvahennys_pros*max(0,peruste-max_perusvahennys))
-        
+            
         # Yhteensä
         kunnallisveronperuste=max(0,peruste-perusvahennys)
         
@@ -816,6 +847,27 @@ class Benefits():
             tuki_alle_3v=341.69 # e/kk
             seuraavat_alle_3v=102.30 # e/kk
             yli_3v=65.73 #e_kk
+            if allekolmev>0:
+                kerroin1=1
+                if allekolmev>1:
+                    kerroin2=allekolmev-1
+                else:
+                    kerroin2=0
+            else:
+                kerroin1=0
+                kerroin2=0
+            
+            arvo=alle_kouluikaisia*yli_3v+tuki_alle_3v*kerroin1+kerroin2*seuraavat_alle_3v        
+        
+        return arvo
+    
+    def kotihoidontuki2021(self,lapsia,allekolmev,alle_kouluikaisia):
+        if lapsia<1:
+            arvo=0
+        else:
+            tuki_alle_3v=343.95 # e/kk
+            seuraavat_alle_3v=102.67 # e/kk
+            yli_3v=65.97 #e_kk
             if allekolmev>0:
                 kerroin1=1
                 if allekolmev>1:
@@ -1559,6 +1611,77 @@ class Benefits():
             maksu=0
         
         return maksu
+        
+    # hallituksen päätöksenmukaiset päivähoitomenot 2018
+    def paivahoitomenot2021(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
+        minimimaksu=10
+
+        if prosentti1==None:
+            prosentti1=0.107
+        if prosentti2==None:
+            prosentti2=0.5
+        if prosentti3==None:
+            prosentti3=0.2
+            
+        if maksimimaksu==None:
+            maksimimaksu=290
+
+        if p['lapsia']>0:
+            vakea=p['lapsia']+p['aikuisia']
+            if vakea==1:
+                alaraja=2050
+                prosentti=prosentti1
+            elif vakea==2:
+                alaraja=2050
+                prosentti=prosentti1
+            elif vakea==3:
+                alaraja=2646
+                prosentti=prosentti1
+            elif vakea==4:
+                alaraja=3003
+                prosentti=prosentti1
+            elif vakea==5:
+                alaraja=3361
+                prosentti=prosentti1
+            elif vakea==6:
+                alaraja=3718
+                prosentti=prosentti1
+            else:
+                alaraja=3718+138*(vakea-6)
+                prosentti=prosentti1
+
+            pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
+            if hoidossa==0:
+                kerroin=0
+            elif hoidossa==1:
+                if pmaksu<minimimaksu:
+                    kerroin=0
+                else:
+                    kerroin=1
+            elif hoidossa==2:
+                if pmaksu<minimimaksu:
+                    kerroin=0
+                else:
+                    if (prosentti2*pmaksu<minimimaksu):
+                        kerroin=1
+                    else:
+                        kerroin=1+prosentti2
+            else:
+                if pmaksu<minimimaksu:
+                    kerroin=0
+                else:
+                    if prosentti2*pmaksu<minimimaksu:
+                        kerroin=1
+                    else:
+                        if (prosentti3*pmaksu<minimimaksu):
+                            kerroin=1+prosentti2
+                        else:
+                            kerroin=1+prosentti2+prosentti3*(p['lapsia']-2)
+            maksu=kerroin*pmaksu
+        else:
+            maksu=0
+        
+        return maksu        
     
     def laske_kansanelake2018(self,ika,tyoelake,yksin,disability=False):
         if yksin>0:
@@ -1606,6 +1729,23 @@ class Benefits():
                 maara = max(0,maara-np.maximum(0,(tyoelake-55.54))/2)
             elif ika>=62: # varhennus
                 maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-55.54))/2)
+            else:
+                maara=0
+            
+        return maara
+        
+    def laske_kansanelake2021(self,ika,tyoelake,yksin,disability=False):
+        if yksin>0:
+            maara=665.29
+        else:
+            maara=593.97
+        if disability:
+            maara = max(0,maara-np.maximum(0,(tyoelake-56.29))/2)
+        else:
+            if ika>=65:
+                maara = max(0,maara-np.maximum(0,(tyoelake-56.29))/2)
+            elif ika>=62: # varhennus
+                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-56.29))/2)
             else:
                 maara=0
             
@@ -1694,12 +1834,18 @@ class Benefits():
             sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12  
-        else:
-            minimi=27.86*25
+        elif self.year==2020:
+            minimi=28.94*25
             sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12  
-                        
+        elif self.year==2021:
+            minimi=29.05*25
+            sotumaksu=0.0448
+            taite1=39_144/12  
+            taite2=60_225/12  
+
+        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
         raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
@@ -1710,15 +1856,15 @@ class Benefits():
             sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-                
-            raha=max(minimi,0.9*min(taite1,vakiintunutpalkka)+0.325*max(vakiintunutpalkka-taite1,0))
+            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
         else: 
             minimi=27.86*25
             sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-                        
-            raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
+            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
         
@@ -1728,15 +1874,33 @@ class Benefits():
             sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-                
-            raha=max(minimi,0.9*min(taite1,vakiintunutpalkka)+0.325*max(vakiintunutpalkka-taite1,0))
+            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
         else: 
             minimi=28.94*25
             sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-                        
-            raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
+            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
+
+        return raha
+        
+    def aitiysraha2021(self,vakiintunutpalkka,kesto):
+        if kesto<56/260:
+            minimi=0
+            sotumaksu=0.0448
+            taite1=39_144/12  
+            taite2=60_225/12 
+            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
+        else: 
+            minimi=29.05*25
+            sotumaksu=0.0448
+            taite1=39_144/12  
+            taite2=60_225/12 
+            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
         
@@ -1746,7 +1910,6 @@ class Benefits():
         taite1=30_394/12
         taite2=58_252/12
         vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
-
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.2*max(vakiintunut-taite2,0))
 
         return raha
@@ -1766,6 +1929,16 @@ class Benefits():
         minimi=28.94*25
         sotumaksu=0.0958
         taite1=31_595/12  
+        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+                    
+        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
+
+        return raha
+        
+    def sairauspaivaraha2021(self,vakiintunutpalkka):
+        minimi=29.05*25
+        sotumaksu=0.0958
+        taite1=32_011/12  
         vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
@@ -1968,6 +2141,43 @@ class Benefits():
             
         return netto,eff,tva,osa_tva
         
+    def comp_taxes(self,p=None,p2=None,min_salary=0,max_salary=6000,step_salary=1,dt=100):
+        n_salary=int((max_salary+step_salary-min_salary)/step_salary)+1
+        netto=np.zeros(n_salary)
+        palkka=np.zeros(n_salary)
+        taxes=np.zeros(n_salary)
+        contributions=np.zeros(n_salary)
+        eff=np.zeros(n_salary)
+        
+        if p is None:
+            p=self.get_default_parameter()
+
+        if p2 is None:
+            p2=p.copy()
+            p2['t']=0 # palkka
+        p3=p.copy()
+        n0,q0=self.laske_tulot(p2)
+        k=0
+        wages=np.arange(min_salary,max_salary+step_salary,step_salary)
+        for t in wages:
+            p3['t']=t # palkka
+            n1,q1=self.laske_tulot(p3)
+            p3['t']=t+dt # palkka
+            n2,q2=self.laske_tulot(p3)
+            netto[k]=n1
+            palkka[k]=t
+            eff[k]=(1-(n2-n1)/dt)*100
+            taxes[k]=q1['verot']
+            
+            #print(f"{t:.2f},{q1['verot']:.2f},{q1['valtionvero']:.2f},{q1['kunnallisvero']:.2f}")
+            #print(f"sv:{q1['ptel']:.2f},{q1['sairausvakuutus']:.2f},{q1['tyotvakmaksu']:.2f},{q1['tyel_kokomaksu']:.2f},{q1['ylevero']}")
+            #print(f"vä:{q1['ansiotulovahennys']:.2f},{q1['perusvahennys']:.2f},{q1['tyotulovahennys']:.2f},{q1['tyotulovahennys_kunnallisveroon']}")
+            #print(f"pe:{t:.2f},{q1['kunnallisveronperuste']:.2f},{q1['valtionveroperuste']:.2f}")
+
+            k=k+1
+            
+        return wages,netto,eff,taxes
+        
     def comp_top_marginaali(self,p=None):
     
         if p==None:
@@ -2098,6 +2308,19 @@ class Benefits():
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
                         colors=pal)
                         
+            axs.set_xlabel(self.labels['wage'])
+            axs.set_ylabel(self.labels['effective'])
+            axs.grid(True,color='lightgray')
+            axs.set_xlim(0, max_salary)
+            axs.set_ylim(0, 120)
+            if selite:
+                #axs.legend(loc='upper right')
+                handles, labels = axs.get_legend_handles_labels()
+                lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
+            if figname is not None:
+                plt.savefig(figname+'_eff.png')
+            plt.show()
+        
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel(self.labels['effective'])
             axs.grid(True,color='lightgray')
