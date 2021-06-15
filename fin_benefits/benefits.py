@@ -95,7 +95,8 @@ class Benefits():
             self.labels['elake']='Pension'
             self.labels['perustulo']='Universal basic income'
             self.labels['opintotuki']='Opintotuki'
-            self.labels['lapsilisa']='Lapsilisa'
+            self.labels['lapsilisa']='Child benefit'
+            self.labels['elatustuki']='Alimony'
             self.labels['net income']='Net income (e/m)'
         else:
             self.labels['wage']='Palkka (e/kk)'
@@ -116,6 +117,7 @@ class Benefits():
             self.labels['perustulo']='Perustulo'
             self.labels['opintotuki']='Opintotuki'
             self.labels['lapsilisa']='Lapsilisa'
+            self.labels['elatustuki']='Elatustuki'
             self.labels['net income']='Käteen (e/kk)'
     
     def toimeentulotuki_param2018(self):
@@ -904,6 +906,19 @@ class Benefits():
         pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
+        
+    def laske_elatustuki(self,lapsia,aikuisia):
+        if self.year==2018:
+            elatustuki=156.39*lapsia
+        elif self.year==2019:
+            elatustuki=167.35*lapsia
+        elif self.year==2020:
+            elatustuki=167.35*lapsia
+        elif self.year==2021:
+            elatustuki=167.35*lapsia
+        
+        return elatustuki
+    
 
     def laske_valtionvero(self,tulot,p):
         rajat,pros=self.valtionvero_asteikko()
@@ -1015,6 +1030,9 @@ class Benefits():
             p['sairauspaivarahalla']=0
         if 'disabled' not in p:
             p['disabled']=0
+        if 'saa_elatustukea' not in p:
+            p['saa_elatustukea']=0
+        
         return p
 
     def laske_tulot(self,p,tt_alennus=0,include_takuuelake=True):
@@ -1144,8 +1162,10 @@ class Benefits():
             q['puoliso_sairausvakuutus']=0
             q['puoliso_tyotvakmaksu']=0
     
-        q['elatustuki']=0
-        #elatustuki=laske_elatustuki(p['lapsia'],p['aikuisia)
+        if p['aikuisia']==1 and p['saa_elatustukea']>0:
+            q['elatustuki']=self.laske_elatustuki(p['lapsia'],p['aikuisia'])
+        else:
+            q['elatustuki']=0
         
         if p['elakkeella']>0:
             q['asumistuki']=self.elakkeensaajan_asumistuki(p['puoliso_tulot']+p['t'],q['kokoelake'],p['asumismenot_asumistuki'],p)
@@ -2191,7 +2211,7 @@ class Benefits():
                 basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
                 otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,ret=False,
                 plot_tva=True,plot_eff=True,plot_netto=True,figname=None,grayscale=False,
-                incl_perustulo=False,incl_elake=True,fig=None,ax=None):
+                incl_perustulo=False,incl_elake=True,fig=None,ax=None,incl_opintotuki=False):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -2268,6 +2288,7 @@ class Benefits():
             ansiopvraha[t]=q1['ansiopvraha_nettonetto']+q1['puoliso_ansiopvraha_nettonetto']
             lapsilisa[t]=q1['lapsilisa']
             perustulo[t]=q1['perustulo_nettonetto']+q1['puoliso_perustulo_nettonetto']
+            elatustuki[t]=q1['elatustuki']
             nettotulot[t]=tulot['tulotnetto']
             tva_asumistuki[t]=tvat['asumistuki']
             tva_toimeentulotuki[t]=tvat['toimtuki']
@@ -2302,9 +2323,13 @@ class Benefits():
                     axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki']),
                         colors=pal)
-                else:
+                elif incl_opintotuki:
                     axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margopintotuki,
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
                         colors=pal)
                         
             axs.set_xlabel(self.labels['wage'])
@@ -2328,17 +2353,21 @@ class Benefits():
                 axs=ax
             sns.set()
             if incl_perustulo:
-                axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,perustulo,
-                    labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']),
+                axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,perustulo,
+                    labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),
                     colors=pal)
             else:
                 if incl_elake:
-                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki']),
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki']),
+                        colors=pal)
+                elif incl_opintotuki:
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,opintotuki,elatustuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['opintotuki'],self.labels['elatustuki']),
                         colors=pal)
                 else:
-                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,opintotuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['opintotuki']),
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elatustuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elatustuki']),
                         colors=pal)
             
             #axs.plot(netto)
@@ -2371,9 +2400,13 @@ class Benefits():
                     axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki']),
                         colors=pal)
-                else:
+                elif incl_opintotuki:
                     axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_opintotuki,
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
                         colors=pal)
 
             axs.plot(tva,label='Vaihtoehto')

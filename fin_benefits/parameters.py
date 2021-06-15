@@ -32,6 +32,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     p['puoliso_saa_ansiopaivarahaa']=0
     p['puoliso_tyottomyyden_kesto']=100
     p['tyottomyyden_kesto']=10
+    p['saa_elatustukea']=0
     
     if perhetyyppi==1: # 1+0, töissä
         lapsia=0    
@@ -455,6 +456,9 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0   
+        
+    if lapsia>0 and aikuisia==1:
+        p['saa_elatustukea']=1
         
     # perhekoko          1   2   3   4    5
     # luvut peräisin Viitamäeltä
