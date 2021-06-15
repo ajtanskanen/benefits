@@ -972,7 +972,7 @@ class Benefits():
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
             # yksinhuoltajakorotus 53,30 e/lapsi
-            lapsilisat += 63.3
+            lapsilisat += 53.3
             
         return lapsilisat
     
@@ -984,23 +984,23 @@ class Benefits():
             
         return lapsilisat
     
-    def laske_lapsilisa(self,lapsia):
-        lapsilisat=self.lapsilisa()
-    
+    def laske_lapsilisa(self,lapsia,yksinhuoltajakorotus=0):
+        lapsilisat=self.lapsilisa(yksinhuoltajakorotus=yksinhuoltajakorotus)
+
         if lapsia==0:
             tuki=0
         elif lapsia==1:
             tuki=lapsilisat[0]
         elif lapsia==2:
-            tuki=sum(lapsilisat[0:1])
-        elif lapsia==3:
             tuki=sum(lapsilisat[0:2])
-        elif lapsia==4:
+        elif lapsia==3:
             tuki=sum(lapsilisat[0:3])
-        elif lapsia==5:
+        elif lapsia==4:
             tuki=sum(lapsilisat[0:4])
+        elif lapsia==5:
+            tuki=sum(lapsilisat[0:5])
         elif lapsia>5:
-            tuki=sum(lapsilisat[0:4])+(lapsia-5)*lapsilisat[4]
+            tuki=sum(lapsilisat[0:5])+(lapsia-5)*lapsilisat[4]
         else:
             print('error(1))')
         
@@ -1178,7 +1178,11 @@ class Benefits():
                 alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['lapsia_alle_3v'])
                 q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
             q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki'],p)
-            q['lapsilisa']=self.laske_lapsilisa(p['lapsia'])
+            if p['aikuisia']==1:
+                yksinhuoltajakorotus=1
+            else:
+                yksinhuoltajakorotus=0
+            q['lapsilisa']=self.laske_lapsilisa(p['lapsia'],yksinhuoltajakorotus=yksinhuoltajakorotus)
         else:
             q['pvhoito']=0
             q['pvhoito_ilman_etuuksia']=0
