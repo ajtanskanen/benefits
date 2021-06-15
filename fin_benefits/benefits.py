@@ -768,7 +768,6 @@ class Benefits():
         # korotettu maksuperuste puuttuu? =max(0,palkkatulot-peritty_sairaanhoitomaksu)*korotus
         peritty_sairaanhoitomaksu=max(0,palkkatulot_puhdas-perusvahennys)*self.sairaanhoitomaksu+(muuttulot+elaketulot_kunnallis)*self.sairaanhoitomaksu_etuus
         
-        # etuuksista peritty sairaanhoitomaksu puuttuu
         if tyotulovahennys_kunnallisveroon>0:
             kunnallisvero_0=kunnallisveronperuste*self.kunnallisvero_pros
             if peritty_sairaanhoitomaksu+kunnallisvero_0>0:
@@ -779,7 +778,7 @@ class Benefits():
                 svhen=0
 
             kunnallisvero=max(0,kunnallisveronperuste*self.kunnallisvero_pros-kvhen)
-            peritty_sairaanhoitomaksu=max(0,peritty_sairaanhoitomaksu*self.sairaanhoitomaksu-svhen)
+            peritty_sairaanhoitomaksu=max(0,peritty_sairaanhoitomaksu-svhen)
         else:
             kunnallisvero=kunnallisveronperuste*self.kunnallisvero_pros
             
@@ -2308,19 +2307,6 @@ class Benefits():
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
                         colors=pal)
                         
-            axs.set_xlabel(self.labels['wage'])
-            axs.set_ylabel(self.labels['effective'])
-            axs.grid(True,color='lightgray')
-            axs.set_xlim(0, max_salary)
-            axs.set_ylim(0, 120)
-            if selite:
-                #axs.legend(loc='upper right')
-                handles, labels = axs.get_legend_handles_labels()
-                lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
-            if figname is not None:
-                plt.savefig(figname+'_eff.png')
-            plt.show()
-        
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel(self.labels['effective'])
             axs.grid(True,color='lightgray')
