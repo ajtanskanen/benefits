@@ -445,6 +445,19 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0  
+    elif perhetyyppi==36: # 2+2, kotihoidontuelta työhön, puolis0 3500e/kk
+        lapsia=2    
+        paivahoidossa=2    
+        lapsia_kotihoidontuella=0    
+        alle3v=2    
+        aikuisia=2    
+        vakiintunutpalkka=1500    
+        tyoton=1    
+        saa_ansiopaivarahaa=0    
+        puolison_tulot=3500    
+        puolison_vakiintunutpalkka=2500    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0                          
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
@@ -574,6 +587,6 @@ def tee_selite(p):
     return selite
 
 def print_examples():
-    for k in range(44):
+    for k in range(1,44):
         p,selite=perheparametrit(perhetyyppi=k,tulosta=False)
         print('Tapaus {}:\n{}\n'.format(k,selite))  

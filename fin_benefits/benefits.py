@@ -8,7 +8,7 @@
 """
 
 import numpy as np
-from .parameters import perheparametrit
+from .parameters import perheparametrit, print_examples, tee_selite
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -73,7 +73,7 @@ class Benefits():
             print('Ei parametrejä')
         else:
             selite=tee_selite(p)
-            print(p)
+            print(selite)
             
     def setup_labels(self):
         self.labels={}
@@ -217,7 +217,7 @@ class Benefits():
         
         tuki=max(0,tuki1+menot-max(0,omabruttopalkka-omaetuoikeutettuosa-omapalkkavero)\
                 -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero)-verot-muuttulot)
-                
+
         if p['toimeentulotuki_vahennys']>0: # vähennetään 20%
             tuki=tuki*0.8
                 
@@ -228,6 +228,9 @@ class Benefits():
         
     def perheparametrit(self,perhetyyppi=10,tulosta=False):
         return perheparametrit(perhetyyppi=perhetyyppi,tulosta=tulosta)
+        
+    def print_examples(self):
+        return print_examples()
         
     def get_default_parameter(self):
         return perheparametrit(perhetyyppi=1)
@@ -306,7 +309,7 @@ class Benefits():
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
     
-        if tyoton>0:
+        if tyoton>0 and p['elakkeella']<1:
             if lapsikorotus<1:
                 lapsia=0    
 
@@ -1007,12 +1010,38 @@ class Benefits():
         return tuki
         
     def opintoraha(self,palkka,p):
+        '''
+        18-vuotias itsellisesti asuva opiskelija
+        '''
         if p['lapsia']>0:
-            tuki=350.28 # +650*0.4 = opintolainahyvitys mukana?
+            if self.year==2018:
+                tuki=350.28 # +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2019:
+                tuki=350.28 # +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2020:
+                tuki=350.28 # +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2021:
+                tuki=355.05# +650*0.4 = opintolainahyvitys mukana?
         else:
-            tuki=250.28 #+650*0.4 # opintolainahyvitys mukana
+            if self.year==2018:
+                tuki=250.28 #+650*0.4 # opintolainahyvitys mukana
+            elif self.year==2019:
+                tuki=250.28 # +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2020:
+                tuki=250.28 # +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2021:
+                tuki=253.69 # +650*0.4 = opintolainahyvitys mukana?
             
-        if palkka>667: #+222/12: # oletetaan että täysiaikainen opiskelija
+        if self.year==2018:
+            raja=696
+        elif self.year==2019:
+            raja=696
+        elif self.year==2020:
+            raja=696
+        elif self.year==2021:
+            raja=696
+
+        if palkka>raja: #+222/12: # oletetaan että täysiaikainen opiskelija
             tuki=0
             
         return tuki
@@ -1191,9 +1220,10 @@ class Benefits():
         # lasketaan netotettu ansiopäiväraha huomioiden verot (kohdistetaan ansiopvrahaan se osa veroista, joka ei aiheudu palkkatuloista)
         q['kokoelake_netto'],q['isyyspaivaraha_netto'],q['ansiopvraha_netto'],q['aitiyspaivaraha_netto'],q['sairauspaivaraha_netto'],\
             q['puoliso_ansiopvraha_netto'],q['opintotuki_netto']=(0,0,0,0,0,0,0)
+            
         if p['elakkeella']>0:
             q['kokoelake_netto']=q['kokoelake']-(q['verot']-q['verot_ilman_etuuksia'])
-        if p['opiskelija']>0:
+        elif p['opiskelija']>0:
             q['opintotuki_netto']=q['opintotuki']-(q['verot']-q['verot_ilman_etuuksia'])
         elif p['aitiysvapaalla']>0:
             q['aitiyspaivaraha_netto']=q['aitiyspaivaraha']-(q['verot']-q['verot_ilman_etuuksia']) 
@@ -1206,6 +1236,9 @@ class Benefits():
         else:
             q['puoliso_ansiopvraha_netto']=q['puoliso_ansiopvraha']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
             q['ansiopvraha_netto']=q['ansiopvraha']-(q['verot']-q['verot_ilman_etuuksia'])
+            
+        if (p['isyysvapaalla']>0 or p['aitiysvapaalla']>0) and p['tyoton']>0:
+            print('error: vanhempainvapaalla & työtön ei toteutettu')
     
         # jaetaan ilman etuuksia laskettu pvhoitomaksu puolisoiden kesken ansiopäivärahan suhteessa
         # eli kohdistetaan päivähoitomaksun korotus ansiopäivärahan mukana
@@ -1222,13 +1255,12 @@ class Benefits():
         if p['opiskelija']>0:
             q['toimtuki']=0
         else:
+            # Hmm, meneekö sairauspäiväraha, äitiyspäiväraha ja isyyspäiväraha oikein?
             q['toimtuki']=self.toimeentulotuki(p['t'],q['verot_ilman_etuuksia'],p['puoliso_tulot'],q['puoliso_verot_ilman_etuuksia'],\
-                q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha']+q['lapsilisa']\
-                +q['kokoelake_netto']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki'],\
+                q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
+                +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki'],\
                 0,p['asumismenot_toimeentulo'],q['pvhoito'],p)
 
-        #print(q['ansiopvraha']+q['perustulo'],q['ansiopvraha_netto'],-(q['pvhoito']-q['pvhoito_ilman_etuuksia']),-(q['verot']-q['verot_ilman_etuuksia']))
-                
         kateen=q['opintotuki']+q['kokoelake']+p['puoliso_tulot']+p['t']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimtuki']\
             +q['ansiopvraha']+q['puoliso_ansiopvraha']+q['elatustuki']-q['puoliso_verot']-q['verot']-q['pvhoito']+q['lapsilisa']+q['sairauspaivaraha']
         q['kateen']=kateen
@@ -2413,7 +2445,7 @@ class Benefits():
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
                         colors=pal)
 
-            axs.plot(tva,label='Vaihtoehto')
+            #axs.plot(tva,label='Vaihtoehto')
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
             axs.set_xlabel(self.labels['wage'])
