@@ -72,7 +72,7 @@ class BenefitsEK2020(Benefits):
         
                 vahentavattulo=max(0,tyotaikaisettulot-suojaosa)    
                 ansiopaivarahamaara=max(0,tuki2-0.5*vahentavattulo)  
-                ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
+                ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,peruspvraha)  
                 #if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
                 #    ansiopaivarahamaara=max(0,vakpalkka-tyotaikaisettulot)    
 
@@ -91,9 +91,11 @@ class BenefitsEK2020(Benefits):
         return tuki,ansiopaivarahamaara,perus
         
     # yläraja 80% ansionalenemasta
-    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka):
-        #if self.muuta_ansiopv_ylaraja:
-        return min(ansiopaivarahamaara,0.4*max(0,vakiintunutpalkka-tyotaikaisettulot))   
+    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,peruspvraha):
+        if ansiopaivarahamaara>peruspvraha:
+            return peruspvraha+min(ansiopaivarahamaara-peruspvraha,0.8*max(0,vakiintunutpalkka-peruspvraha))   
+        else:
+            return peruspvraha
         #else:
         #return super().ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)        
      
