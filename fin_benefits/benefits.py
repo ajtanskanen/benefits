@@ -2282,6 +2282,7 @@ class Benefits():
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
+        osatva=np.zeros(max_salary+1)
         eff=np.zeros(max_salary+1)
         asumistuki=np.zeros(max_salary+1)
         toimeentulotuki=np.zeros(max_salary+1)
@@ -2405,6 +2406,7 @@ class Benefits():
                 tva[t]=(1-(n1-n0)/t)*100
             else:
                 tva[t]=0
+            osatva[t]=(1-(n3-n1)/deltat)*100
                 
         if plot_eff and plottaa:
             sns.set()
