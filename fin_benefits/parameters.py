@@ -535,7 +535,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     
     return p,selite
 
-def tee_selite(p):
+def tee_selite(p,short=False):
     if p['aikuisia']>1:
         selite="Perhe, jossa {aikuisia} aikuista".format(aikuisia=p['aikuisia'])
     elif p['aikuisia']>0:
@@ -543,23 +543,36 @@ def tee_selite(p):
     else:
         selite="Perhe, jossa ei aikuisia"
         
-    if p['lapsia']>0:
-        selite+=" ja {lapsia} lasta.".format(lapsia=p['lapsia'])
-        if p['lapsia_paivahoidossa']>0:
-            selite+=" Lapsista {paiva} on päivähoidossa.".format(paiva=p['lapsia_paivahoidossa'])
-        if p['lapsia_kotihoidontuella']>0:
-            selite+=" Lapsista {paiva} kotihoidossa.".format(paiva=p['lapsia_kotihoidontuella'])
-        if p['alle3v']>0:
-            selite+=" Lapsista {alle3v}".format(alle3v=p['alle3v'])
-        selite
+    if not short:
+        if p['lapsia']>0:
+            if p['lapsia']>1:
+                selite+=" ja {lapsia} lasta.".format(lapsia=p['lapsia'])
+            else:
+                selite+=" ja 1 lapsi."
+            if p['lapsia_paivahoidossa']>0:
+                selite+=" Lapsista {paiva} on päivähoidossa.".format(paiva=p['lapsia_paivahoidossa'])
+            if p['lapsia_kotihoidontuella']>0:
+                selite+=" Lapsista {paiva} kotihoidossa.".format(paiva=p['lapsia_kotihoidontuella'])
+            if p['alle3v']>0:
+                selite+=" Lapsista {alle3v}".format(alle3v=p['alle3v'])
+        else:
+            selite=selite+", ei lapsia."
     else:
-        selite=selite+", ei lapsia."
-        
+        if p['lapsia']>0:
+            if p['lapsia']>1:
+                selite+=" ja {lapsia} lasta.".format(lapsia=p['lapsia'])
+            else:
+                selite+=" ja 1 lapsi."
+        else:
+            selite=selite+", ei lapsia."        
     if p['elakkeella']<1:
         if p['tyoton']>0:
             selite+=" Työtön"
             if p['saa_ansiopaivarahaa']>0:
-                selite+=" (ansiopaivaraha, vakiintunut ansio {v} e/kk)".format(v=p['vakiintunutpalkka'])
+                if short:
+                    selite+=" (ansiopäiväraha)"
+                else:
+                    selite+=" (ansiopäiväraha, vakiintunut ansio {v} e/kk)".format(v=p['vakiintunutpalkka'])
             else:
                 selite+=" (työmarkkinatuki)"
         elif p['opiskelija']>0:
@@ -569,20 +582,21 @@ def tee_selite(p):
     else:
         selite+=" Vanhuuseläkkeellä (työeläke {e} e/kk)".format(e=p['tyoelake'])
         
-    if p['aikuisia']>1:
-        if p['puoliso_tyoton']>0:
-            selite+=", puoliso työtön"
-            if p['puoliso_saa_ansiopaivarahaa']>0:
-                selite+=" (ansiopaivaraha, vakiintunut ansio {v} e/kk).".format(v=p['puoliso_vakiintunutpalkka'])
+    if not short:
+        if p['aikuisia']>1:
+            if p['puoliso_tyoton']>0:
+                selite+=", puoliso työtön"
+                if p['puoliso_saa_ansiopaivarahaa']>0:
+                    selite+=" (ansiopäiväraha, vakiintunut ansio {v} e/kk).".format(v=p['puoliso_vakiintunutpalkka'])
+                else:
+                    selite+=" (työmarkkinatuki)."
             else:
-                selite+=" (työmarkkinatuki)."
+                selite+=", puoliso töissä"
+                selite+=" (palkka {p} e/kk).".format(p=p['puoliso_tulot'])
         else:
-            selite+=", puoliso töissä"
-            selite+=" (palkka {p} e/kk).".format(p=p['puoliso_tulot'])
-    else:
-        selite+=", ei puolisoa."
+            selite+=", ei puolisoa."
         
-    selite+=" Asumismenot asumistuessa {a} e/kk".format(a=p['asumismenot_toimeentulo'])
+        selite+=" Asumismenot {a} e/kk".format(a=p['asumismenot_toimeentulo'])
             
     return selite
 

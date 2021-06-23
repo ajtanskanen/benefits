@@ -22,10 +22,10 @@ class BenefitsEK(Benefits):
         #self.ansiopvraha_kesto300=250/(12*21.5)   
         #self.toe_vaatimus=1.0 # työssäoloehto väh 12kk   
         self.porrastus=False
-        self.muuta_ansiopv_ylaraja=False
+        self.muuta_ansiopv_ylaraja=True
         self.muuta_pvhoito=False
-        self.muuta_toimeentulotuki=True
-        self.muuta_asumistuki=True
+        self.muuta_toimeentulotuki=False
+        self.muuta_asumistuki=False
 
     def paivahoitomenot(self,hoidossa,tulot,p):
         if self.muuta_pvhoito:
@@ -50,9 +50,12 @@ class BenefitsEK(Benefits):
         return super().ansiopaivaraha(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin,omavastuukerroin=omavastuukerroin)
 
     # yläraja 80% ansionalenemasta
-    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka):
+    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,peruspvraha):
         if self.muuta_ansiopv_ylaraja:
-            return min(ansiopaivarahamaara,0.8*max(0,vakiintunutpalkka-tyotaikaisettulot))   
+            if ansiopaivarahamaara>peruspvraha:
+                return peruspvraha+min(ansiopaivarahamaara-peruspvraha,0.8*max(0,vakiintunutpalkka-peruspvraha))   
+            else:
+                return peruspvraha
         else:
             return super().ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)        
      

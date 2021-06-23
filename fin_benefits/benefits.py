@@ -79,6 +79,7 @@ class Benefits():
         self.labels={}
         if self.language=='English':
             self.labels['wage']='Wage (e/m)'
+            self.labels['parttimewage']='Part-time wage (e/m)'
             self.labels['pure wage']='Wage'
             self.labels['effective']='Eff.marg.tax (%)'
             self.labels['valtionvero']='State tax'
@@ -100,6 +101,7 @@ class Benefits():
             self.labels['net income']='Net income (e/m)'
         else:
             self.labels['wage']='Palkka (e/kk)'
+            self.labels['parttimewage']='Osa-aikatyön palkka (e/kk)'
             self.labels['pure wage']='Palkka'
             self.labels['effective']='Eff.marg.veroaste (%)'
             self.labels['valtionvero']='Valtionvero'
@@ -118,7 +120,7 @@ class Benefits():
             self.labels['opintotuki']='Opintotuki'
             self.labels['lapsilisa']='Lapsilisa'
             self.labels['elatustuki']='Elatustuki'
-            self.labels['net income']='Käteen (e/kk)'
+            self.labels['net income']='Nettotulot (e/kk)'
     
     def toimeentulotuki_param2018(self):
         min_etuoikeutettuosa=150
@@ -292,14 +294,14 @@ class Benefits():
         elif lapsia==2:
             lisa=7.78     # e/pv
         else:
-            lisa=10.03     # e/pv
+            lisa=10.03     # e/pv 
         
         pvraha=21.5*(33.78+lisa) #*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
                 
-    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka):
+    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,peruspvraha):
         if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
             return max(0,vakpalkka-tyotaikaisettulot) 
             
@@ -326,7 +328,7 @@ class Benefits():
                 sotumaksu=0.0414+0.6*self.additional_tyel_premium
                 taite=3197.70    
             elif self.year==2021:
-                lapsikorotus=np.array([0,5.30,7.80,10.03])*21.5    
+                lapsikorotus=np.array([0,5.30,7.78,10.03])*21.5    
                 sotumaksu=0.0434+0.6*self.additional_tyel_premium
                 taite=3209.10    
             else:
@@ -357,12 +359,12 @@ class Benefits():
         
                 vahentavattulo=max(0,tyotaikaisettulot-suojaosa)    
                 ansiopaivarahamaara=max(0,tuki2-0.5*vahentavattulo)  
-                ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
+                soviteltuperus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
+                ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,soviteltuperus)  
                 #print(f'ansiopaivarahamaara {ansiopaivarahamaara}')
 
                 tuki=ansiopaivarahamaara    
-                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
-                tuki=omavastuukerroin*max(perus,tuki)     # voi tulla vastaan pienillä tasoilla4
+                tuki=omavastuukerroin*max(soviteltuperus,tuki)     # voi tulla vastaan pienillä tasoilla4
             else:
                 ansiopaivarahamaara=0    
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
@@ -1613,25 +1615,25 @@ class Benefits():
         if p['lapsia']>0:
             vakea=p['lapsia']+p['aikuisia']
             if vakea==1:
-                alaraja=2050
+                alaraja=2136
                 prosentti=prosentti1
             elif vakea==2:
-                alaraja=2050
+                alaraja=2136
                 prosentti=prosentti1
             elif vakea==3:
-                alaraja=2646
+                alaraja=2756
                 prosentti=prosentti1
             elif vakea==4:
-                alaraja=3003
+                alaraja=3129
                 prosentti=prosentti1
             elif vakea==5:
-                alaraja=3361
+                alaraja=3502
                 prosentti=prosentti1
             elif vakea==6:
-                alaraja=3718
+                alaraja=3874
                 prosentti=prosentti1
             else:
-                alaraja=3718+138*(vakea-6)
+                alaraja=3874+138*(vakea-6)
                 prosentti=prosentti1
 
             pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
@@ -1667,42 +1669,44 @@ class Benefits():
         
         return maksu
         
-    # hallituksen päätöksenmukaiset päivähoitomenot 2018
     def paivahoitomenot2021(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
-        minimimaksu=10
+        '''
+        Päivähoitomaksut 1.8.2021
+        '''
+        minimimaksu=27
 
         if prosentti1==None:
             prosentti1=0.107
         if prosentti2==None:
-            prosentti2=0.5
+            prosentti2=0.4
         if prosentti3==None:
             prosentti3=0.2
             
         if maksimimaksu==None:
-            maksimimaksu=290
+            maksimimaksu=288
 
         if p['lapsia']>0:
             vakea=p['lapsia']+p['aikuisia']
             if vakea==1:
-                alaraja=2050
+                alaraja=2789
                 prosentti=prosentti1
             elif vakea==2:
-                alaraja=2050
+                alaraja=2789
                 prosentti=prosentti1
             elif vakea==3:
-                alaraja=2646
+                alaraja=3610
                 prosentti=prosentti1
             elif vakea==4:
-                alaraja=3003
+                alaraja=4099
                 prosentti=prosentti1
             elif vakea==5:
-                alaraja=3361
+                alaraja=4588
                 prosentti=prosentti1
             elif vakea==6:
-                alaraja=3718
+                alaraja=5075
                 prosentti=prosentti1
             else:
-                alaraja=3718+138*(vakea-6)
+                alaraja=5075+138*(vakea-6)
                 prosentti=prosentti1
 
             pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
@@ -2058,10 +2062,15 @@ class Benefits():
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
-            figname=None,grayscale=None):
+            figname=None,grayscale=None,source='Lähde: EK',header=True):
             
         netto,eff,tva,osa_tva=self.comp_insentives(p=p,p2=None,min_salary=min_salary,
                                                 max_salary=max_salary,step_salary=step_salary,dt=dt)
+                
+        if header:
+            head_text=tee_selite(p,short=True)
+        else:
+            head_text=None
                 
         if plottaa:
             self.plot_insentives(netto,eff,tva,osa_tva,min_salary=min_salary,max_salary=max_salary+1,
@@ -2069,7 +2078,7 @@ class Benefits():
                 basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
                 dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
                 plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
-                figname=figname,grayscale=grayscale)
+                figname=figname,grayscale=grayscale,source=source,header=head_text)
         
         return netto,eff,tva,osa_tva
         
@@ -2078,7 +2087,7 @@ class Benefits():
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=False,
-            figname=None,grayscale=False):
+            figname=None,grayscale=False,source=None,header=None):
             
         if grayscale:
             plt.style.use('grayscale')
@@ -2102,8 +2111,15 @@ class Benefits():
             axs.set_ylabel(self.labels['net income'])
             axs.grid(False)
             axs.set_xlim(0, max_salary)
+            if source is not None:
+                self.add_source(source)
+            
+            if header is not None:
+                axs.title.set_text(header)
+                
             if figname is not None:
                 plt.savefig(figname+'_netto.eps', format='eps')
+                
             plt.show()
 
         if plot_eff:
@@ -2119,6 +2135,11 @@ class Benefits():
             axs.set_ylabel(self.labels['effective'])
             axs.grid(True)
             axs.set_xlim(0, max_salary)
+            if source is not None:
+                self.add_source(source)
+            
+            if header is not None:
+                axs.title.set_text(header)
             if figname is not None:
                 plt.savefig(figname+'_effmarg.eps', format='eps')
             plt.show()
@@ -2137,6 +2158,11 @@ class Benefits():
             axs.grid(True)
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 120)
+            if source is not None:
+                self.add_source(source)
+            
+            if header is not None:
+                axs.title.set_text(header)
             if figname is not None:
                 plt.savefig(figname+'_tva.eps', format='eps')
             plt.show()
@@ -2155,6 +2181,10 @@ class Benefits():
             axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.marg.vero (%)')
             axs.grid(True)
             axs.set_xlim(0, max_salary)
+            if source is not None:
+                self.add_source(source)
+            if header is not None:
+                axs.title.set_text(header)
             if figname is not None:
                 plt.savefig(figname+'_osatva.eps', format='eps')
             plt.show()    
@@ -2247,7 +2277,8 @@ class Benefits():
                 basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
                 otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,ret=False,
                 plot_tva=True,plot_eff=True,plot_netto=True,figname=None,grayscale=False,
-                incl_perustulo=False,incl_elake=True,fig=None,ax=None,incl_opintotuki=False):
+                incl_perustulo=False,incl_elake=True,fig=None,ax=None,incl_opintotuki=False,
+                plot_osatva=True,header=True,source='Lähde: EK'):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -2281,6 +2312,17 @@ class Benefits():
         tva_opintotuki=np.zeros(max_salary+1)        
         tva_yht=np.zeros(max_salary+1)        
         tva_yht2=np.zeros(max_salary+1)        
+        osatva_asumistuki=np.zeros(max_salary+1)
+        osatva_toimeentulotuki=np.zeros(max_salary+1)
+        osatva_ansiopvraha=np.zeros(max_salary+1)
+        osatva_verot=np.zeros(max_salary+1)        
+        osatva_elake=np.zeros(max_salary+1)        
+        osatva_pvhoito=np.zeros(max_salary+1)        
+        osatva_perustulo=np.zeros(max_salary+1)        
+        osatva_opintotuki=np.zeros(max_salary+1)        
+        osatva_yht=np.zeros(max_salary+1)        
+        osatva_yht2=np.zeros(max_salary+1)        
+
         
         if grayscale:
             plt.style.use('grayscale')
@@ -2294,7 +2336,13 @@ class Benefits():
         if p is None:
             p=self.get_default_parameter()
             
+        if header:
+            head_text=tee_selite(p,short=True)
+        else:
+            head_text=None
+            
         p2=p.copy()
+        p3=p.copy()
 
         p2['t']=0 # palkka
         n0,q0=self.laske_tulot(p2)
@@ -2303,8 +2351,13 @@ class Benefits():
             n1,q1=self.laske_tulot(p2)
             p2['t']=t+dt # palkka
             n2,q2=self.laske_tulot(p2)
+            deltat=1000
+            p3['t']=t+deltat # palkka
+            n3,q3=self.laske_tulot(p3)
+            
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
             tulot2,tvat=self.laske_marginaalit(q0,q1,t,laske_tyollistymisveroaste=1)
+            tulot3,osatvat=self.laske_marginaalit(q2,q3,deltat)
             netto[t]=n1
             palkka[t]=t
             margasumistuki[t]=marg['asumistuki']
@@ -2336,6 +2389,16 @@ class Benefits():
             tva_pvhoito[t]=tvat['pvhoito']
             tva_yht[t]=tvat['marginaali']
             tva_yht2[t]=tvat['marginaaliveroprosentti']
+            osatva_asumistuki[t]=osatvat['asumistuki']
+            osatva_toimeentulotuki[t]=osatvat['toimtuki']
+            osatva_verot[t]=osatvat['verot']
+            osatva_elake[t]=osatvat['elake']
+            osatva_perustulo[t]=osatvat['perustulo']
+            osatva_ansiopvraha[t]=osatvat['ansiopvraha']
+            osatva_opintotuki[t]=osatvat['opintotuki']
+            osatva_pvhoito[t]=osatvat['pvhoito']
+            osatva_yht[t]=osatvat['marginaali']
+            osatva_yht2[t]=osatvat['marginaaliveroprosentti']
 
             eff[t]=(1-(n2-n1)/dt)*100
             if t>0:
@@ -2377,6 +2440,11 @@ class Benefits():
                 #axs.legend(loc='upper right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
+            if source is not None:
+                self.add_source(source)
+            if header is not None:
+                axs.title.set_text(head_text)
+                
             if figname is not None:
                 plt.savefig(figname+'_eff.png')
             plt.show()
@@ -2415,6 +2483,10 @@ class Benefits():
                 #axs.legend(loc='lower right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='lower right')
+            if source is not None:
+                self.add_source(source)
+            if header is not None:
+                axs.title.set_text(head_text)
                 
             if figname is not None:
                 plt.savefig(figname+'_netto.png')
@@ -2457,13 +2529,66 @@ class Benefits():
                 #axs.legend(loc='upper right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
+            if source is not None:
+                self.add_source(source)
+            if header is not None:
+                axs.title.set_text(head_text)
                 
             if figname is not None:
                 plt.savefig(figname+'_tva.png')
             plt.show()
+            
+        if plot_osatva and plottaa:
+            if fig is None:
+                figi,axs = plt.subplots()
+            else:
+                figi=fig
+                axs=ax
+            sns.set()
+            if incl_perustulo:
+                axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,
+                    labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']),
+                    colors=pal)
+            else:
+                if incl_elake:
+                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki']),
+                        colors=pal)
+                elif incl_opintotuki:
+                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_opintotuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
+                        colors=pal)
+
+            #axs.plot(tva,label='Vaihtoehto')
+            #axs.plot(tva_yht,label='Vaihtoehto2')
+            #axs.plot(tva_yht2,label='Vaihtoehto3')
+            axs.set_xlabel(self.labels['parttimewage'])
+            axs.set_ylabel('Efektiivinen marginaaliveroaste osatyöstä kokoaikatyöhön (%)')
+            axs.grid(True,color='lightgray')
+            axs.set_xlim(0, max_salary)
+            axs.set_ylim(0, 120)
+            if selite:
+                #axs.legend(loc='upper right')
+                handles, labels = axs.get_legend_handles_labels()
+                lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
+            if source is not None:
+                self.add_source(source)
+            if header is not None:
+                axs.title.set_text(head_text)
+                
+            if figname is not None:
+                plt.savefig(figname+'_osatva.png')
+            plt.show()            
                
         if ret: 
-            return netto,eff,tva   
+            return netto,eff,tva,osatva
+            
+    def add_source(self,source):
+        plt.annotate(source, xy=(0.8,-0.1), xytext=(0,0), fontsize=8, xycoords='axes fraction', textcoords='offset points', va='top')
 
     def laske_ja_plottaa_veromarginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True):
         palkka=np.zeros(max_salary+1)
