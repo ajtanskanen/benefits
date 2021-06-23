@@ -1265,7 +1265,7 @@ class Benefits():
 
         kateen=q['opintotuki']+q['kokoelake']+p['puoliso_tulot']+p['t']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimtuki']\
             +q['ansiopvraha']+q['puoliso_ansiopvraha']+q['elatustuki']-q['puoliso_verot']-q['verot']-q['pvhoito']+q['lapsilisa']+q['sairauspaivaraha']
-        q['kateen']=kateen
+        q['kateen']=kateen # tulot yhteensä perheessä
         q['perhetulot_netto']=p['puoliso_tulot']+p['t']-q['verot_ilman_etuuksia']-q['puoliso_verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
         q['omattulot_netto']=p['t']-q['verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
         q['etuustulo_netto']=q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['opintotuki']\
@@ -1274,6 +1274,8 @@ class Benefits():
         q['etuustulo_brutto']=q['ansiopvraha']+q['puoliso_ansiopvraha']+q['opintotuki']\
             +q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
             +q['toimtuki']+q['kokoelake']
+            
+        q['alv']=self.laske_alv(max(0,kateen-p['asumismenot_asumistuki'])) 
         
         q['palkkatulot']=p['t']
         if p['elakkeella']<1:
@@ -1291,6 +1293,16 @@ class Benefits():
         q['puoliso_perustulo_nettonetto']=0
 
         return kateen,q
+
+    def laske_alv(self,kateen)        
+        if self.year==2021:
+            return 0.24*kateen
+        elif self.year=2020:
+            return 0.24*kateen
+        elif self.year=2019:
+            return 0.24*kateen
+        elif self.year=2018:
+            return 0.24*kateen
         
     def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
