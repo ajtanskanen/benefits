@@ -1037,9 +1037,9 @@ class Benefits():
         if self.year==2018:
             raja=696
         elif self.year==2019:
-            raja=696
+            raja=667
         elif self.year==2020:
-            raja=696
+            raja=667
         elif self.year==2021:
             raja=696
 
