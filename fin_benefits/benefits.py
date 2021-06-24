@@ -1294,14 +1294,14 @@ class Benefits():
 
         return kateen,q
 
-    def laske_alv(self,kateen)        
+    def laske_alv(self,kateen):
         if self.year==2021:
             return 0.24*kateen
-        elif self.year=2020:
+        elif self.year==2020:
             return 0.24*kateen
-        elif self.year=2019:
+        elif self.year==2019:
             return 0.24*kateen
-        elif self.year=2018:
+        elif self.year==2018:
             return 0.24*kateen
         
     def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p):
