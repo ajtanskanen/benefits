@@ -1295,14 +1295,15 @@ class Benefits():
         return kateen,q
 
     def laske_alv(self,kateen):
+        # kulutusmenoista maksetaan noin 10% alvia (lähde: TK, https://www.stat.fi/tietotrendit/artikkelit/2019/arvonlisavero-haivyttaa-progression-vaikutuksen-pienituloisimmilta/)
         if self.year==2021:
-            return 0.24*kateen
+            return 0.10*kateen
         elif self.year==2020:
-            return 0.24*kateen
+            return 0.10*kateen
         elif self.year==2019:
-            return 0.24*kateen
+            return 0.10*kateen
         elif self.year==2018:
-            return 0.24*kateen
+            return 0.10*kateen
         
     def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
@@ -1416,8 +1417,8 @@ class Benefits():
         # 
         # 137    130    123    118
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([137, 130, 123, 118])
+        max_menot=np.array([[521, 504, 400, 353],[754, 723, 584, 514],[960, 912, 741, 657],[1122, 1064, 878, 783]])
+        max_lisa=np.array([140, 133, 120, 115])
         # kuntaryhma=3
 
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]

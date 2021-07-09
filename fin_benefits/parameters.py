@@ -458,6 +458,45 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=2500    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0                          
+    elif perhetyyppi==37: # 2+3, työmarkkinatuelta työhön, puoliso 1500e/kk
+        lapsia=3
+        paivahoidossa=2
+        lapsia_kotihoidontuella=0    
+        alle3v=2
+        aikuisia=2    
+        vakiintunutpalkka=1500    
+        tyoton=1    
+        saa_ansiopaivarahaa=0    
+        puolison_tulot=1500    
+        puolison_vakiintunutpalkka=1500    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0                          
+    elif perhetyyppi==38: # 2+3, työmarkkinatuelta työhön, puoliso 1500e/kk
+        lapsia=4
+        paivahoidossa=2
+        lapsia_kotihoidontuella=0    
+        alle3v=2
+        aikuisia=2    
+        vakiintunutpalkka=1500    
+        tyoton=1    
+        saa_ansiopaivarahaa=0    
+        puolison_tulot=1500    
+        puolison_vakiintunutpalkka=1500    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0                          
+    elif perhetyyppi==39: # 2+3, työmarkkinatuelta työhön, puoliso 1500e/kk
+        lapsia=3
+        paivahoidossa=2
+        lapsia_kotihoidontuella=0    
+        alle3v=2
+        aikuisia=2    
+        vakiintunutpalkka=1500    
+        tyoton=1    
+        saa_ansiopaivarahaa=1  
+        puolison_tulot=1500    
+        puolison_vakiintunutpalkka=1500    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0                          
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
@@ -479,9 +518,15 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
     vuokra_asumistuki =np.array([411,600,761,901,1024])
     vuokra_yhdistetty =vuokra_toimeentulo    
 
-    asumismenot_toimeentulo=vuokra_toimeentulo[lapsia+aikuisia-1]
-    asumismenot_asumistuki=vuokra_asumistuki[lapsia+aikuisia-1]
-    asumismenot_yhdistetty=vuokra_yhdistetty[lapsia+aikuisia-1]
+    ind=lapsia+aikuisia-1
+    if ind<5:
+        asumismenot_toimeentulo=vuokra_toimeentulo[ind]
+        asumismenot_asumistuki=vuokra_asumistuki[ind]
+        asumismenot_yhdistetty=vuokra_yhdistetty[ind]
+    else:
+        asumismenot_toimeentulo=vuokra_toimeentulo[4]+115*(ind-4)
+        asumismenot_asumistuki=vuokra_asumistuki[4]+115*(ind-4)
+        asumismenot_yhdistetty=vuokra_yhdistetty[4]+115*(ind-4)
     
     if (aikuisia<2):
         puolison_tulot=0    
