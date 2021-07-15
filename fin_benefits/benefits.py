@@ -1275,7 +1275,7 @@ class Benefits():
             +q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
             +q['toimtuki']+q['kokoelake']
             
-        q['alv']=self.laske_alv(max(0,kateen-p['asumismenot_asumistuki'])) 
+        q['alv']=self.laske_alv(max(0,kateen-p['asumismenot_asumistuki'])) # vuokran ylittävä osuus tuloista menee kulutukseen
         
         q['palkkatulot']=p['t']
         if p['elakkeella']<1:
