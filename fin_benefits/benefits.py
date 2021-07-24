@@ -31,6 +31,7 @@ class Benefits():
         self.additional_income_tax_high=0.0
         self.extra_ppr_factor=1.0 # kerroin peruspäivärahalle
         self.language='Finnish' # 'English'
+        self.use_extra_ppr=False
         
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -61,6 +62,7 @@ class Benefits():
                     self.additional_kunnallisvero=value
             elif key=='extra_ppr':
                 if value is not None:
+                    self.use_extra_ppr=True
                     self.extra_ppr_factor+=value
     
         # choose the correct set of benefit functions for computations
@@ -216,6 +218,9 @@ class Benefits():
         # end
         if alennus>0:
             tuki1=tuki1*(1-alennus)
+            
+        if self.use_extra_ppr:
+            tuki1=tuki1*self.extra_ppr_factor
         
         tuki=max(0,tuki1+menot-max(0,omabruttopalkka-omaetuoikeutettuosa-omapalkkavero)\
                 -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero)-verot-muuttulot)
@@ -248,7 +253,10 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa) #*self.extra_ppr_factor
+        if self.use_extra_ppr:
+            pvraha=21.5*(32.40+lisa)*self.extra_ppr_factor
+        else:
+            pvraha=21.5*(32.40+lisa) #*self.extra_ppr_factor
         tuki=max(0,pvraha)    
     
         return tuki
@@ -264,7 +272,10 @@ class Benefits():
         else:
             lisa=9.90     # e/pv
         
-        pvraha=21.5*(32.40+lisa) #*self.extra_ppr_factor
+        if self.use_extra_ppr:
+            pvraha=21.5*(32.40+lisa)*self.extra_ppr_factor
+        else:
+            pvraha=21.5*(32.40+lisa)
         tuki=max(0,pvraha)    
     
         return tuki
@@ -280,7 +291,10 @@ class Benefits():
         else:
             lisa=10.00     # e/pv
         
-        pvraha=21.5*(33.66+lisa) #*self.extra_ppr_factor
+        if self.use_extra_ppr:
+            pvraha=21.5*(33.66+lisa)*self.extra_ppr_factor
+        else:
+            pvraha=21.5*(33.66+lisa)
         tuki=max(0,pvraha)    
     
         return tuki
@@ -296,7 +310,10 @@ class Benefits():
         else:
             lisa=10.03     # e/pv 
         
-        pvraha=21.5*(33.78+lisa) #*self.extra_ppr_factor
+        if self.use_extra_ppr:
+            pvraha=21.5*(33.78+lisa)*self.extra_ppr_factor
+        else:
+            pvraha=21.5*(33.78+lisa)
         tuki=max(0,pvraha)    
     
         return tuki
@@ -1333,6 +1350,9 @@ class Benefits():
             perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
         
         #print('palkka {:.1f} muuttulot {:.1f} perusomavastuu {:.1f} vuokra {:.1f} max_meno {:.1f} tuki {:.1f}'.format(palkkatulot,muuttulot,perusomavastuu,vuokra,max_meno,tuki))
     
@@ -1366,6 +1386,9 @@ class Benefits():
             perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
     
         return tuki
 
@@ -1398,6 +1421,9 @@ class Benefits():
             perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
     
         return tuki
         
@@ -1430,6 +1456,9 @@ class Benefits():
             perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
     
         return tuki
         
@@ -1466,6 +1495,9 @@ class Benefits():
         lisaomavastuu=0.4*max(0,palkkatulot+muuttulot-tuloraja)
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
+
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
     
         return tuki
 
