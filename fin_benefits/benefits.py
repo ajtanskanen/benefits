@@ -2126,6 +2126,36 @@ class Benefits():
                 figname=figname,grayscale=grayscale,source=source,header=head_text)
         
         return netto,eff,tva,osa_tva
+
+    def laske_ja_selita(self,p=None,min_salary=0,max_salary=3000,step_salary=1500,
+            basenetto=None,baseeff=None,basetva=None,baseosatva=None,
+            dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
+            figname=None,grayscale=None,source='Lähde: EK',header=True):
+            
+        netto,eff,tva,osa_tva=self.comp_insentives(p=p,p2=None,min_salary=min_salary,
+                                                max_salary=max_salary,step_salary=step_salary,dt=dt)
+                
+        head_text=tee_selite(p,short=False)
+
+        tyottomana_base=basenetto[0]
+        tyottomana_vaihtoehto=netto[0]
+        tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
+        tyossa_base=basenetto[2]
+        tyossa_vaihtoehto=netto[2]
+        tyossa_ero=tyossa_vaihtoehto-tyossa_base
+        osatyossa_base=basenetto[1]
+        osatyossa_vaihtoehto=netto[1]
+        osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
+
+        if header:
+            print(head_text)
+        print(f'Nettotulot työttömänä {tyottomana_vaihtoehto:.2f} perus {tyottomana_base:.2f}  ero {tyottomana_ero:.2f}')
+        print(f'Nettotulot työssä (palkka {max_salary:.2f} e/kk) {tyossa_vaihtoehto:.2f} perus {tyossa_base:.2f}  ero {tyossa_ero:.2f}')
+        print(f'Nettotulot 50% osa-aikatyössä (palkka {max_salary/2:.2f} e/k) {osatyossa_vaihtoehto:.2f} perus {osatyossa_base:.2f} ero {osatyossa_ero:.2f}')
+        
+        return netto,eff,tva,osa_tva
+
         
     def plot_insentives(self,netto,eff,tva,osa_tva,
             min_salary=0,max_salary=6000,step_salary=1,
