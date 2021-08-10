@@ -887,13 +887,13 @@ class BasicIncomeBenefits(Benefits):
                 tuki2=tuki2*ansiokerroin # mahdollinen porrastus tehdään tämän avulla
                 suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa,p)    
         
-                perus=self.perustulo()     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
+                perus=self.perustulo()
                 if tuki2>.9*vakpalkka:
                     tuki2=max(.9*vakpalkka,perus)    
         
                 vahentavattulo=max(0,tyotaikaisettulot-suojaosa)    
                 ansiopaivarahamaara=max(0,tuki2-0.5*vahentavattulo)  
-                ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka)  
+                ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,perus)  
 
                 tuki=ansiopaivarahamaara
                 perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)

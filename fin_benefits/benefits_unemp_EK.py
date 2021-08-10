@@ -21,7 +21,7 @@ class BenefitsEK(Benefits):
         #self.ansiopvraha_kesto400=350/(12*21.5) # lyhennetty 50 pv
         #self.ansiopvraha_kesto300=250/(12*21.5)   
         #self.toe_vaatimus=1.0 # työssäoloehto väh 12kk   
-        self.porrastus=False
+        self.porrastus=True
         self.muuta_ansiopv_ylaraja=False
         self.muuta_pvhoito=False
         self.muuta_toimeentulotuki=True
@@ -42,9 +42,9 @@ class BenefitsEK(Benefits):
             elif kesto>3*25:
                 kerroin=0.95
             else:
-                kerroin=1.05
+                kerroin=1.00
         else:
-            kerroin=1.0
+            kerroin=1.00
             
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
         return super().ansiopaivaraha(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=kerroin,omavastuukerroin=omavastuukerroin)
