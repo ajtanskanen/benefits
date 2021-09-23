@@ -2194,6 +2194,7 @@ class Benefits():
                 
             if figname is not None:
                 plt.savefig(figname+'_netto.eps', format='eps')
+                plt.savefig(figname+'_netto.png', format='png',dpi=300)
                 
             plt.show()
 
