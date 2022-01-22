@@ -34,6 +34,7 @@ class Benefits():
         self.language='Finnish' # 'English'
         self.use_extra_ppr=False
         self.vaihtuva_tyelmaksu=False
+        self.tyel_perusvuosi=1970
         
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -65,6 +66,9 @@ class Benefits():
             elif key=='vaihtuva_tyelmaksu':
                 if value is not None:
                     self.vaihtuva_tyelmaksu=value
+            elif key=='tyel_perusvuosi':
+                if value is not None:
+                    self.tyel_perusvuosi=value                    
             elif key=='extra_ppr':
                 if value is not None:
                     self.use_extra_ppr=True
@@ -74,6 +78,9 @@ class Benefits():
         self.set_year(self.year)
         self.lab=Labels()
         self.labels=self.lab.ben_labels(self.language)
+        
+        if self.vaihtuva_tyelmaksu:
+            self.get_tyelpremium()
         
     def explain(self,p=None):
         #self.tee_selite()
@@ -85,11 +92,12 @@ class Benefits():
             
     def laske_vaihtuva_tyoelakemaksu(self,ika):
         #self.syntymavuosi=1980
-        realage=int(self.floor(self.vuosi+ika-18)) # alkuvuonna 18
+        vuosi=int(self.floor(self.tyel_perusvuosi+ika18)) # alkuvuonna 18
         # prosenttia palkoista, vuodesta 2017 alkaen, jatkettu päätepisteen tasolla vuoden 2085 jälkeen
-        tyel_kokomaksu=np.array([24.3,24.4,24.4,24.4,24.4,24.4,24.4,24.5,24.5,24.6,24.6,24.7,24.8,24.8,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
-        ptel=0.5*(tyel_kokomaksu-tyel_kokomaksu[0])+0.0615 # vuonna 2017 ptel oli 6,15 %
-        ind=ika-18+self.vuosi-2017
+        #tyel_kokomaksu=np.array([24.3,24.4,24.4,24.4,24.4,24.4,24.4,24.5,24.5,24.6,24.6,24.7,24.8,24.8,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
+        tyel_kokomaksu=self.tyel_kokomaksu[vuosi]
+        ptel=0.5*(tyel_kokomaksu-tyel_kokomaksu)+0.0615 # vuonna 2017 ptel oli 6,15 %
+        ind=ika-18+self.vuosi#-2017
         self.tyontekijan_maksu=ptel[ind]
         self.tyontekijan_maksu_52=self.tyontekijan_maksu+0.015
         self.koko_tyel_maksu=tyel_kokomaksu[ind]
@@ -508,15 +516,18 @@ class Benefits():
     def veroparam2018(self):
         self.kunnallisvero_pros=max(0,max(0,0.1984+self.additional_kunnallisvero)) # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
         self.tyottomyysvakuutusmaksu=0.0190 #
-        self.tyontekijan_maksu=max(0,max(0,0.0635+self.additional_tyel_premium)) # PTEL
-        self.tyontekijan_maksu_52=max(0,max(0,0.0785+self.additional_tyel_premium)) # PTEL
-        self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium))
+        if self.vaihtuva_tyelmaksu:
+            self.laske_vaihtuva_tyoelakemaksu()
+        else:
+            self.tyontekijan_maksu=max(0,max(0,0.0635+self.additional_tyel_premium)) # PTEL
+            self.tyontekijan_maksu_52=max(0,max(0,0.0785+self.additional_tyel_premium)) # PTEL
+            self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium))
+            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0086
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
@@ -532,15 +543,18 @@ class Benefits():
     def veroparam2019(self):
         self.kunnallisvero_pros=max(0,0.1988+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
-        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        if self.vaihtuva_tyelmaksu:
+            self.laske_vaihtuva_tyoelakemaksu()
+        else:
+            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0077
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
@@ -556,15 +570,18 @@ class Benefits():
     def veroparam2020(self):
         self.kunnallisvero_pros=max(0,0.1997+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
-        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        if self.vaihtuva_tyelmaksu:
+            self.laske_vaihtuva_tyoelakemaksu()
+        else:
+            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0134
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
@@ -580,15 +597,18 @@ class Benefits():
     def veroparam2021(self):
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0140 #
-        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        if self.vaihtuva_tyelmaksu:
+            self.laske_vaihtuva_tyoelakemaksu()
+        else:
+            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0153
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
@@ -604,15 +624,18 @@ class Benefits():
     def veroparam2022(self):
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0140 #
-        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        if self.vaihtuva_tyelmaksu:
+            self.laske_vaihtuva_tyoelakemaksu()
+        else:
+            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0153
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
@@ -3830,4 +3853,13 @@ class Benefits():
             self.toimeentulotuki_param=self.toimeentulotuki_param2018            
         else:
             print('Vuoden {v} aineisto puuttuu'.format(v=vuosi))
-    
+            
+    def get_tyelpremium(self):
+        tyel_kokomaksu=np.zeros((2100,5))
+        # data
+        tyel_kokomaksu[1962:2022]=[5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.15,5.15,5.65,6.1,6.4,6.9,7.9,9.9,12.0,10.0,11.7,13.3,13.3,12.4,11.1,11.1,11.5,12.2,13.0,13.8,14.9,16.9,16.9,14.4,18.5,18.6,20.6,21.1,21.2,21.5,21.5,21.5,21.1,21.1,21.4,21.4,21.6,21.2,21.1,21.1,21.3,21.6,22.1,22.8,22.8,23.6,24.0,24.0,24.4,24.4,24.4,24.4,24.4,24.4]
+        # ETK
+        tyel_kokomaksu[2023:2085]=np.array([24.4,24.5,24.5,24.6,24.6,24.7,24.8,24.8,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
+        ptel=0.5*(tyel_kokomaksu-tyel_kokomaksu[0])+0.0615 # vuonna 2017 ptel oli 6,15 %
+        
+        return tyel_kokomaksu
