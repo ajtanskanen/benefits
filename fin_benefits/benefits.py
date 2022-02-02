@@ -359,9 +359,9 @@ class Benefits():
                 sotumaksu=0.0434+0.6*self.additional_tyel_premium
                 taite=3209.10    
             elif self.year==2022:
-                lapsikorotus=np.array([0,5.30,7.78,10.03])*21.5    
+                lapsikorotus=np.array([0,5.41,7.95,10.25])*21.5    
                 sotumaksu=0.0434+0.6*self.additional_tyel_premium
-                taite=3209.10    
+                taite=3277.50    
             else:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
                 sotumaksu=0.0448+0.6*self.additional_tyel_premium
@@ -1788,7 +1788,7 @@ class Benefits():
 
         if p[puolisoalku+'alive']<1 and p[omatalku+'alive']<1:
             q['asumistuki'] = 0
-        elif p[omatalku+'elakkeella']>0 or p[puolisoalku+'elakkeella']>0 :
+        elif p[omatalku+'elakkeella']>0 and p[puolisoalku+'elakkeella']>0 :
             q['asumistuki']=self.elakkeensaajan_asumistuki(q['palkkatulot'],q['kokoelake'],p['asumismenot_asumistuki'],p)
         else:
             q['asumistuki']=self.asumistuki(q['palkkatulot'],q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
@@ -2269,38 +2269,36 @@ class Benefits():
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
         # e/kk    III kuntaryhmä,
-        # e/kk    IIII kuntaryhmä,
-        # e/kk
-        # 1    508    492    411    362
-        # 2    735    706    600    527
-        # 3    937    890    761    675
-        # 4    1095    1038    901    804
-        # + lisähenkilöä kohden, e/kk
-        # 
-        # 137    130    123    118
-        # enimmaismenot kuntaryhmittain kun hloita 1-4
-        # tarkasta
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([137, 130, 123, 118])
-        # kuntaryhma=3
-
-        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+        max_menot=np.array([8_613,7_921,6_949])
+        max_meno=max_menot[max(0,p['kuntaryhma']-1)]
 
         prosentti=0.85 # vastaa 85 %
-        perusomavastuu=50.87 # e/kk, 2019
+        perusomavastuu=52.66 # e/kk, 2019
         if p['aikuisia']<2:
-            tuloraja=8_676/12
+            tuloraja=9_534/12
         else:
-            tuloraja=12_717/12 # oletetaan että puolisolla ei oikeutta asumistukeen
+            tuloraja=15_565/12
+            #if puolisolla_oikeus:
+            #    tuloraja=15_565/12
+            #else:
+            #    tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
             
-        lisaomavastuu=0.4*max(0,palkkatulot+muuttulot-tuloraja)
+        lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
-
+        
+        if p['aikuisia']>1:
+            if tuki<6.92:
+                tuki=0
+        else:
+            if tuki<3.46:
+                tuki=0
+        
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
     
-        return tuki
+        return tuki        
+
         
     def elakkeensaajan_asumistuki_2019(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
@@ -2312,33 +2310,36 @@ class Benefits():
         # 1    508    492    411    362
         # 2    735    706    600    527
         # 3    937    890    761    675
-        # 4    1095    1038    901    804
-        # + lisähenkilöä kohden, e/kk
-        # 
-        # 137    130    123    118
-        # enimmaismenot kuntaryhmittain kun hloita 1-4
-        # tarkasta
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([137, 130, 123, 118])
-        # kuntaryhma=3
-
-        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+        max_menot=np.array([8_243,7_581,6_651])
+        max_meno=max_menot[max(0,p['kuntaryhma']-1)]
 
         prosentti=0.85 # vastaa 85 %
-        perusomavastuu=50.87 # e/kk, 2019
+        perusomavastuu=52.66 # e/kk, 2019
         if p['aikuisia']<2:
-            tuloraja=8_676/12
+            tuloraja=9_534/12
         else:
-            tuloraja=12_717/12 # oletetaan että puolisolla ei oikeutta asumistukeen
+            tuloraja=15_565/12
+            #if puolisolla_oikeus:
+            #    tuloraja=15_565/12
+            #else:
+            #    tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
             
-        lisaomavastuu=0.4*max(0,palkkatulot+muuttulot-tuloraja)
+        lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
-
+        
+        if p['aikuisia']>1:
+            if tuki<6.92:
+                tuki=0
+        else:
+            if tuki<3.46:
+                tuki=0
+        
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
     
-        return tuki
+        return tuki        
+
 
     def elakkeensaajan_asumistuki_2020(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
@@ -2350,108 +2351,104 @@ class Benefits():
         # 1    508    492    411    362
         # 2    735    706    600    527
         # 3    937    890    761    675
-        # 4    1095    1038    901    804
-        # + lisähenkilöä kohden, e/kk
-        # 
-        # 137    130    123    118
-        # enimmaismenot kuntaryhmittain kun hloita 1-4
-        # tarkasta
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([137, 130, 123, 118])
-        # kuntaryhma=3
-
-        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
-
-        prosentti=0.85 # vastaa 85 %
-        perusomavastuu=50.87 # e/kk, 2019
-        if p['aikuisia']<2:
-            tuloraja=8_676/12
-        else:
-            tuloraja=12_717/12 # oletetaan että puolisolla ei oikeutta asumistukeen
-            
-        lisaomavastuu=0.4*max(0,palkkatulot+muuttulot-tuloraja)
-            
-        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
-
-        if self.use_extra_ppr:
-            tuki=tuki*self.extra_ppr_factor
-    
-        return tuki
-        
-    def elakkeensaajan_asumistuki_2021(self,palkkatulot,muuttulot,vuokra,p):
-        # Ruokakunnan koko
-        # henkilöä    I kuntaryhmä,
-        # e/kk    II kuntaryhmä,
-        # e/kk    III kuntaryhmä,
-        # e/kk    IIII kuntaryhmä,
-        # e/kk
-        # 1    508    492    411    362
-        # 2    735    706    600    527
-        # 3    937    890    761    675
-        # 4    1095    1038    901    804
-        # + lisähenkilöä kohden, e/kk
-        # 
-        # 137    130    123    118
-        # enimmaismenot kuntaryhmittain kun hloita 1-4
-        # tarkasta
-        max_menot=np.array([[521, 504, 400, 353],[754, 723, 584, 514],[960, 912, 741, 657],[1122, 1064, 878, 783]])
-        max_lisa=np.array([140, 133, 120, 115])
-        # kuntaryhma=3
-
-        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
-
-        prosentti=0.85 # vastaa 85 %
-        perusomavastuu=50.87 # e/kk, 2019
-        if p['aikuisia']<2:
-            tuloraja=8_676/12
-        else:
-            tuloraja=12_717/12 # oletetaan että puolisolla ei oikeutta asumistukeen
-            
-        lisaomavastuu=0.4*max(0,palkkatulot+muuttulot-tuloraja)
-            
-        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
-
-        if self.use_extra_ppr:
-            tuki=tuki*self.extra_ppr_factor
-    
-        return tuki
-        
-    def elakkeensaajan_asumistuki_2022(self,palkkatulot,muuttulot,vuokra,p,puolisolla_oikeus=False):
-        # Ruokakunnan koko
-        # henkilöä    I kuntaryhmä,
-        # e/kk    II kuntaryhmä,
-        # e/kk    III kuntaryhmä,
-        # e/kk    IIII kuntaryhmä,
-        # e/kk
-        # 1    508    492    411    362
-        # 2    735    706    600    527
-        # 3    937    890    761    675
-        # 4    1095    1038    901    804
-        # + lisähenkilöä kohden, e/kk
-        # 
-        # 137    130    123    118
-        # enimmaismenot kuntaryhmittain kun hloita 1-4
-        # tarkasta
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([137, 130, 123, 118])
-        # kuntaryhma=3
-
-        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+        max_menot=np.array([8_360,7_688,6_745])
+        max_meno=max_menot[max(0,p['kuntaryhma']-1)]
 
         prosentti=0.85 # vastaa 85 %
         perusomavastuu=52.66 # e/kk, 2019
         if p['aikuisia']<2:
             tuloraja=9_534/12
         else:
-            if puolisolla_oikeus:
-                tuloraja=15_565/12
-            else:
-                tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
+            tuloraja=15_565/12
+            #if puolisolla_oikeus:
+            #    tuloraja=15_565/12
+            #else:
+            #    tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
             
-        lisaomavastuu=0.4*max(0,palkkatulot+muuttulot-tuloraja)
+        lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
+        
+        if p['aikuisia']>1:
+            if tuki<6.92:
+                tuki=0
+        else:
+            if tuki<3.46:
+                tuki=0
+        
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
+    
+        return tuki        
 
+        
+    def elakkeensaajan_asumistuki_2021(self,palkkatulot,muuttulot,vuokra,p):
+        # Ruokakunnan koko
+        # henkilöä    I kuntaryhmä,
+        # e/kk    II kuntaryhmä,
+        # e/kk    III kuntaryhmä,
+        max_menot=np.array([8_613,7_921,6_949])
+        max_meno=max_menot[max(0,p['kuntaryhma']-1)]
+
+        prosentti=0.85 # vastaa 85 %
+        perusomavastuu=52.66 # e/kk, 2019
+        if p['aikuisia']<2:
+            tuloraja=9_534/12
+        else:
+            tuloraja=15_565/12
+            #if puolisolla_oikeus:
+            #    tuloraja=15_565/12
+            #else:
+            #    tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
+            
+        lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
+            
+        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
+        
+        if p['aikuisia']>1:
+            if tuki<6.92:
+                tuki=0
+        else:
+            if tuki<3.46:
+                tuki=0
+        
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
+    
+        return tuki        
+
+        
+    def elakkeensaajan_asumistuki_2022(self,palkkatulot,muuttulot,vuokra,p,puolisolla_oikeus=False):
+        # Ruokakunnan koko
+        # henkilöä    I kuntaryhmä,
+        # e/kk    II kuntaryhmä,
+        # e/kk    III kuntaryhmä,
+        #
+        max_menot=np.array([8_433,7_755,6_804])
+        max_meno=max_menot[max(0,p['kuntaryhma']-1)]
+
+        prosentti=0.85 # vastaa 85 %
+        perusomavastuu=52.66 # e/kk, 2019
+        if p['aikuisia']<2:
+            tuloraja=9_534/12
+        else:
+            tuloraja=15_565/12
+            #if puolisolla_oikeus:
+            #    tuloraja=15_565/12
+            #else:
+            #    tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
+            
+        lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
+            
+        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
+        
+        if p['aikuisia']>1:
+            if tuki<6.92:
+                tuki=0
+        else:
+            if tuki<3.46:
+                tuki=0
+        
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
     
@@ -3721,7 +3718,7 @@ class Benefits():
                         labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elatustuki']),
                         colors=pal)
             
-            #axs.plot(netto)
+            axs.plot(netto)
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel(self.labels['net income'])
             axs.grid(True,color='lightgray')
@@ -3764,7 +3761,7 @@ class Benefits():
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
                         colors=pal)
 
-            #axs.plot(tva,label='Vaihtoehto')
+            axs.plot(tva,label='Vaihtoehto')
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
             axs.set_xlabel(self.labels['wage'])
@@ -3921,7 +3918,7 @@ class Benefits():
             axs.legend(loc='lower right')
         plt.show()
 
-    def laske_ja_plottaa_hila(self,min_salary=0,max_salary=6000,type='eff',dt=100,maxn=None,dire=None):
+    def laske_ja_plottaa_hila(self,min_salary=0,max_salary=6000,type='eff',dt=100,maxn=None,dire=None,grayscale=False):
         if maxn is None:
             maxn=36
         fig,axs = plt.subplots(int(maxn/5),5,sharex=True,sharey=True)
@@ -3930,7 +3927,8 @@ class Benefits():
             y=int(np.floor((k-1)/5))
             #ax=plt.subplot(10,3,k)
             p,_=perheparametrit(k)
-            self.lp_marginaalit_apu(axs[y,x],otsikko='Tapaus '+str(k),p=p,min_salary=min_salary,max_salary=max_salary,type=type,dt=dt)
+            self.lp_marginaalit_apu(axs[y,x],otsikko='Tapaus '+str(k),p=p,min_salary=min_salary,
+                max_salary=max_salary,type=type,dt=dt,grayscale=grayscale)
 
         if dire is not None:
             fig.savefig(dire+'multiple_'+type+'.eps',bbox_inches='tight')
@@ -3938,7 +3936,8 @@ class Benefits():
 
         plt.show()
 
-    def lp_marginaalit_apu(self,axs,otsikko='',p=None,min_salary=0,max_salary=6000,type='eff',dt=100,selite=False,include_perustulo=False):
+    def lp_marginaalit_apu(self,axs,otsikko='',p=None,min_salary=0,max_salary=6000,type='eff',dt=100,selite=False,
+                            include_perustulo=False,include_opintotuki=False,include_elake=False,grayscale=False):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -3970,8 +3969,16 @@ class Benefits():
         tva_pvhoito=np.zeros(max_salary+1)        
         tva_yht=np.zeros(max_salary+1)        
         tva_yht2=np.zeros(max_salary+1)        
-        tva_perustulo=np.zeros(max_salary+1)        
-
+        tva_perustulo=np.zeros(max_salary+1)   
+        
+        if grayscale:
+            plt.style.use('grayscale')
+            plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
+            pal=sns.dark_palette("darkgray", 6, reverse=True)
+            reverse=True
+        else:
+            pal=sns.color_palette()            
+            
         if p is None:
             p=self.get_default_parameter()
             
@@ -4084,11 +4091,29 @@ class Benefits():
                 axs.legend(loc='upper right')
         else:
             if include_perustulo:
-                axs.stackplot(palkka,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,elake,opintotuki,perustulo,
-                    labels=(self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['pure wage'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']))
+                axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,perustulo,
+                    labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),
+                    colors=pal)
             else:
-                axs.stackplot(palkka,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,elake,opintotuki,
-                    labels=(self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['pure wage'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki']))
+                if include_elake:
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki']),
+                        colors=pal)
+                elif include_opintotuki:
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,opintotuki,elatustuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['opintotuki'],self.labels['elatustuki']),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elatustuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elatustuki']),
+                        colors=pal)
+#         
+#             if include_perustulo:
+#                 axs.stackplot(palkka,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,elake,opintotuki,perustulo,
+#                     labels=(self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['pure wage'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']))
+#             else:
+#                 axs.stackplot(palkka,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,elake,opintotuki,
+#                     labels=(self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['pure wage'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki']))
                             
             axs.plot(netto)
             axs.title.set_text(otsikko)
