@@ -12,6 +12,7 @@ from .parameters import perheparametrit, print_examples, tee_selite
 from .labels import Labels
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.font_manager as font_manager
 
 class Benefits():
     """
@@ -34,7 +35,7 @@ class Benefits():
         self.language='Finnish' # 'English'
         self.use_extra_ppr=False
         self.vaihtuva_tyelmaksu=False
-        self.tyel_perusvuosi=1970
+        self.tyel_perusvuosi=1970 # ikäluokan syntymävuosi
         self.irr_vain_tyoelake=False
         
         if 'kwargs' in kwargs:
@@ -92,18 +93,17 @@ class Benefits():
             print(selite)
             
     def laske_vaihtuva_tyoelakemaksu(self,ika):
-        #self.syntymavuosi=1980
-        vuosi=int(self.floor(self.tyel_perusvuosi+ika18)) # alkuvuonna 18
+        vuosi=int(self.floor(self.tyel_perusvuosi+ika)) # alkuvuonna 18
+        
         # prosenttia palkoista, vuodesta 2017 alkaen, jatkettu päätepisteen tasolla vuoden 2085 jälkeen
-        #tyel_kokomaksu=np.array([24.3,24.4,24.4,24.4,24.4,24.4,24.4,24.5,24.5,24.6,24.6,24.7,24.8,24.8,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
-        tyel_kokomaksu=self.tyel_kokomaksu[vuosi]
-        ptel=0.5*(tyel_kokomaksu-tyel_kokomaksu)+0.0615 # vuonna 2017 ptel oli 6,15 %
-        ind=ika-18+self.vuosi#-2017
-        self.tyontekijan_maksu=ptel[ind]
-        self.tyontekijan_maksu_52=self.tyontekijan_maksu+0.015
-        self.koko_tyel_maksu=tyel_kokomaksu[ind]
+        self.tyontekijan_maksu=self.data_ptel[vuosi]
+        if vuosi<2017:
+            self.tyontekijan_maksu_52=self.tyontekijan_maksu*19/15
+        else:
+            self.tyontekijan_maksu_52=self.tyontekijan_maksu+0.015
+            
+        self.koko_tyel_maksu=self.data_tyel_kokomaksu[vuosi]
         self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
-        #tyel_ta=tyel_kokomaksu-tyel_ptel
     
     def toimeentulotuki_param2018(self):
         min_etuoikeutettuosa=150
@@ -333,7 +333,23 @@ class Benefits():
             return max(0,vakpalkka-tyotaikaisettulot) 
             
         return ansiopaivarahamaara   
-
+        
+    def laske_sotumaksu(self,vuosi):
+        if vuosi==2018:
+            sotumaksu=0.0448+0.6*self.additional_tyel_premium
+        elif vuosi==2019:
+            sotumaksu=0.0448+0.6*self.additional_tyel_premium
+        elif vuosi==2020:
+            sotumaksu=0.0414+0.6*self.additional_tyel_premium
+        elif vuosi==2021:
+            sotumaksu=0.0434+0.6*self.additional_tyel_premium
+        elif vuosi==2022:
+            sotumaksu=0.0434+0.6*self.additional_tyel_premium
+        else:
+            sotumaksu=0.0448+0.6*self.additional_tyel_premium
+            
+        return sotumaksu
+        
     def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
@@ -344,34 +360,28 @@ class Benefits():
 
             if self.year==2018:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
-                sotumaksu=0.0448+0.6*self.additional_tyel_premium
                 taite=3078.60    
             elif self.year==2019:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
-                sotumaksu=0.0448+0.6*self.additional_tyel_premium
                 taite=3078.60    
             elif self.year==2020:
                 lapsikorotus=np.array([0,5.28,7.76,10.00])*21.5    
-                sotumaksu=0.0414+0.6*self.additional_tyel_premium
                 taite=3197.70    
             elif self.year==2021:
                 lapsikorotus=np.array([0,5.30,7.78,10.03])*21.5    
-                sotumaksu=0.0434+0.6*self.additional_tyel_premium
                 taite=3209.10    
             elif self.year==2022:
                 lapsikorotus=np.array([0,5.41,7.95,10.25])*21.5    
-                sotumaksu=0.0434+0.6*self.additional_tyel_premium
                 taite=3277.50    
             else:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
-                sotumaksu=0.0448+0.6*self.additional_tyel_premium
-                taite=3078.60    
+                taite=3078.60   
                             
             if saa_ansiopaivarahaa>0: # & (kesto<400.0): # ei keston tarkastusta!
                 #print(f'tyoton {tyoton} vakiintunutpalkka {vakiintunutpalkka} lapsia {lapsia} tyotaikaisettulot {tyotaikaisettulot} saa_ansiopaivarahaa {saa_ansiopaivarahaa} kesto {kesto} ansiokerroin {ansiokerroin} omavastuukerroin {omavastuukerroin}')
             
                 perus=self.peruspaivaraha(0)     # peruspäiväraha lasketaan tässä kohdassa ilman lapsikorotusta
-                vakpalkka=vakiintunutpalkka*(1-sotumaksu)     
+                vakpalkka=vakiintunutpalkka*(1-self.sotumaksu)     
                 #print(f'vakpalkka {vakpalkka}')
                 if vakpalkka>taite:
                     tuki2=0.2*max(0,vakpalkka-taite)+0.45*max(0,taite-perus)+perus    
@@ -518,7 +528,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,max(0,0.1984+self.additional_kunnallisvero)) # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
         self.tyottomyysvakuutusmaksu=0.0190 #
         if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu()
+            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
             self.tyontekijan_maksu=max(0,max(0,0.0635+self.additional_tyel_premium)) # PTEL
             self.tyontekijan_maksu_52=max(0,max(0,0.0785+self.additional_tyel_premium)) # PTEL
@@ -545,7 +555,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,0.1988+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
         if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu()
+            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
             self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
             self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
@@ -572,7 +582,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,0.1997+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0125 #
         if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu()
+            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
             self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
             self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
@@ -599,7 +609,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0140 #
         if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu()
+            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
             self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
             self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
@@ -626,7 +636,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0140 #
         if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu()
+            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
             self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
             self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
@@ -1006,9 +1016,9 @@ class Benefits():
         if lapsia<1:
             arvo=0
         else:
-            tuki_alle_3v=343.95 # e/kk
-            seuraavat_alle_3v=102.67 # e/kk
-            yli_3v=65.97 #e_kk
+            tuki_alle_3v=350.27 # e/kk
+            seuraavat_alle_3v=104.86 # e/kk
+            yli_3v=67.38 #e_kk
             if allekolmev>0:
                 kerroin1=1
                 if allekolmev>1:
@@ -1091,7 +1101,11 @@ class Benefits():
         elif self.year==2020:
             elatustuki=167.35*lapsia
         elif self.year==2021:
+            elatustuki=167.35*lapsia
+        elif self.year==2022:
             elatustuki=172.59*lapsia
+        else:
+            error()
         
         return elatustuki
     
@@ -1250,6 +1264,8 @@ class Benefits():
         for alku in set(['omat_','puoliso_','']):
             if alku+'alive' not in p:
                 p[alku+'alive']=1
+            if alku+'elake_maksussa' not in p:
+                p[alku+'elake_maksussa']=0
             if alku+'opiskelija' not in p:
                 p[alku+'opiskelija']=0
             if alku+'elakkeella' not in p:
@@ -1273,6 +1289,14 @@ class Benefits():
         q['puoliso_perustulo']=0
         q['puhdas_tyoelake']=0
         q['multiplier']=1
+        q['kotihoidontuki']=0
+        q['kotihoidontuki_netto']=0
+        q['puoliso_opintotuki']=0
+        q['puoliso_kotihoidontuki']=0
+        q['puoliso_kotihoidontuki_netto']=0
+        q['puoliso_ansiopvraha_netto']=0
+        q['puoliso_kotihoidontuki_netto']=0
+        q['puoliso_opintotuki_netto']=0
         if p['elakkeella']>0: # vanhuuseläkkeellä
             p['tyoton']=0
             q['isyyspaivaraha'],q['aitiyspaivaraha'],q['kotihoidontuki'],q['sairauspaivaraha']=(0,0,0,0)
@@ -1385,7 +1409,8 @@ class Benefits():
 
         if (p['aikuisia']>1):
             _,q['puoliso_verot'],_,_,_,_,_,_,_,_,q['puoliso_ptel'],q['puoliso_sairausvakuutusmaksu'],\
-                q['puoliso_tyotvakmaksu'],q['puoliso_tyel_kokomaksu'],q['puoliso_ylevero']=self.verotus(p['puoliso_tulot'],q['puoliso_ansiopvraha']+q['puoliso_aitiyspaivaraha']+q['puoliso_isyyspaivaraha']+q['puoliso_kotihoidontuki']+q['puoliso_sairauspaivaraha']+q['puoliso_opintotuki'],
+                q['puoliso_tyotvakmaksu'],q['puoliso_tyel_kokomaksu'],q['puoliso_ylevero']\
+                =self.verotus(p['puoliso_tulot'],q['puoliso_ansiopvraha']+q['puoliso_aitiyspaivaraha']+q['puoliso_isyyspaivaraha']+q['puoliso_kotihoidontuki']+q['puoliso_sairauspaivaraha']+q['puoliso_opintotuki'],
                     q['puoliso_kokoelake'],p['lapsia'],p)
             _,q['puoliso_verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],0,0,0,p)
         else:
@@ -1409,7 +1434,7 @@ class Benefits():
             q['pvhoito']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['puoliso_ansiopvraha']+q['sairauspaivaraha'],p)
             if (p['lapsia_kotihoidontuella']>0):
                 alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['lapsia_alle_3v'])
-                q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
+                q['pvhoito']=0 #max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
             q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki'],p)
             if p['aikuisia']==1:
                 yksinhuoltajakorotus=1
@@ -1438,8 +1463,18 @@ class Benefits():
         elif p['sairauspaivarahalla']>0:
             q['sairauspaivaraha_netto']=q['sairauspaivaraha']-(q['verot']-q['verot_ilman_etuuksia']) 
         else:
-            q['puoliso_ansiopvraha_netto']=q['puoliso_ansiopvraha']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
             q['ansiopvraha_netto']=q['ansiopvraha']-(q['verot']-q['verot_ilman_etuuksia'])
+            
+        if p['aikuisia']>1:
+            if p['puoliso_tyoton']>0: # vanhuuseläkkeellä
+                q['puoliso_ansiopvraha_netto']=q['puoliso_ansiopvraha']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
+            elif p['puoliso_opiskelija']>0:
+                q['puoliso_opintotuki_netto']=q['puoliso_opintotuki']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
+            elif p['puoliso_kotihoidontuella']>0:
+                q['puoliso_kotihoidontuki_netto']=q['puoliso_kotihoidontuki']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia']) 
+        else:
+            q['puoliso_ansiopvraha_netto']=0
+        #print('ptyötön',q['puoliso_ansiopvraha_netto'],q['puoliso_ansiopvraha'],q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
             
         if (p['isyysvapaalla']>0 or p['aitiysvapaalla']>0) and p['tyoton']>0:
             print('error: vanhempainvapaalla & työtön ei toteutettu')
@@ -1461,8 +1496,8 @@ class Benefits():
         else:
             # Hmm, meneekö sairauspäiväraha, äitiyspäiväraha ja isyyspäiväraha oikein?
             q['toimeentulotuki']=self.toimeentulotuki(p['t'],q['verot_ilman_etuuksia'],p['puoliso_tulot'],q['puoliso_verot_ilman_etuuksia'],\
-                q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
-                +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki'],\
+                q['elatustuki']+q['opintotuki_netto']+q['puoliso_opintotuki_netto']+q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
+                +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto']+q['puoliso_kotihoidontuki_netto'],\
                 0,p['asumismenot_toimeentulo'],q['pvhoito'],p)
 
         kateen=q['opintotuki']+q['kokoelake']+p['puoliso_tulot']+p['t']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimeentulotuki']\
@@ -1711,6 +1746,8 @@ class Benefits():
             q['elatustuki']=q[omat+'elatustuki']+q[puoliso+'elatustuki']
             q['perustulo']=q[omat+'perustulo']+q[puoliso+'perustulo']
             q['palkkatulot_eielakkeella']=q[puoliso+'palkkatulot_eielakkeella']+q[omat+'palkkatulot_eielakkeella']
+            q['perustulo_netto']=q[omat+'perustulo_netto']+q[puoliso+'perustulo_netto']
+            q['perustulo_nettonetto']=q[omat+'perustulo_nettonetto']+q[puoliso+'perustulo_nettonetto']
         else:
             q['verot']=q[omat+'verot']
             q['ptel']=q[omat+'ptel']
@@ -1735,6 +1772,8 @@ class Benefits():
             q['elatustuki']=q[omat+'elatustuki']
             q['perustulo']=q[omat+'perustulo']
             q['palkkatulot_eielakkeella']=q[omat+'palkkatulot_eielakkeella']
+            q['perustulo_netto']=q[omat+'perustulo_netto']
+            q['perustulo_nettonetto']=q[omat+'perustulo_nettonetto']
         
         return q
         
@@ -1919,8 +1958,8 @@ class Benefits():
             else:
                 # Hmm, meneekö sairauspäiväraha, äitiyspäiväraha ja isyyspäiväraha oikein?
                 q['toimeentulotuki']=self.toimeentulotuki(p[omatalku+'t'],q[omat+'verot_ilman_etuuksia'],0,0,\
-                    q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
-                    +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki'],\
+                    q['elatustuki']+q['opintotuki_netto']+q['ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
+                    +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto'],\
                     0,p['asumismenot_toimeentulo'],q['pvhoito'],p)
                 #print(p[omatalku+'t'],q[omat+'verot_ilman_etuuksia'],0,0,\
                 #    q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
@@ -1935,8 +1974,8 @@ class Benefits():
             else:
                 # Hmm, meneekö sairauspäiväraha, äitiyspäiväraha ja isyyspäiväraha oikein?
                 q['toimeentulotuki']=self.toimeentulotuki(p[omatalku+'t'],q[omat+'verot_ilman_etuuksia'],p[puolisoalku+'t'],q[puoliso+'verot_ilman_etuuksia'],\
-                    q['elatustuki']+q['opintotuki']+q['ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
-                    +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki'],\
+                    q['elatustuki']+q['opintotuki_netto']+q['ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
+                    +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto'],\
                     0,p['asumismenot_toimeentulo'],q['pvhoito'],p)
 
         # sisältää sekä omat että puolison tulot ja menot
@@ -2116,13 +2155,16 @@ class Benefits():
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
+        if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
+            perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
 
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
         
-        #print('palkka {:.1f} muuttulot {:.1f} perusomavastuu {:.1f} vuokra {:.1f} max_meno {:.1f} tuki {:.1f}'.format(palkkatulot,muuttulot,perusomavastuu,vuokra,max_meno,tuki))
+        if tuki<15:
+            tuki=0
     
         return tuki
         
@@ -2152,11 +2194,16 @@ class Benefits():
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
+        if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
+            perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
 
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
+    
+        if tuki<15:
+            tuki=0
     
         return tuki
 
@@ -2187,11 +2234,16 @@ class Benefits():
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
+        if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
+            perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
 
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
+    
+        if tuki<15:
+            tuki=0
     
         return tuki
         
@@ -2222,11 +2274,16 @@ class Benefits():
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
+        if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
+            perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
 
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
+    
+        if tuki<15:
+            tuki=0
     
         return tuki
         
@@ -2256,11 +2313,16 @@ class Benefits():
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(619+103*p['aikuisia']+228*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
+        if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
+            perusomavastuu=0
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
 
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
+            
+        if tuki<15:
+            tuki=0
     
         return tuki
     
@@ -2939,6 +3001,9 @@ class Benefits():
         else:
             elake=0
         
+        if elake<6.92:
+            elake=0
+
         return elake
     
     def laske_takuuelake2019(self,ika,muuelake,disability=False,lapsia=0):
@@ -2951,6 +3016,9 @@ class Benefits():
         else:
             elake=0
         
+        if elake<6.92:
+            elake=0
+
         return elake
     
     def laske_takuuelake2020(self,ika,muuelake,disability=False,lapsia=0):
@@ -2963,6 +3031,9 @@ class Benefits():
         else:
             elake=0
         
+        if elake<6.92:
+            elake=0
+
         return elake
         
     def laske_takuuelake2021(self,ika,muuelake,disability=False,lapsia=0):
@@ -2976,6 +3047,9 @@ class Benefits():
         else:
             elake=0
         
+        if elake<6.92:
+            elake=0
+
         return elake
         
     def laske_takuuelake2022(self,ika,muuelake,disability=False,lapsia=0):
@@ -2989,8 +3063,10 @@ class Benefits():
         else:
             elake=0
         
-        return elake
-        
+        if elake<6.92:
+            elake=0
+
+        return elake        
         
     def laske_puhdas_tyoelake(self,ika,elake,disability=False,yksin=1,lapsia=0):
          '''
@@ -3061,26 +3137,30 @@ class Benefits():
     def isyysraha_perus(self,vakiintunutpalkka):
         if self.year==2018:
             minimi=27.86*25
-            sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12  
         elif self.year==2019:
             minimi=27.86*25
-            sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12  
         elif self.year==2020:
             minimi=28.94*25
-            sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12  
         elif self.year==2021:
             minimi=29.05*25
-            sotumaksu=0.0448
+            taite1=39_144/12  
+            taite2=60_225/12  
+        elif self.year==2022:
+            minimi=29.67*25
+            taite1=39_144/12  
+            taite2=60_225/12  
+        elif self.year==2023:
+            minimi=29.67*25
             taite1=39_144/12  
             taite2=60_225/12  
 
-        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
         raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
@@ -3088,17 +3168,15 @@ class Benefits():
     def aitiysraha2019(self,vakiintunutpalkka,kesto):
         if kesto<56/260:
             minimi=0
-            sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
         else: 
             minimi=27.86*25
-            sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
@@ -3106,17 +3184,15 @@ class Benefits():
     def aitiysraha2020(self,vakiintunutpalkka,kesto):
         if kesto<56/260:
             minimi=0
-            sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
         else: 
             minimi=28.94*25
-            sotumaksu=0.0448
             taite1=37_861/12  
             taite2=58_252/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
@@ -3124,17 +3200,15 @@ class Benefits():
     def aitiysraha2021(self,vakiintunutpalkka,kesto):
         if kesto<56/260:
             minimi=0
-            sotumaksu=0.0448
             taite1=39_144/12  
             taite2=60_225/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
         else: 
             minimi=29.05*25
-            sotumaksu=0.0448
             taite1=39_144/12  
             taite2=60_225/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
@@ -3142,37 +3216,33 @@ class Benefits():
     def aitiysraha2022(self,vakiintunutpalkka,kesto):
         if kesto<56/260:
             minimi=0
-            sotumaksu=0.0448
             taite1=39_144/12  
             taite2=60_225/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
         else: 
-            minimi=29.05*25
-            sotumaksu=0.0448
+            minimi=29.67*25
             taite1=39_144/12  
             taite2=60_225/12 
-            vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
         return raha
         
     def sairauspaivaraha2018(self,vakiintunutpalkka):
         minimi=24.64*25
-        sotumaksu=0.0448
         taite1=30_394/12
         taite2=58_252/12
-        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.2*max(vakiintunut-taite2,0))
 
         return raha
         
     def sairauspaivaraha2019(self,vakiintunutpalkka):
         minimi=27.86*25
-        sotumaksu=0.05
         taite1=30_394/12
         taite2=57_183/12
-        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
 
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.2*max(vakiintunut-taite2,0))
 
@@ -3180,9 +3250,8 @@ class Benefits():
 
     def sairauspaivaraha2020(self,vakiintunutpalkka):
         minimi=28.94*25
-        sotumaksu=0.0958
         taite1=31_595/12  
-        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
@@ -3190,19 +3259,17 @@ class Benefits():
         
     def sairauspaivaraha2021(self,vakiintunutpalkka):
         minimi=29.05*25
-        sotumaksu=0.0958
         taite1=32_011/12  
-        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
         return raha
         
     def sairauspaivaraha2022(self,vakiintunutpalkka):
-        minimi=29.05*25
-        sotumaksu=0.0958
+        minimi=29.67*25
         taite1=32_011/12  
-        vakiintunut=(1-sotumaksu)*vakiintunutpalkka                    
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
@@ -3216,6 +3283,7 @@ class Benefits():
         # lasketaan marginaalit
         marg={}        
         marg['asumistuki']=(-q2['asumistuki']+q1['asumistuki'])*100/dt
+        marg['kotihoidontuki']=(-q2['kotihoidontuki_netto']+q1['kotihoidontuki_netto'])*100/dt
         marg['ansiopvraha']=(+q1['ansiopvraha_netto']-q2['ansiopvraha_netto']+q1['puoliso_ansiopvraha_netto']-q2['puoliso_ansiopvraha_netto'])*100/dt 
         marg['pvhoito']=(-q1['pvhoito']+q2['pvhoito'])*100/dt
         marg['toimeentulotuki']=(+q1['toimeentulotuki']-q2['toimeentulotuki'])*100/dt
@@ -3225,10 +3293,10 @@ class Benefits():
         marg['elake']=(q1['kokoelake_netto']-q2['kokoelake_netto'])*100/dt
         marg['opintotuki']=(q1['opintotuki_netto']-q2['opintotuki_netto'])*100/dt
         marg['kunnallisvero']=(-q1['kunnallisvero']+q2['kunnallisvero'])*100/dt
-        marg['ansiotulovah']=(+q1['ansiotulovahennys']-q2['ansiotulovahennys'])*100/dt
-        marg['tyotulovahennys']=(+q1['tyotulovahennys']-q2['tyotulovahennys'])*100/dt
-        marg['perusvahennys']=(+q1['perusvahennys']-q2['perusvahennys'])*100/dt
-        marg['tyotulovahennys_kunnallisveroon']=(+q1['tyotulovahennys_kunnallisveroon']-q2['tyotulovahennys_kunnallisveroon'])*100/dt
+        #marg['ansiotulovah']=(+q1['ansiotulovahennys']-q2['ansiotulovahennys'])*100/dt
+        #marg['tyotulovahennys']=(+q1['tyotulovahennys']-q2['tyotulovahennys'])*100/dt
+        #marg['perusvahennys']=(+q1['perusvahennys']-q2['perusvahennys'])*100/dt
+        #marg['tyotulovahennys_kunnallisveroon']=(+q1['tyotulovahennys_kunnallisveroon']-q2['tyotulovahennys_kunnallisveroon'])*100/dt
         marg['ptel']=(-q1['ptel']+q2['ptel']-q1['puoliso_ptel']+q2['puoliso_ptel'])*100/dt
         marg['sairausvakuutusmaksu']=(-q1['sairausvakuutusmaksu']+q2['sairausvakuutusmaksu']-q1['puoliso_sairausvakuutusmaksu']+q2['puoliso_sairausvakuutusmaksu'])*100/dt
         marg['tyotvakmaksu']=(-q1['tyotvakmaksu']+q2['tyotvakmaksu']-q1['puoliso_tyotvakmaksu']+q2['puoliso_tyotvakmaksu'])*100/dt
@@ -3236,7 +3304,7 @@ class Benefits():
         marg['perustulo']=(-q2['perustulo_netto']+q1['perustulo_netto']-q2['puoliso_perustulo_netto']+q1['puoliso_perustulo_netto'])*100/dt
     
         marg['sivukulut']=marg['tyotvakmaksu']+marg['sairausvakuutusmaksu']+marg['ptel'] # sisältyvät jo veroihin
-        marg['etuudet']=marg['ansiopvraha']+marg['asumistuki']+marg['toimeentulotuki']
+        marg['etuudet']=marg['ansiopvraha']+marg['asumistuki']+marg['toimeentulotuki']+marg['kotihoidontuki']
         marg['verot']=marg['palkkaverot'] # sisältää sivukulut
         marg['ansioverot']=marg['palkkaverot']+marg['elake'] # sisältää sivukulut
         marg['marginaali']=marg['pvhoito']+marg['etuudet']+marg['verot']+marg['elake']
@@ -3246,30 +3314,37 @@ class Benefits():
         tulot['kateen1']=q1['kateen']
         tulot['kateen2']=q2['kateen']
     
-        omattulotnetto1=q1['omattulot_netto'] # ilman etuuksia
-        omattulotnetto2=q2['omattulot_netto'] # ilman etuuksia
-        puolisontulotnetto1=q1['puoliso_tulot_netto'] # ilman etuuksia
-        puolisontulotnetto2=q2['puoliso_tulot_netto'] # ilman etuuksia
+        if 'omattulot_netto' in q1: # v1
+            omattulotnetto1=q1['omattulot_netto'] # ilman etuuksia
+            omattulotnetto2=q2['omattulot_netto'] # ilman etuuksia
+            puolisontulotnetto1=q1['puoliso_tulot_netto'] # ilman etuuksia
+            puolisontulotnetto2=q2['puoliso_tulot_netto'] # ilman etuuksia
+        else:
+            omattulotnetto1=q1['omat_netto'] # ilman etuuksia
+            omattulotnetto2=q2['omat_netto'] # ilman etuuksia
+            puolisontulotnetto1=q1['puoliso_netto'] # ilman etuuksia
+            puolisontulotnetto2=q2['puoliso_netto'] # ilman etuuksia
+
         if laske_tyollistymisveroaste>0:
             tulot['tulotnetto']=omattulotnetto2+puolisontulotnetto2
-            tulot['puolisotulotnetto']=puolisontulotnetto2
-            tulot['omattulotnetto']=omattulotnetto2
+            #tulot['puolisotulotnetto']=puolisontulotnetto2
+            #tulot['omattulotnetto']=omattulotnetto2
         else:
             tulot['tulotnetto']=omattulotnetto1+puolisontulotnetto1
-            tulot['puolisotulotnetto']=puolisontulotnetto1
-            tulot['omattulotnetto']=omattulotnetto1
+            #tulot['puolisotulotnetto']=puolisontulotnetto1
+            #tulot['omattulotnetto']=omattulotnetto1
             
         marg['marginaaliveroprosentti']=100-(tulot['kateen2']-tulot['kateen1'])*100/dt 
     
         return tulot,marg
     
-    def laske_ja_plottaa(self,p=None,min_salary=0,max_salary=6000,step_salary=1,
+    def laske_ja_plottaa(self,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
             figname=None,grayscale=None,source='Lähde: EK',header=True):
             
-        netto,eff,tva,osa_tva=self.comp_insentives(p=p,p2=None,min_salary=min_salary,
+        netto,eff,tva,osa_tva=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
                                                 max_salary=max_salary,step_salary=step_salary,dt=dt)
                 
         if header:
@@ -3287,32 +3362,97 @@ class Benefits():
         
         return netto,eff,tva,osa_tva
 
-    def laske_ja_selita(self,p=None,min_salary=0,max_salary=3000,step_salary=1500,
+    def get_palette_EK(self):
+        colors1=['#003326','#05283d','#ff9d6a','#599956']
+        colors2=['#295247','#2c495a','#fdaf89','#7cae79']
+        colors3=['#88b2eb','#ffcb21','#e85c03']
+        
+        colors=['#295247','#7cae79','#ffcb21','#e85c03','#88b2eb','#2c495a','#fdaf89']
+        
+        return sns.color_palette(colors)
+        
+    def get_style_EK(self):
+        axes={'axes.facecolor': 'white',
+         'axes.edgecolor': 'black',
+         'axes.grid': False,
+         'axes.axisbelow': 'line',
+         'axes.labelcolor': 'black',
+         'figure.facecolor': 'white',
+         'grid.color': '#b0b0b0',
+         'grid.linestyle': '-',
+         'text.color': 'black',
+         'xtick.color': 'black',
+         'ytick.color': 'black',
+         'xtick.direction': 'out',
+         'ytick.direction': 'out',
+         'lines.solid_capstyle': 'projecting',
+         'patch.edgecolor': 'black',
+         'patch.force_edgecolor': False,
+         'image.cmap': 'viridis',
+         'font.family': ['sans-serif'],
+         'font.sans-serif': ['IBM Plex Sans',
+          'DejaVu Sans',
+          'Bitstream Vera Sans',
+          'Computer Modern Sans Serif',
+          'Lucida Grande',
+          'Verdana',
+          'Geneva',
+          'Lucid',
+          'Arial',
+          'Helvetica',
+          'Avant Garde',
+          'sans-serif'],
+         'xtick.bottom': True,
+         'xtick.top': False,
+         'ytick.left': True,
+         'ytick.right': False,
+         'axes.spines.left': False,
+         'axes.spines.bottom': True,
+         'axes.spines.right': False,
+         'axes.spines.top': False}
+         
+        return axes
+        
+    def laske_ja_selita(self,p=None,p0=None,min_salary=0,max_salary=3000,step_salary=1500,
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
             figname=None,grayscale=None,source='Lähde: EK',header=True):
             
-        netto,eff,tva,osa_tva=self.comp_insentives(p=p,p2=None,min_salary=min_salary,
-                                                max_salary=max_salary,step_salary=step_salary,dt=dt)
-                
         head_text=tee_selite(p,short=False)
 
-        tyottomana_base=basenetto[0]
-        tyottomana_vaihtoehto=netto[0]
-        tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
-        tyossa_base=basenetto[2]
-        tyossa_vaihtoehto=netto[2]
-        tyossa_ero=tyossa_vaihtoehto-tyossa_base
-        osatyossa_base=basenetto[1]
-        osatyossa_vaihtoehto=netto[1]
-        osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
+        if p0 is None:
+            netto,eff,tva,osa_tva=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
+                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
+                
+            tyottomana_base=basenetto[0]
+            tyottomana_vaihtoehto=netto[0]
+            tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
+            tyossa_base=basenetto[2]
+            tyossa_vaihtoehto=netto[2]
+            tyossa_ero=tyossa_vaihtoehto-tyossa_base
+            osatyossa_base=basenetto[1]
+            osatyossa_vaihtoehto=netto[1]
+            osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
+        else:
+            netto,eff,tva,osa_tva,basenetto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
+                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
+            tyottomana_base=basenetto[0]
+            tyottomana_vaihtoehto=netto[0]
+            tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
+            tyossa_base=basenetto[2]
+            tyossa_vaihtoehto=netto[2]
+            tyossa_ero=tyossa_vaihtoehto-tyossa_base
+            osatyossa_base=basenetto[1]
+            osatyossa_vaihtoehto=netto[1]
+            osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
+        
 
         if header:
             print(head_text)
         print(f'Nettotulot työttömänä {tyottomana_vaihtoehto:.2f} perus {tyottomana_base:.2f}  ero {tyottomana_ero:.2f}')
-        print(f'Nettotulot työssä (palkka {max_salary:.2f} e/kk) {tyossa_vaihtoehto:.2f} perus {tyossa_base:.2f}  ero {tyossa_ero:.2f}')
-        print(f'Nettotulot 50% osa-aikatyössä (palkka {max_salary/2:.2f} e/k) {osatyossa_vaihtoehto:.2f} perus {osatyossa_base:.2f} ero {osatyossa_ero:.2f}')
+        print(f'Nettotulot työssä (palkka {max_salary:.2f} e/kk) {tyossa_vaihtoehto:.2f} perus {tyossa_base:.2f}  ero {tyossa_ero:.2f} tva {tva[2]:.3f}%')
+        print(f'Nettotulot 50% osa-aikatyössä (palkka {max_salary/2:.2f} e/k) {osatyossa_vaihtoehto:.2f} perus {osatyossa_base:.2f} ero {osatyossa_ero:.2f}  tva {tva[1]:.3f}%')
         
         return netto,eff,tva,osa_tva
 
@@ -3425,22 +3565,28 @@ class Benefits():
                 plt.savefig(figname+'_osatva.eps', format='eps')
             plt.show()    
         
-    def comp_insentives(self,p=None,p2=None,min_salary=0,max_salary=6000,step_salary=1,dt=100):
+    def comp_insentives(self,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,dt=100):
+    
         n_salary=int((max_salary+step_salary-min_salary)/step_salary)
         netto=np.zeros(n_salary)
+        basenetto=np.zeros(n_salary)
         palkka=np.zeros(n_salary)
         tva=np.zeros(n_salary)
         osa_tva=np.zeros(n_salary)
         eff=np.zeros(n_salary)
         
         if p is None:
-            p=self.get_default_parameter()
+            p,selite=self.get_default_parameter()
 
-        if p2 is None:
-            p2=p.copy()
-            p2['t']=0 # palkka
+        if p0 is None:
+            p2b=p.copy()
+        else:
+            p2b=p0.copy()
+        
         p3=p.copy()
-        n0,q0=self.laske_tulot(p2)
+            
+        n0,q0=self.laske_tulot(p2b)
+        basenetto[0]
         k=0
         for t in np.arange(min_salary,max_salary+step_salary,step_salary):
             p3['t']=t # palkka
@@ -3458,9 +3604,15 @@ class Benefits():
             else:
                 tva[k]=0
                 osa_tva[k]=0
+            p2b['t']=t # palkka
+            basenetto[k],_=self.laske_tulot(p2b)
+
             k=k+1
             
-        return netto,eff,tva,osa_tva
+        if p0 is not None:
+            return netto,eff,tva,osa_tva,basenetto
+        else:
+            return netto,eff,tva,osa_tva
         
     def comp_taxes(self,p=None,p2=None,min_salary=0,max_salary=6000,step_salary=1,dt=100):
         n_salary=int((max_salary+step_salary-min_salary)/step_salary)+1
@@ -3471,7 +3623,7 @@ class Benefits():
         eff=np.zeros(n_salary)
         
         if p is None:
-            p=self.get_default_parameter()
+            p,selite=self.get_default_parameter()
 
         if p2 is None:
             p2=p.copy()
@@ -3509,12 +3661,14 @@ class Benefits():
         
         return eff[0]
         
-    def laske_ja_plottaa_marginaalit(self,p=None,min_salary=0,max_salary=6000,
+    def laske_ja_plottaa_marginaalit(self,p=None,p2=None,min_salary=0,max_salary=6000,
                 basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
-                otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,ret=False,
+                otsikko="Vaihtoehto",otsikkobase="Perustapaus",legend=True,ret=False,
                 plot_tva=True,plot_eff=True,plot_netto=True,figname=None,grayscale=False,
                 incl_perustulo=False,incl_elake=True,fig=None,ax=None,incl_opintotuki=False,
-                plot_osatva=True,header=True,source='Lähde: EK'):
+                incl_alv=False,
+                plot_kotihoidontuki=False,
+                plot_osatva=True,header=True,source='Lähde: EK',palette=None,palette_EK=True,square=False):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -3529,6 +3683,7 @@ class Benefits():
         elatustuki=np.zeros(max_salary+1)
         perustulo=np.zeros(max_salary+1)
         opintotuki=np.zeros(max_salary+1)        
+        kotihoidontuki=np.zeros(max_salary+1)    
         margasumistuki=np.zeros(max_salary+1)
         margtoimeentulotuki=np.zeros(max_salary+1)
         margansiopvraha=np.zeros(max_salary+1)
@@ -3539,8 +3694,10 @@ class Benefits():
         margyht=np.zeros(max_salary+1)        
         margyht2=np.zeros(max_salary+1)    
         margperustulo=np.zeros(max_salary+1)    
-        margopintotuki=np.zeros(max_salary+1)        
+        margopintotuki=np.zeros(max_salary+1)    
+        margkotihoidontuki=np.zeros(max_salary+1)    
         tva_asumistuki=np.zeros(max_salary+1)
+        tva_kotihoidontuki=np.zeros(max_salary+1)    
         tva_toimeentulotuki=np.zeros(max_salary+1)
         tva_ansiopvraha=np.zeros(max_salary+1)
         tva_verot=np.zeros(max_salary+1)        
@@ -3552,6 +3709,7 @@ class Benefits():
         tva_yht=np.zeros(max_salary+1)        
         tva_yht2=np.zeros(max_salary+1)        
         osatva_asumistuki=np.zeros(max_salary+1)
+        osatva_kotihoidontuki=np.zeros(max_salary+1)    
         osatva_toimeentulotuki=np.zeros(max_salary+1)
         osatva_ansiopvraha=np.zeros(max_salary+1)
         osatva_verot=np.zeros(max_salary+1)        
@@ -3562,7 +3720,6 @@ class Benefits():
         osatva_opintotuki=np.zeros(max_salary+1)        
         osatva_yht=np.zeros(max_salary+1)        
         osatva_yht2=np.zeros(max_salary+1)        
-
         
         if grayscale:
             plt.style.use('grayscale')
@@ -3572,26 +3729,46 @@ class Benefits():
             reverse=True
         else:
             pal=sns.color_palette()
-        
+
+        if palette is not None:
+            pal=sns.color_palette(palette, 12)
+            
+        if palette_EK:
+            pal=self.get_palette_EK()
+            #csfont = {'fontname':'Comic Sans MS'}
+            fontname='IBM Plex Sans'
+            csfont = {'fontname':fontname}
+            #fontprop = font_manager.FontProperties(family=fontname,weight='normal',style='normal', size=12)
+            custom_params = {"axes.spines.right": False, "axes.spines.top": False, "axes.spines.left": False, 'ytick.left': False}
+            sns.set_theme(style="ticks", font=fontname,rc=custom_params)
+        else:
+            csfont = {}
+
         if p is None:
-            p=self.get_default_parameter()
+            p,selite=self.get_default_parameter()
             
         if header:
-            head_text=tee_selite(p,short=True)
+            head_text=tee_selite(p,p2=p2,short=True)
         else:
             head_text=None
             
-        p2=p.copy()
-        p3=p.copy()
+        if p2 is None:
+            p1=p.copy()
+            p2=p.copy()
+            p3=p.copy()
+        else:
+            p1=p.copy()
+            p3=p2.copy()
+            plot_eff=False
 
-        p2['t']=0 # palkka
-        n0,q0=self.laske_tulot(p2)
+        p1['t']=0 # palkka
+        n0,q0=self.laske_tulot(p1)
         for t in range(0,max_salary+1):
             p2['t']=t # palkka
             n1,q1=self.laske_tulot(p2)
             p2['t']=t+dt # palkka
             n2,q2=self.laske_tulot(p2)
-            deltat=1000
+            deltat=1500
             p3['t']=t+deltat # palkka
             n3,q3=self.laske_tulot(p3)
             
@@ -3608,6 +3785,7 @@ class Benefits():
             margansiopvraha[t]=marg['ansiopvraha']
             margpvhoito[t]=marg['pvhoito']
             margperustulo[t]=marg['perustulo']
+            margkotihoidontuki[t]=marg['kotihoidontuki']
             margopintotuki[t]=marg['opintotuki']
             margyht[t]=marg['marginaali']
             margyht2[t]=marg['marginaaliveroprosentti']
@@ -3620,7 +3798,9 @@ class Benefits():
             perustulo[t]=q1['perustulo_nettonetto']+q1['puoliso_perustulo_nettonetto']
             elatustuki[t]=q1['elatustuki']
             nettotulot[t]=tulot['tulotnetto']
+            kotihoidontuki[t]=q1['kotihoidontuki_netto']
             tva_asumistuki[t]=tvat['asumistuki']
+            tva_kotihoidontuki[t]=tvat['kotihoidontuki']
             tva_toimeentulotuki[t]=tvat['toimeentulotuki']
             tva_verot[t]=tvat['verot']
             tva_alv[t]=tvat['alv']
@@ -3632,6 +3812,7 @@ class Benefits():
             tva_yht[t]=tvat['marginaali']
             tva_yht2[t]=tvat['marginaaliveroprosentti']
             osatva_asumistuki[t]=osatvat['asumistuki']
+            osatva_kotihoidontuki[t]=osatvat['kotihoidontuki']
             osatva_toimeentulotuki[t]=osatvat['toimeentulotuki']
             osatva_verot[t]=osatvat['verot']
             osatva_alv[t]=osatvat['alv']
@@ -3651,12 +3832,13 @@ class Benefits():
             osatva[t]=(1-(n3-n1)/deltat)*100
                 
         if plot_eff and plottaa:
-            sns.set()
             if fig is None:
                 figi,axs = plt.subplots()
             else:
                 figi=fig
                 axs=ax
+            #sns.set_theme()
+            axs.set_axisbelow(False)
             if incl_perustulo:
                 axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,
                     labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo'],self.labels['alv']),
@@ -3670,17 +3852,23 @@ class Benefits():
                     axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margopintotuki,margalv,
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki'],self.labels['alv']),
                         colors=pal)
+                elif plot_kotihoidontuki:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margpvhoito,margalv,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito'],self.labels['alv']),
+                        colors=pal)
                 else:
-                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margalv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['alv']),
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,#margalv,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),#self.labels['alv']),
                         colors=pal)
                         
-            axs.set_xlabel(self.labels['wage'])
+            axs.set_xlabel(self.labels['wage'],)
             axs.set_ylabel(self.labels['effective'])
-            axs.grid(True,color='lightgray')
-            axs.set_xlim(0, max_salary)
+            plt.yticks(**csfont)
+            plt.xticks(**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+            axs.set_xlim(min_salary, max_salary)
             axs.set_ylim(0, 120)
-            if selite:
+            if legend:
                 #axs.legend(loc='upper right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
@@ -3699,31 +3887,39 @@ class Benefits():
             else:
                 figi=fig
                 axs=ax
-            sns.set()
+            #sns.set_theme(**csfont)
+            axs.set_axisbelow(False)
             if incl_perustulo:
                 axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,perustulo,
                     labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),
                     colors=pal)
             else:
                 if incl_elake:
-                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki']),
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,kotihoidontuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['kotihoidontuki']),
                         colors=pal)
                 elif incl_opintotuki:
-                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,opintotuki,elatustuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['opintotuki'],self.labels['elatustuki']),
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,opintotuki,elatustuki,kotihoidontuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['opintotuki'],self.labels['elatustuki'],self.labels['kotihoidontuki']),
+                        colors=pal)
+                elif plot_kotihoidontuki:
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,lapsilisa,elatustuki,kotihoidontuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],'Lapsilisä',self.labels['elatustuki'],self.labels['kotihoidontuki']),
                         colors=pal)
                 else:
-                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elatustuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elatustuki']),
+                    axs.stackplot(palkka,nettotulot,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elatustuki,kotihoidontuki,
+                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elatustuki'],self.labels['kotihoidontuki']),
                         colors=pal)
             
             axs.plot(netto)
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel(self.labels['net income'])
-            axs.grid(True,color='lightgray')
-            axs.set_xlim(0, max_salary)
-            if selite:        
+            plt.yticks(**csfont)
+            plt.xticks(**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+            axs.set_facecolor('white')
+            axs.set_xlim(min_salary, max_salary)
+            if legend:        
                 #axs.legend(loc='lower right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='lower right')
@@ -3742,34 +3938,43 @@ class Benefits():
             else:
                 figi=fig
                 axs=ax
-            sns.set()
+            #sns.set_theme(**csfont)
+            axs.set_axisbelow(False)
             if incl_perustulo:
                 axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_perustulo,
                     labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']),
                     colors=pal)
             else:
                 if incl_elake:
-                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki']),
+                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_kotihoidontuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['kotihoidontuki']),
                         colors=pal)
                 elif incl_opintotuki:
-                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_opintotuki,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
+                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_opintotuki,tva_kotihoidontuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki'],self.labels['kotihoidontuki']),
+                        colors=pal)
+                elif plot_kotihoidontuki:
+                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_pvhoito,tva_kotihoidontuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito'],self.labels['kotihoidontuki']),
                         colors=pal)
                 else:
-                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
+                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,#tva_kotihoidontuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),#self.labels['kotihoidontuki']),
                         colors=pal)
 
-            axs.plot(tva,label='Vaihtoehto')
+            #axs.plot(tva,label='Vaihtoehto')
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel('Työllistymisveroaste (%)')
-            axs.grid(True,color='lightgray')
-            axs.set_xlim(0, max_salary)
+            plt.yticks(**csfont)
+            plt.xticks(**csfont)
+            axs.grid(False)#,color='lightgray',fillstyle='top')
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+            axs.set_facecolor('white')
+            axs.set_xlim(min_salary, max_salary)
             axs.set_ylim(0, 120)
-            if selite:
+            if legend:
                 #axs.legend(loc='upper right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
@@ -3788,7 +3993,8 @@ class Benefits():
             else:
                 figi=fig
                 axs=ax
-            sns.set()
+            #sns.set_theme(**csfont)
+            axs.set_axisbelow(False)
             if incl_perustulo:
                 axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,
                     labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']),
@@ -3802,6 +4008,10 @@ class Benefits():
                     axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_opintotuki,
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
                         colors=pal)
+                elif plot_kotihoidontuki:
+                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_pvhoito,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito']),
+                        colors=pal)
                 else:
                     axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
@@ -3811,11 +4021,14 @@ class Benefits():
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
             axs.set_xlabel(self.labels['parttimewage'])
-            axs.set_ylabel('Efektiivinen marginaaliveroaste osatyöstä kokoaikatyöhön (%)')
-            axs.grid(True,color='lightgray')
-            axs.set_xlim(0, max_salary)
-            axs.set_ylim(0, 120)
-            if selite:
+            axs.set_ylabel('Eff. rajaveroaste osa-aikatyöstä kokoaikatyöhön (%)')
+            plt.yticks(**csfont)
+            plt.xticks(**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+            axs.set_facecolor('white')
+            axs.set_xlim(min_salary, max_salary)
+            axs.set_ylim(0, 100)
+            if legend:
                 #axs.legend(loc='upper right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
@@ -3833,9 +4046,10 @@ class Benefits():
             return netto,eff,tva,osatva
             
     def add_source(self,source):
-        plt.annotate(source, xy=(0.8,-0.1), xytext=(0,0), fontsize=8, xycoords='axes fraction', textcoords='offset points', va='top')
+        plt.annotate(source, xy=(0.88,-0.1), xytext=(0,0), fontsize=12, xycoords='axes fraction', textcoords='offset points', va='top')
 
-    def laske_ja_plottaa_veromarginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True):
+    def laske_ja_plottaa_veromarginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,
+            basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True):
         palkka=np.zeros(max_salary+1)
         margtyotvakmaksu=np.zeros(max_salary+1)        
         margsairausvakuutusmaksu=np.zeros(max_salary+1)
@@ -3859,7 +4073,7 @@ class Benefits():
         puolisonverot=np.zeros(max_salary+1)  
         
         if p is None:
-            p=self.get_default_parameter()
+            p,selite=self.get_default_parameter()
             
         p2=p.copy()
 
@@ -3980,7 +4194,7 @@ class Benefits():
             pal=sns.color_palette()            
             
         if p is None:
-            p=self.get_default_parameter()
+            p,selite=self.get_default_parameter()
             
         p2=p.copy()
 
@@ -4010,6 +4224,7 @@ class Benefits():
             ansiopvraha[t]=q1['ansiopvraha_nettonetto']+q1['puoliso_ansiopvraha_nettonetto']
             lapsilisa[t]=q1['lapsilisa']
             opintotuki[t]=q1['opintotuki']
+            elatustuki[t]=q1['elatustuki']
             nettotulot[t]=tulot['tulotnetto']
             if type=='tva':
                 tulot2,tvat=self.laske_marginaalit(q0,q1,t,laske_tyollistymisveroaste=1)
@@ -4036,18 +4251,6 @@ class Benefits():
             else:
                 axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,
                     labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake']))
-            self.labels['valtionvero']='Valtionvero'
-            self.labels['kunnallisvero']='Kunnallisvero'
-            self.labels['telp']='TEL-P'
-            self.labels['sairausvakuutusmaksu']='sairausvakuutusmaksu'
-            self.labels['työttömyysvakuutusmaksu']='työttömyysvakuutusmaksu'
-            self.labels['puolison verot']='puolison verot'
-            self.labels['taxes']='verot'
-            self.labels['asumistuki']='asumistuki'
-            self.labels['toimeentulotuki']='toimeentulotuki'
-            self.labels['tyottomyysturva']='työttömyystuki'
-            self.labels['paivahoito']='päivähoito'
-            self.labels['elake']='eläke'
             
             axs.plot(eff)
             #axs.plot(margyht,label='Vaihtoehto2')
@@ -4240,12 +4443,16 @@ class Benefits():
         else:
             print('Vuoden {v} aineisto puuttuu'.format(v=vuosi))
             
+        self.sotumaksu=self.laske_sotumaksu(vuosi)
+
+            
     def get_tyelpremium(self):
         tyel_kokomaksu=np.zeros((2100,5))
         # data
-        tyel_kokomaksu[1962:2022]=[5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.15,5.15,5.65,6.1,6.4,6.9,7.9,9.9,12.0,10.0,11.7,13.3,13.3,12.4,11.1,11.1,11.5,12.2,13.0,13.8,14.9,16.9,16.9,14.4,18.5,18.6,20.6,21.1,21.2,21.5,21.5,21.5,21.1,21.1,21.4,21.4,21.6,21.2,21.1,21.1,21.3,21.6,22.1,22.8,22.8,23.6,24.0,24.0,24.4,24.4,24.4,24.4,24.4,24.4]
+        self.data_tyel_kokomaksu[1962:2022]=[5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.15,5.15,5.65,6.1,6.4,6.9,7.9,9.9,12.0,10.0,11.7,13.3,13.3,12.4,11.1,11.1,11.5,12.2,13.0,13.8,14.9,16.9,16.9,14.4,18.5,18.6,20.6,21.1,21.2,21.5,21.5,21.5,21.1,21.1,21.4,21.4,21.6,21.2,21.1,21.1,21.3,21.6,22.1,22.8,22.8,23.6,24.0,24.0,24.4,24.4,24.4,24.4,24.4,24.4]
         # ETK
-        tyel_kokomaksu[2023:2085]=np.array([24.4,24.5,24.5,24.6,24.6,24.7,24.8,24.8,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
-        ptel=0.5*(tyel_kokomaksu-tyel_kokomaksu[0])+0.0615 # vuonna 2017 ptel oli 6,15 %
+        self.data_tyel_kokomaksu[2023:2085]=np.array([24.4,24.5,24.5,24.6,24.6,24.7,24.8,24.8,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
+        self.data_ptel=0.5*(self.data_tyel_kokomaksu-self.data_tyel_kokomaksu[2017])+0.0615 # vuonna 2017 ptel oli 6,15 %
+        self.data_ptel[1962:1993]=0
         
         return tyel_kokomaksu

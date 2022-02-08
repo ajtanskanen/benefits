@@ -139,6 +139,14 @@ class Labels():
             labels['elatustuki']='Alimony'
             labels['net income']='Net income (e/m)'
             labels['alv']='VAT'
+            labels['valtionvero']='Valtionvero'
+            labels['kunnallisvero']='Kunnallisvero'
+            labels['telp']='TEL-P'
+            labels['sairausvakuutusmaksu']='sairausvakuutusmaksu'
+            labels['työttömyysvakuutusmaksu']='työttömyysvakuutusmaksu'
+            labels['puolison verot']='puolison verot'
+            labels['taxes']='verot'
+            labels['kotihoidontuki']='Kotihoidontuki'
         else:
             labels['wage']='Palkka (e/kk)'
             labels['parttimewage']='Osa-aikatyön palkka (e/kk)'
@@ -162,6 +170,13 @@ class Labels():
             labels['elatustuki']='Elatustuki'
             labels['net income']='Nettotulot (e/kk)'        
             labels['alv']='ALV'
+            labels['valtionvero']='Valtionvero'
+            labels['kunnallisvero']='Kunnallisvero'
+            labels['telp']='TEL-P'
+            labels['sairausvakuutusmaksu']='sairausvakuutusmaksu'
+            labels['työttömyysvakuutusmaksu']='työttömyysvakuutusmaksu'
+            labels['puolison verot']='puolison verot'
+            labels['kotihoidontuki']='Kotihoidontuki'
             
         return labels
             
