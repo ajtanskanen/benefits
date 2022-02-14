@@ -151,7 +151,7 @@ class Labels():
             labels['wage']='Palkka (e/kk)'
             labels['parttimewage']='Osa-aikatyön palkka (e/kk)'
             labels['pure wage']='Palkka'
-            labels['effective']='Eff.marg.veroaste (%)'
+            labels['effective']='Eff.rajaveroaste (%)'
             labels['valtionvero']='Valtionvero'
             labels['kunnallisvero']='Kunnallisvero'
             labels['telp']='TEL-P'

@@ -75,7 +75,7 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         aikuisia=1    
         vakiintunutpalkka=2500    
         tyoton=0    
-        saa_ansiopaivarahaa=1    
+        saa_ansiopaivarahaa=0
         puolison_tulot=0    
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
@@ -567,9 +567,9 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         vakiintunutpalkka=3500    
         tyoton=1
         saa_ansiopaivarahaa=0
-        puolison_tulot=0    
+        puolison_tulot=1000
         puolison_vakiintunutpalkka=3500
-        puoliso_tyoton=1
+        puoliso_tyoton=0
         puoliso_saa_ansiopaivarahaa=0
     elif perhetyyppi==45: # 2+4
         lapsia=4
@@ -584,6 +584,62 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_tulot=0    
         puolison_vakiintunutpalkka=3500
         puoliso_tyoton=1
+        puoliso_saa_ansiopaivarahaa=0
+    elif perhetyyppi==46: # 2+3
+        lapsia=2
+        paivahoidossa=2
+        lapsia_kotihoidontuella=0
+        kotihoidontuella=0
+        alle3v=2
+        aikuisia=2
+        vakiintunutpalkka=1500
+        tyoton=1
+        saa_ansiopaivarahaa=0
+        puolison_tulot=1000
+        puolison_vakiintunutpalkka=2500
+        puoliso_tyoton=0
+        puoliso_saa_ansiopaivarahaa=0
+    elif perhetyyppi==47: # 2+3
+        lapsia=0
+        paivahoidossa=0
+        lapsia_kotihoidontuella=0
+        kotihoidontuella=0
+        alle3v=0
+        aikuisia=1
+        vakiintunutpalkka=4000
+        tyoton=1
+        saa_ansiopaivarahaa=1
+        puolison_tulot=0
+        puolison_vakiintunutpalkka=0
+        puoliso_tyoton=0
+        puoliso_saa_ansiopaivarahaa=0
+    elif perhetyyppi==48: # 2+3
+        lapsia=0
+        paivahoidossa=0
+        lapsia_kotihoidontuella=0
+        kotihoidontuella=0
+        alle3v=0
+        aikuisia=1
+        vakiintunutpalkka=4000
+        tyoton=0
+        saa_ansiopaivarahaa=0
+        puolison_tulot=0
+        puolison_vakiintunutpalkka=0
+        puoliso_tyoton=0
+        puoliso_saa_ansiopaivarahaa=0
+    elif perhetyyppi==49: # 2+2
+        lapsia=2
+        paivahoidossa=2
+        lapsia_kotihoidontuella=0
+        kotihoidontuella=0
+        alle3v=2
+        aikuisia=2
+        vakiintunutpalkka=2500
+        tyoton=1
+        saa_ansiopaivarahaa=1
+        puolison_tulot=1000
+        puolison_vakiintunutpalkka=1000
+        puoliso_tyoton=0
         puoliso_saa_ansiopaivarahaa=0
     else: # 1+0
         lapsia=0    
@@ -678,7 +734,7 @@ def tee_selite(p,p2=None,short=False):
     else:
         selite="Perhe, jossa ei aikuisia"
         
-    if not short:
+    if not short and False:
         if p['lapsia']>0:
             pvhoito=''
             if p['lapsia']<2:
@@ -707,7 +763,8 @@ def tee_selite(p,p2=None,short=False):
             else:
                 selite+=" ja 1 lapsi."
         else:
-            selite=selite+", ei lapsia."        
+            selite=selite+", ei lapsia."   
+                 
     if p2 is not None:
         selite+=' Siirtyy'
         if p['elakkeella']<1:
@@ -717,7 +774,7 @@ def tee_selite(p,p2=None,short=False):
                     if short:
                         selite+=" (ansiopäiväraha)"
                     else:
-                        selite+=" (ansiopäiväraha, vakiintunut ansio {v} e/kk)".format(v=p['vakiintunutpalkka'])
+                        selite+=" (ansiopäiväraha, peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
                 else:
                     selite+=" (työmarkkinatuki)"
             elif p['opiskelija']>0:
@@ -735,7 +792,7 @@ def tee_selite(p,p2=None,short=False):
                     if short:
                         selite+=" (ansiopäiväraha)"
                     else:
-                        selite+=" (ansiopäiväraha, vakiintunut ansio {v} e/kk)".format(v=p['vakiintunutpalkka'])
+                        selite+=" (ansiopäiväraha, peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
                 else:
                     selite+=" (työmarkkinatuki)"
             elif p2['opiskelija']>0:
@@ -752,7 +809,7 @@ def tee_selite(p,p2=None,short=False):
                     if short:
                         selite+=" (ansiopäiväraha)"
                     else:
-                        selite+=" (ansiopvraha, vakiintunut ansio {v} e/kk)".format(v=p['vakiintunutpalkka'])
+                        selite+=" (ansiopvraha, peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
                 else:
                     selite+=" (työmarkkinatuki)"
             elif p['opiskelija']>0:
@@ -769,7 +826,7 @@ def tee_selite(p,p2=None,short=False):
             if p['puoliso_tyoton']>0:
                 selite+=", puoliso työtön"
                 if p['puoliso_saa_ansiopaivarahaa']>0:
-                    selite+=" (ansiopäiväraha, vakiintunut ansio {v} e/kk).".format(v=p['puoliso_vakiintunutpalkka'])
+                    selite+=" (ansiopäiväraha, peruste {v} e/kk).".format(v=p['puoliso_vakiintunutpalkka'])
                 else:
                     selite+=" (työmarkkinatuki)."
             else:
@@ -778,7 +835,7 @@ def tee_selite(p,p2=None,short=False):
         else:
             selite+=", ei puolisoa."
         
-        selite+=" Asumismenot {a} e/kk".format(a=p['asumismenot_toimeentulo'])
+        #selite+=" Asumismenot {a} e/kk".format(a=p['asumismenot_toimeentulo'])
             
     return selite
 

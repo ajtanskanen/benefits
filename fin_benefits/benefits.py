@@ -1514,6 +1514,7 @@ class Benefits():
         q['etuustulo_brutto']=q['ansiopvraha']+q['puoliso_ansiopvraha']+q['opintotuki']\
             +q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
             +q['toimeentulotuki']+q['kokoelake']
+        q['brutto']=q['etuustulo_brutto']+p['t']
             
         #if p['aikuisia']>1 and False:
         #    asumismeno=0.5*p['asumismenot_asumistuki']
@@ -3554,7 +3555,7 @@ class Benefits():
                 axs.plot(x,osa_tva) 
                        
             axs.set_xlabel('Osatyön palkka (e/kk)')
-            axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.marg.vero (%)')
+            axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.rajavero (%)')
             axs.grid(True)
             axs.set_xlim(0, max_salary)
             if source is not None:
@@ -3748,7 +3749,7 @@ class Benefits():
             p,selite=self.get_default_parameter()
             
         if header:
-            head_text=tee_selite(p,p2=p2,short=True)
+            head_text=tee_selite(p,p2=p2,short=False)
         else:
             head_text=None
             
@@ -3763,16 +3764,22 @@ class Benefits():
 
         p1['t']=0 # palkka
         n0,q0=self.laske_tulot(p1)
+        brutto0=q0['brutto']
         for t in range(0,max_salary+1):
             p2['t']=t # palkka
             n1,q1=self.laske_tulot(p2)
+            brutto1=q1['brutto']
             p2['t']=t+dt # palkka
             n2,q2=self.laske_tulot(p2)
-            deltat=1500
+            deltat=t
+            brutto2=q2['brutto']
             p3['t']=t+deltat # palkka
             n3,q3=self.laske_tulot(p3)
+            brutto3=q1['brutto']
             
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
+            d_brutto=brutto2-brutto0
+            #tulot2,tvat=self.laske_marginaalit(q0,q1,d_brutto,laske_tyollistymisveroaste=1)
             tulot2,tvat=self.laske_marginaalit(q0,q1,t,laske_tyollistymisveroaste=1)
             tulot3,osatvat=self.laske_marginaalit(q2,q3,deltat)
             netto[t]=n1
@@ -3829,7 +3836,11 @@ class Benefits():
                 tva[t]=(1-(n1-n0)/t)*100
             else:
                 tva[t]=0
-            osatva[t]=(1-(n3-n1)/deltat)*100
+                
+            if deltat>0:
+                osatva[t]=(1-(n3-n1)/deltat)*100
+            else:
+                osatva[t]=0
                 
         if plot_eff and plottaa:
             if fig is None:
@@ -3984,7 +3995,7 @@ class Benefits():
                 axs.title.set_text(head_text)
                 
             if figname is not None:
-                plt.savefig(figname+'_tva.png')
+                plt.savefig(figname+'_tva.png',dpi=200)
             plt.show()
             
         if plot_osatva and plottaa:
@@ -4038,7 +4049,7 @@ class Benefits():
                 axs.title.set_text(head_text)
                 
             if figname is not None:
-                plt.savefig(figname+'_osatva.png')
+                plt.savefig(figname+'_osatva.png',dpi=200)
             if fig is None:
                 plt.show()            
                
@@ -4071,6 +4082,7 @@ class Benefits():
         valtionvero=np.zeros(max_salary+1)  
         perusvahennys=np.zeros(max_salary+1)  
         puolisonverot=np.zeros(max_salary+1)  
+        brutto=np.zeros(max_salary+1)  
         
         if p is None:
             p,selite=self.get_default_parameter()
@@ -4103,6 +4115,7 @@ class Benefits():
             kunnallisvero[t]=q1['kunnallisvero']
             valtionvero[t]=q1['valtionvero']
             puolisonverot[t]=0 #q1['puolisoverot']
+            brutto[t]=q1['bruttotulot']
                             
         fig,axs = plt.subplots()
         axs.stackplot(palkka,margvaltionvero,margkunnallisvero,margptel,margsairausvakuutusmaksu,margtyotvakmaksu,margpuolisonverot,
