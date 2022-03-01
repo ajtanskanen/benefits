@@ -234,6 +234,9 @@ class Benefits():
     def get_default_parameter(self):
         return perheparametrit(perhetyyppi=1)
     
+    def perustulo(self):
+        return 0
+    
     # tmtuki samankokoinen
     def peruspaivaraha2018(self,lapsia):
         if lapsia==0:
