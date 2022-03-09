@@ -38,6 +38,7 @@ class BasicIncomeBenefits(Benefits):
         self.vaihtuva_tyelmaksu=False
         self.tyel_perusvuosi=1970 # ikäluokan syntymävuosi
         self.irr_vain_tyoelake=False
+        self.include_perustulo=True
         
         self.osittainen_perustulo=True
         self.perustulo_korvaa_toimeentulotuen=False
