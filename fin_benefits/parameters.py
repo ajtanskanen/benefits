@@ -641,6 +641,20 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=1000
         puoliso_tyoton=0
         puoliso_saa_ansiopaivarahaa=0
+    elif perhetyyppi==50: # 2+2
+        lapsia=2
+        paivahoidossa=2
+        lapsia_kotihoidontuella=0
+        kotihoidontuella=0
+        alle3v=2
+        aikuisia=2
+        vakiintunutpalkka=2500
+        tyoton=0
+        saa_ansiopaivarahaa=0
+        puolison_tulot=1000
+        puolison_vakiintunutpalkka=1000
+        puoliso_tyoton=0
+        puoliso_saa_ansiopaivarahaa=0
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
@@ -804,14 +818,13 @@ def tee_selite(p,p2=None,short=False):
     else:
         if p['elakkeella']<1:
             if p['tyoton']>0:
-                selite+=" Työtön"
                 if p['saa_ansiopaivarahaa']>0:
                     if short:
-                        selite+=" (ansiopäiväraha)"
+                        selite+=" Ansiopäivärahalta työllistyvä"
                     else:
-                        selite+=" (ansiopvraha, peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
+                        selite+=" Ansiopäivärahalta työllistyvä (peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
                 else:
-                    selite+=" (työmarkkinatuki)"
+                    selite+=" Työmarkkinatuelta työllistyvä"
             elif p['opiskelija']>0:
                 selite+=" Opiskelija"
             elif p['kotihoidontuella']>0:
@@ -840,6 +853,6 @@ def tee_selite(p,p2=None,short=False):
     return selite
 
 def print_examples():
-    for k in range(1,44):
+    for k in range(1,50):
         p,selite=perheparametrit(perhetyyppi=k,tulosta=False)
         print('Tapaus {}:\n{}\n'.format(k,selite))  

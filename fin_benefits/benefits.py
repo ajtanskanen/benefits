@@ -3778,7 +3778,7 @@ class Benefits():
             brutto3=q1['brutto']
             
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
-            d_brutto=brutto2-brutto0
+            #d_brutto=brutto2-brutto0
             #tulot2,tvat=self.laske_marginaalit(q0,q1,d_brutto,laske_tyollistymisveroaste=1)
             tulot2,tvat=self.laske_marginaalit(q0,q1,t,laske_tyollistymisveroaste=1)
             tulot3,osatvat=self.laske_marginaalit(q2,q3,deltat)
