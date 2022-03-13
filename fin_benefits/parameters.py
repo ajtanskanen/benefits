@@ -641,20 +641,83 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=1000
         puoliso_tyoton=0
         puoliso_saa_ansiopaivarahaa=0
-    elif perhetyyppi==50: # 2+2
-        lapsia=2
-        paivahoidossa=2
-        lapsia_kotihoidontuella=0
-        kotihoidontuella=0
-        alle3v=2
-        aikuisia=2
-        vakiintunutpalkka=2500
-        tyoton=0
-        saa_ansiopaivarahaa=0
-        puolison_tulot=1000
-        puolison_vakiintunutpalkka=1000
-        puoliso_tyoton=0
-        puoliso_saa_ansiopaivarahaa=0
+    elif perhetyyppi==50: # 1+0, työtön ansiopäivärahalla 
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=2000    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==51: # 1+0, työtön ansiopäivärahalla 
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=2500    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==52: # 1+0, työtön ansiopäivärahalla 
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=3000    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==53: # 1+0, työtön ansiopäivärahalla 
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=3500    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==54: # 1+0, työtön ansiopäivärahalla 
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=4000    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==55: # 1+0, työtön ansiopäivärahalla 
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=4500    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==56: # 1+0, työtön ansiopäivärahalla 
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=5000    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
@@ -818,13 +881,14 @@ def tee_selite(p,p2=None,short=False):
     else:
         if p['elakkeella']<1:
             if p['tyoton']>0:
+                selite+=" Työtön"
                 if p['saa_ansiopaivarahaa']>0:
                     if short:
-                        selite+=" Ansiopäivärahalta työllistyvä"
+                        selite+=" (ansiopäiväraha)"
                     else:
-                        selite+=" Ansiopäivärahalta työllistyvä (peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
+                        selite+=" (ansiopvraha, peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
                 else:
-                    selite+=" Työmarkkinatuelta työllistyvä"
+                    selite+=" (työmarkkinatuki)"
             elif p['opiskelija']>0:
                 selite+=" Opiskelija"
             elif p['kotihoidontuella']>0:
@@ -853,6 +917,6 @@ def tee_selite(p,p2=None,short=False):
     return selite
 
 def print_examples():
-    for k in range(1,50):
+    for k in range(1,57):
         p,selite=perheparametrit(perhetyyppi=k,tulosta=False)
         print('Tapaus {}:\n{}\n'.format(k,selite))  

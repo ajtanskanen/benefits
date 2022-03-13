@@ -59,6 +59,7 @@ class Labels():
             labels['malli']='Life cycle model'
             labels['lapsia']='Children'
             labels['spouses']='Spouses'
+            labels['työvoima %']='Workforce %'
         else:
             labels['osuus tilassa x']='Osuus tilassa {} [%]'
             labels['age']='Ikä [v]'
@@ -111,6 +112,7 @@ class Labels():
             labels['malli']='elinkaarimalli'
             labels['lapsia']='Lapsia'
             labels['spouses']='Spouses'
+            labels['työvoima %']='Työvoima %'
 
         return labels
         
