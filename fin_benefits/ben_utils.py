@@ -1,4 +1,8 @@
 
+import seaborn as sns
+import matplotlib.font_manager as font_manager
+
+
 def get_palette_EK():
     colors1=['#003326','#05283d','#ff9d6a','#599956']
     colors2=['#295247','#2c495a','#fdaf89','#7cae79']

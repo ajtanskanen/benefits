@@ -87,6 +87,18 @@ class Marginals():
         if self.vaihtuva_tyelmaksu:
             self.get_tyelpremium()        
             
+    def setup_EK_fonts(self):
+        pal=get_palette_EK()
+        #csfont = {'fontname':'Comic Sans MS'}
+        fontname='IBM Plex Sans'
+        csfont = {'font':fontname,'family':fontname,'fontsize':15}
+        #fontprop = font_manager.FontProperties(family=fontname,weight='normal',style='normal', size=12)
+        custom_params = {"axes.spines.right": False, "axes.spines.top": False, "axes.spines.left": False, 'ytick.left': False}
+        sns.set_theme(style="ticks", font=fontname,rc=custom_params)
+        linecolors = {'color':'red'}
+        
+        return csfont,pal
+            
     def laske_ja_plottaa_marginaalit(self,p=None,p2=None,min_salary=0,max_salary=6000,
                 basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
                 otsikko="Vaihtoehto",otsikkobase="Perustapaus",legend=True,ret=False,
@@ -151,7 +163,7 @@ class Marginals():
             plt.style.use('grayscale')
             plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
             pal=sns.dark_palette("darkgray", 6, reverse=True)
-            plt.grid(b=False)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             reverse=True
         else:
             pal=sns.color_palette()
@@ -160,13 +172,7 @@ class Marginals():
             pal=sns.color_palette(palette, 12)
             
         if palette_EK:
-            pal=self.get_palette_EK()
-            #csfont = {'fontname':'Comic Sans MS'}
-            fontname='IBM Plex Sans'
-            csfont = {'fontname':fontname}
-            #fontprop = font_manager.FontProperties(family=fontname,weight='normal',style='normal', size=12)
-            custom_params = {"axes.spines.right": False, "axes.spines.top": False, "axes.spines.left": False, 'ytick.left': False}
-            sns.set_theme(style="ticks", font=fontname,rc=custom_params)
+            csfont,pal=self.setup_EK_fonts()
         else:
             csfont = {}
 
@@ -297,21 +303,22 @@ class Marginals():
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),#self.labels['alv']),
                         colors=pal)
                         
-            axs.set_xlabel(self.labels['wage'],)
-            axs.set_ylabel(self.labels['effective'])
+            axs.set_xlabel(self.labels['wage'],**csfont)
+            axs.set_ylabel(self.labels['effective'],**csfont)
             plt.yticks(**csfont)
             plt.xticks(**csfont)
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(min_salary, max_salary)
-            axs.set_ylim(0, 120)
+            axs.set_ylim(0, 119)
             if legend:
                 #axs.legend(loc='upper right')
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             if header is not None:
-                axs.title.set_text(head_text)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(head_text,**csfont)
                 
             if figname is not None:
                 plt.savefig(figname+'_eff.png')
@@ -348,8 +355,8 @@ class Marginals():
                         colors=pal)
             
             axs.plot(netto)
-            axs.set_xlabel(self.labels['wage'])
-            axs.set_ylabel(self.labels['net income'])
+            axs.set_xlabel(self.labels['wage'],**csfont)
+            axs.set_ylabel(self.labels['net income'],**csfont)
             plt.yticks(**csfont)
             plt.xticks(**csfont)
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
@@ -360,9 +367,10 @@ class Marginals():
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='lower right')
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             if header is not None:
-                axs.title.set_text(head_text)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(head_text,**csfont)
                 
             if figname is not None:
                 plt.savefig(figname+'_netto.png')
@@ -401,11 +409,10 @@ class Marginals():
             #axs.plot(tva,label='Vaihtoehto')
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
-            axs.set_xlabel(self.labels['wage'])
-            axs.set_ylabel('Työllistymisveroaste (%)')
+            axs.set_xlabel(self.labels['wage'],**csfont)
+            axs.set_ylabel('Työllistymisveroaste (%)',**csfont)
             plt.yticks(**csfont)
             plt.xticks(**csfont)
-            axs.grid(False)#,color='lightgray',fillstyle='top')
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_facecolor('white')
             axs.set_xlim(min_salary, max_salary)
@@ -415,9 +422,10 @@ class Marginals():
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             if header is not None:
-                axs.title.set_text(head_text)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(head_text,**csfont)
                 
             if figname is not None:
                 plt.savefig(figname+'_tva.png',dpi=200)
@@ -456,8 +464,8 @@ class Marginals():
             #axs.plot(tva,label='Vaihtoehto')
             #axs.plot(tva_yht,label='Vaihtoehto2')
             #axs.plot(tva_yht2,label='Vaihtoehto3')
-            axs.set_xlabel(self.labels['parttimewage'])
-            axs.set_ylabel('Eff. rajaveroaste osa-aikatyöstä kokoaikatyöhön (%)')
+            axs.set_xlabel(self.labels['parttimewage'],**csfont)
+            axs.set_ylabel('Eff. rajaveroaste osa-aikatyöstä kokoaikatyöhön (%)',**csfont)
             plt.yticks(**csfont)
             plt.xticks(**csfont)
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
@@ -469,9 +477,10 @@ class Marginals():
                 handles, labels = axs.get_legend_handles_labels()
                 lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             if header is not None:
-                axs.title.set_text(head_text)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(head_text,**csfont)
                 
             if figname is not None:
                 plt.savefig(figname+'_osatva.png',dpi=200)
@@ -481,11 +490,11 @@ class Marginals():
         if ret: 
             return netto,eff,tva,osatva
             
-    def add_source(self,source):
-        plt.annotate(source, xy=(0.88,-0.1), xytext=(0,0), fontsize=12, xycoords='axes fraction', textcoords='offset points', va='top')
+    def add_source(self,source,**csfont):
+        plt.annotate(source, xy=(0.88,-0.1), xytext=(0,0), xycoords='axes fraction', textcoords='offset points', va='top', **csfont)
 
     def laske_ja_plottaa_veromarginaalit(self,p=None,min_salary=0,max_salary=6000,basenetto=None,baseeff=None,
-            basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True):
+            basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,palette_EK=True):
         palkka=np.zeros(max_salary+1)
         margtyotvakmaksu=np.zeros(max_salary+1)        
         margsairausvakuutusmaksu=np.zeros(max_salary+1)
@@ -513,6 +522,11 @@ class Marginals():
             p,selite=self.get_default_parameter()
             
         p2=p.copy()
+        
+        if palette_EK:
+            csfont,pal=self.setup_EK_fonts()
+        else:
+            csfont = {}
 
         p2['t']=0 # palkka
         n0,q0=self.ben.laske_tulot(p2)
@@ -551,7 +565,7 @@ class Marginals():
         #axs.plot(margyht2,label='Vaihtoehto3')
         axs.set_xlabel(self.labels['wage'])
         axs.set_ylabel(self.labels['effective'])
-        axs.grid(True)
+        axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
         axs.set_xlim(0, max_salary)
         axs.set_ylim(-50, 120)
         if selite:
@@ -564,7 +578,7 @@ class Marginals():
         #axs.plot(netto)
         axs.set_xlabel(self.labels['wage'])
         axs.set_ylabel('Verot yhteensä (e/kk)')
-        axs.grid(True)
+        axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
         axs.set_xlim(0, max_salary)
         if selite:        
             axs.legend(loc='lower right')
@@ -593,7 +607,7 @@ class Marginals():
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=False,
-            figname=None,grayscale=False,source=None,header=None):
+            figname=None,grayscale=False,source=None,header=None,palette_EK=True):
             
         if grayscale:
             plt.style.use('grayscale')
@@ -603,25 +617,35 @@ class Marginals():
         else:
             pal=sns.color_palette()            
             
+        if palette_EK:
+            csfont,pal=self.setup_EK_fonts()
+        else:
+            csfont = {}
+            linecolors ={}
+            
+        linestyle={'linewidth': 3}
+        legendstyle={'frameon': False}
+            
         x=np.arange(min_salary,max_salary,step_salary)
         if plot_netto:
             fig, axs = plt.subplots()
             if basenetto is not None:
-                axs.plot(x,basenetto,label=otsikkobase)
-                axs.plot(x,netto,label=otsikko)
+                axs.plot(x,basenetto,label=otsikkobase,**linestyle)
+                axs.plot(x,netto,label=otsikko,**linestyle)
                 if selite:
-                    axs.legend(loc='upper right')
+                    axs.legend(loc='upper right',**legendstyle)
             else:
-                axs.plot(x,netto)        
-            axs.set_xlabel(self.labels['wage'])
-            axs.set_ylabel(self.labels['net income'])
-            axs.grid(False)
+                axs.plot(x,netto,**linestyle)
+            axs.set_xlabel(self.labels['wage'],**csfont)
+            axs.set_ylabel(self.labels['net income'],**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             
             if header is not None:
-                axs.title.set_text(header)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(header,**csfont)
                 
             if figname is not None:
                 plt.savefig(figname+'_netto.eps', format='eps')
@@ -632,21 +656,23 @@ class Marginals():
         if plot_eff:
             fig, axs = plt.subplots()
             if baseeff is not None:
-                axs.plot(x,baseeff,label=otsikkobase)
-                axs.plot(x,eff,label=otsikko)
+                axs.plot(x,baseeff,label=otsikkobase,**linestyle)
+                axs.plot(x,eff,label=otsikko,**linestyle)
                 if selite:
-                    axs.legend(loc='upper right')
+                    axs.legend(loc='upper right',**legendstyle)
             else:
-                axs.plot(x,eff)        
-            axs.set_xlabel(self.labels['wage'])
-            axs.set_ylabel(self.labels['effective'])
-            axs.grid(True)
+                axs.plot(x,eff,**linestyle)
+            axs.set_xlabel(self.labels['wage'],**csfont)
+            axs.set_ylabel(self.labels['effective'],**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
+            axs.set_ylim(0, 119)
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             
             if header is not None:
-                axs.title.set_text(header)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(header,**csfont)
             if figname is not None:
                 plt.savefig(figname+'_effmarg.eps', format='eps')
             plt.show()
@@ -654,22 +680,23 @@ class Marginals():
         if plot_tva:
             fig, axs = plt.subplots()
             if basenetto is not None:
-                axs.plot(x,basetva,label=otsikkobase)
-                axs.plot(x,tva,label=otsikko)
+                axs.plot(x,basetva,label=otsikkobase,**linestyle)
+                axs.plot(x,tva,label=otsikko,**linestyle)
                 if selite:
-                    axs.legend(loc='upper right')
+                    axs.legend(loc='upper right',**legendstyle)
             else:
-                axs.plot(x,tva)
-            axs.set_xlabel(self.labels['wage'])
-            axs.set_ylabel('Työllistymisveroaste (%)')
-            axs.grid(True)
+                axs.plot(x,tva,**linestyle)
+            axs.set_xlabel(self.labels['wage'],**csfont)
+            axs.set_ylabel('Työllistymisveroaste (%)',**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 120)
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             
             if header is not None:
-                axs.title.set_text(header)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(header,**csfont)
             if figname is not None:
                 plt.savefig(figname+'_tva.eps', format='eps')
             plt.show()
@@ -677,21 +704,22 @@ class Marginals():
         if plot_osaeff:
             fig, axs = plt.subplots()
             if baseosatva is not None:
-                axs.plot(x,baseosatva,label=otsikkobase)
-                axs.plot(x,osa_tva,label=otsikko)
+                axs.plot(x,baseosatva,label=otsikkobase,**linestyle)
+                axs.plot(x,osa_tva,label=otsikko,**linestyle)
                 if selite:
-                    axs.legend(loc='upper right')
+                    axs.legend(loc='upper right',**legendstyle)
             else:
-                axs.plot(x,osa_tva) 
+                axs.plot(x,osa_tva,**linestyle)
                        
-            axs.set_xlabel('Osatyön palkka (e/kk)')
-            axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.rajavero (%)')
-            axs.grid(True)
+            axs.set_xlabel('Osatyön palkka (e/kk)',**csfont)
+            axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.rajavero (%)',**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
             if source is not None:
-                self.add_source(source)
+                self.add_source(source,**csfont)
             if header is not None:
-                axs.title.set_text(header)
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(header,**csfont)
             if figname is not None:
                 plt.savefig(figname+'_osatva.eps', format='eps')
             plt.show()    
@@ -741,7 +769,12 @@ class Marginals():
             pal=sns.dark_palette("darkgray", 6, reverse=True)
             reverse=True
         else:
-            pal=sns.color_palette()            
+            pal=sns.color_palette()          
+            
+        if palette_EK:
+            csfont,pal=self.setup_EK_fonts()
+        else:
+            csfont = {}
             
         if p is None:
             p,selite=self.get_default_parameter()
@@ -807,8 +840,9 @@ class Marginals():
             #axs.plot(margyht2,label='Vaihtoehto3')
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel(self.labels['effective'])
-            axs.grid(True)
-            axs.title.set_text(otsikko)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+            #axs.title.set_text(otsikko)
+            axs.set_title(otsikko,**csfont)
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 120)
             if selite:
@@ -823,7 +857,8 @@ class Marginals():
                 axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,
                     labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake']))
             
-            axs.title.set_text(otsikko)
+            axs.set_title(otsikko,**csfont)
+            #axs.title.set_text(otsikko)
             if self.language=='Finnish':
                 axs.plot(tva,label='Vaihtoehto')
                 #axs.plot(tva_yht,label='Vaihtoehto2')
@@ -837,7 +872,7 @@ class Marginals():
                 axs.set_xlabel('Wage (e/m)')
                 axs.set_ylabel('Työllistymisveroaste (%)')
             
-            axs.grid(True)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 120)
             if selite:
@@ -869,11 +904,12 @@ class Marginals():
 #                     labels=(self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['pure wage'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki']))
                             
             axs.plot(netto)
-            axs.title.set_text(otsikko)
+            axs.set_title(otsikko,**csfont)
+            #axs.title.set_text(otsikko)
             axs.set_xlabel(self.labels['wage'])
             axs.set_ylabel(self.labels['net income'])
             
-            axs.grid(True)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
             if selite:
                 axs.legend(loc='lower right')
@@ -885,13 +921,38 @@ class Marginals():
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
-            figname=None,grayscale=None,source='Lähde: EK',header=True):
+            figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
             
         netto,eff,tva,osa_tva=self.ben.comp_insentives(p=p,p0=p0,min_salary=min_salary,
                                                 max_salary=max_salary,step_salary=step_salary,dt=dt)
                 
         if header:
-            head_text=tee_selite(p,short=True)
+            head_text=tee_selite(p,short=short)
+        else:
+            head_text=None
+                
+        if plottaa:
+            self.plot_insentives(netto,eff,tva,osa_tva,min_salary=min_salary,max_salary=max_salary+1,
+                step_salary=step_salary,
+                basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
+                dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
+                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
+                figname=figname,grayscale=grayscale,source=source,header=head_text)
+        
+        return netto,eff,tva,osa_tva
+
+    
+    def plot(self,ben,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,
+            basenetto=None,baseeff=None,basetva=None,baseosatva=None,
+            dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
+            figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
+            
+        netto,eff,tva,osa_tva=ben.comp_insentives(p=p,p0=p0,min_salary=min_salary,
+                                                max_salary=max_salary,step_salary=step_salary,dt=dt)
+                
+        if header:
+            head_text=tee_selite(p,short=short)
         else:
             head_text=None
                 

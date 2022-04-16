@@ -161,6 +161,57 @@ class Benefits():
         muu=437.60
         yksinasuva=514.82
         return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+
+    def toimeentulotuki_param2023(self):
+        '''
+        Päivitä
+        '''
+        min_etuoikeutettuosa=150
+        lapsi1=324.34     # e/kk     alle 10v lapsi
+        lapsi2=298.60     # e/kk
+        lapsi3=272.85     # e/kk
+        yksinhuoltaja=586.89     # e/kk
+        # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
+        muu=437.60
+        yksinasuva=514.82
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        
+    def setup_tmtuki_param(self,vuosi):
+        if vuosi==2018:
+            self.tmtuki_suojaosa_perheellinen=800
+            self.tmtuki_puoliso_suojaosa=560
+            self.tmtuki_lisa=106
+            self.tmtuki_suojaosa_yksin=211
+        elif vuosi==2019:
+            self.tmtuki_suojaosa_perheellinen=800
+            self.tmtuki_puoliso_suojaosa=560
+            self.tmtuki_lisa=106
+            self.tmtuki_suojaosa_yksin=211
+        elif vuosi==2020:
+            self.tmtuki_suojaosa_perheellinen=800
+            self.tmtuki_puoliso_suojaosa=560
+            self.tmtuki_lisa=106
+            self.tmtuki_suojaosa_yksin=211
+        elif vuosi==2021:
+            self.tmtuki_suojaosa_perheellinen=800
+            self.tmtuki_puoliso_suojaosa=560
+            self.tmtuki_lisa=106
+            self.tmtuki_suojaosa_yksin=211
+        elif vuosi==2022:
+            self.tmtuki_suojaosa_perheellinen=800
+            self.tmtuki_puoliso_suojaosa=560
+            self.tmtuki_lisa=106
+            self.tmtuki_suojaosa_yksin=211
+        elif vuosi==2023:
+            self.tmtuki_suojaosa_perheellinen=800
+            self.tmtuki_puoliso_suojaosa=560
+            self.tmtuki_lisa=106
+            self.tmtuki_suojaosa_yksin=211
+        else:
+            self.tmtuki_suojaosa_perheellinen=1044
+            self.tmtuki_puoliso_suojaosa=560
+            self.tmtuki_lisa=13
+            self.tmtuki_suojaosa_yksin=311
         
     def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,
                              muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0,alennus=0):
@@ -331,6 +382,24 @@ class Benefits():
         tuki=max(0,pvraha)    
     
         return tuki
+
+    def peruspaivaraha2023(self,lapsia):
+        if lapsia==0:
+            lisa=0    
+        elif lapsia==1:
+            lisa=5.41     # e/pv
+        elif lapsia==2:
+            lisa=7.95     # e/pv
+        else:
+            lisa=10.25     # e/pv 
+        
+        if self.use_extra_ppr:
+            pvraha=21.5*(34.50+lisa)*self.extra_ppr_factor
+        else:
+            pvraha=21.5*(34.50+lisa)
+        tuki=max(0,pvraha)    
+    
+        return tuki
                 
     def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,peruspvraha):
         if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
@@ -348,6 +417,8 @@ class Benefits():
         elif vuosi==2021:
             sotumaksu=0.0434+0.6*self.additional_tyel_premium
         elif vuosi==2022:
+            sotumaksu=0.0434+0.6*self.additional_tyel_premium
+        elif vuosi==2023:
             sotumaksu=0.0434+0.6*self.additional_tyel_premium
         else:
             sotumaksu=0.0448+0.6*self.additional_tyel_premium
@@ -375,6 +446,9 @@ class Benefits():
                 lapsikorotus=np.array([0,5.30,7.78,10.03])*21.5    
                 taite=3209.10    
             elif self.year==2022:
+                lapsikorotus=np.array([0,5.41,7.95,10.25])*21.5    
+                taite=3277.50    
+            elif self.year==2023:
                 lapsikorotus=np.array([0,5.41,7.95,10.25])*21.5    
                 taite=3277.50    
             else:
@@ -408,9 +482,14 @@ class Benefits():
                 tuki=ansiopaivarahamaara    
                 tuki=omavastuukerroin*max(soviteltuperus,tuki)     # voi tulla vastaan pienillä tasoilla4
             else:
-                ansiopaivarahamaara=0    
-                perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
-                tuki=omavastuukerroin*perus    
+                if p[alku+'peruspaivarahalla']>0:
+                    ansiopaivarahamaara=0    
+                    perus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
+                    tuki=omavastuukerroin*perus    
+                else: # tm-tuki
+                    ansiopaivarahamaara=0    
+                    perus=self.soviteltu_tmtuki(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
+                    tuki=omavastuukerroin*perus    
         else:
             perus=0    
             tuki=0    
@@ -424,6 +503,59 @@ class Benefits():
         pvraha=self.peruspaivaraha(lapsia)
         vahentavattulo=max(0,tyotaikaisettulot-suojaosa)
         tuki=max(0,pvraha-0.5*vahentavattulo)
+    
+        return tuki
+        
+    def tmtuki_suojaosa(self,lapsia,p):
+        if lapsia>0:
+            suojaosa=self.tmtuki_suojaosa_perheellinen+lapsia*self.tmtuki_lisa
+        else:
+            suojaosa=self.tmtuki_suojaosa_yksin
+            
+        return suojaosa
+        
+    def tmtuki_vahentavatulo(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p):
+        if True: # ei tarveharkintaa, koska tarveharkinta kohdistuu vain pääomatuloihin yms. ove pitäisi tarveharkita
+            return self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)
+        else:
+            if p['aikuisia']>1:
+                puoliso=True
+            else:
+                puoliso=False
+            
+            if lapsia>0 or puoliso:
+                suojaosa=self.tmtuki_suojaosa_perheellinen+lapsia*self.tmtuki_lisa
+            else:
+                suojaosa=self.tmtuki_suojaosa_yksin
+            
+            if puoliso:
+                # Henkilölle, joka on saanut työttömyyspäivärahaa enimmäisajan, työmarkkinatuki
+                # maksetaan ilman tarveharkintaa 180 ensimmäisen työttömyyspäivän ajalta. 
+                # Myös jos ikä >= 55 ja toe täyttynyt työttömäksi joutuessa, 
+                if p['ika']>=55:
+                    vahentavattulo=max(0,tyotaikaisettulot-suojaosa)
+                else:
+                    vahentavattulo=max(0,max(p['puoliso_tulot']-self.tmtuki_puoliso_suojaosa,0)+tyotaikaisettulot-suojaosa)
+            else:
+                vahentavattulo=max(0,tyotaikaisettulot-suojaosa)
+            
+        return vahentavattulo
+        
+    def soviteltu_tmtuki(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p):
+        suojaosa=self.tmtuki_suojaosa(lapsia,p)
+
+        pvraha=self.peruspaivaraha(lapsia)
+        vahentavattulo=self.tmtuki_vahentavatulo(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)
+
+        if p['aikuisia']>1:
+            puoliso=True
+        else:
+            puoliso=False
+
+        if lapsia>0 or puoliso:
+            tuki=max(0,pvraha-0.5*vahentavattulo)
+        else:
+            tuki=max(0,pvraha-0.75*vahentavattulo)
     
         return tuki
         
@@ -462,6 +594,13 @@ class Benefits():
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
+    def elaketulovahennys2023(self,elaketulot,tulot):
+        max_elaketulovahennys_valtio=11150/self.kk_jakaja
+        elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
+        max_elaketulovahennys_kunnallis=9270/self.kk_jakaja
+        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
+        return elaketulovahennys_valtio,elaketulovahennys_kunnallis
+
     def tyotulovahennys2018(self):
         max_tyotulovahennys=1540/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja
@@ -487,6 +626,12 @@ class Benefits():
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def tyotulovahennys2022(self):
+        max_tyotulovahennys=1840/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
+        ttulopros=np.array([0.127,0.0189,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2023(self):
         max_tyotulovahennys=1840/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
         ttulopros=np.array([0.127,0.0189,0])
@@ -523,6 +668,12 @@ class Benefits():
         return rajat,maxvahennys,ansvah
         
     def ansiotulovahennys2022(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+
+    def ansiotulovahennys2023(self):
         rajat=np.array([2500,7230,14000])/self.kk_jakaja
         maxvahennys=3570/self.kk_jakaja
         ansvah=np.array([0.51,0.28,0.045])
@@ -637,7 +788,40 @@ class Benefits():
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
     def veroparam2022(self):
+        '''
+        Päivitä
+        '''
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
+        self.tyottomyysvakuutusmaksu=0.0150 #
+        if self.vaihtuva_tyelmaksu:
+            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        else:
+            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+
+        self.tyonantajan_sairausvakuutusmaksu=0.0134
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
+        self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
+        self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+            +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
+    
+        self.sairaanhoitomaksu=0.0053
+        self.sairaanhoitomaksu_etuus=0.0150 # muut
+        
+        self.paivarahamaksu_pros=0.0118 # palkka
+        self.paivarahamaksu_raja=15128/self.kk_jakaja    
+        
+        self.elakemaksu_alaraja=62.88
+        self.tulonhankkimisvahennys=750/self.kk_jakaja
+        
+    def veroparam2023(self):
+        '''
+        Päivitä
+        '''
+        self.kunnallisvero_pros=max(0,0.2001+self.additional_kunnallisvero) # Viitamäen raportista
         self.tyottomyysvakuutusmaksu=0.0140 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -728,6 +912,19 @@ class Benefits():
             
         return ylevero    
 
+    def laske_ylevero2023(self,palkkatulot,elaketulot):
+        yleveropros=0.025
+        min_ylevero=0/self.kk_jakaja
+        max_ylevero=163/self.kk_jakaja
+        ylevero_alaraja=14000/self.kk_jakaja
+    
+        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+    
+        if ylevero<min_ylevero:
+            ylevero=0
+            
+        return ylevero    
+
     def perusvahennys2018(self):
         perusvahennys_pros=0.18
         max_perusvahennys=3020/self.kk_jakaja
@@ -749,6 +946,11 @@ class Benefits():
         return perusvahennys_pros,max_perusvahennys
     
     def perusvahennys2022(self):
+        perusvahennys_pros=0.18
+        max_perusvahennys=3740/self.kk_jakaja
+        return perusvahennys_pros,max_perusvahennys
+    
+    def perusvahennys2023(self):
         perusvahennys_pros=0.18
         max_perusvahennys=3740/self.kk_jakaja
         return perusvahennys_pros,max_perusvahennys
@@ -1037,6 +1239,27 @@ class Benefits():
         
         return arvo
 
+    def kotihoidontuki2023(self,lapsia,allekolmev,alle_kouluikaisia):
+        if lapsia<1:
+            arvo=0
+        else:
+            tuki_alle_3v=350.27 # e/kk
+            seuraavat_alle_3v=104.86 # e/kk
+            yli_3v=67.38 #e_kk
+            if allekolmev>0:
+                kerroin1=1
+                if allekolmev>1:
+                    kerroin2=allekolmev-1
+                else:
+                    kerroin2=0
+            else:
+                kerroin1=0
+                kerroin2=0
+            
+            arvo=alle_kouluikaisia*yli_3v+tuki_alle_3v*kerroin1+kerroin2*seuraavat_alle_3v        
+        
+        return arvo
+
     def raippavero2018(self,elaketulo):
         alaraja=47_000*self.kk_jakaja
         pros=0.0585
@@ -1062,6 +1285,12 @@ class Benefits():
         return vero
     
     def raippavero2022(self,elaketulo):
+        alaraja=47_000*self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+    
+    def raippavero2023(self,elaketulo):
         alaraja=47_000*self.kk_jakaja
         pros=0.0585
         vero=max(elaketulo-alaraja,0)*pros
@@ -1097,6 +1326,12 @@ class Benefits():
         pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
         
+    def valtionvero_asteikko_2023(self):
+        rajat=np.array([19200,28700,47300,82900])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+        
     def laske_elatustuki(self,lapsia,aikuisia):
         if self.year==2018:
             elatustuki=156.39*lapsia
@@ -1107,6 +1342,8 @@ class Benefits():
         elif self.year==2021:
             elatustuki=167.35*lapsia
         elif self.year==2022:
+            elatustuki=172.59*lapsia
+        elif self.year==2023:
             elatustuki=172.59*lapsia
         else:
             error()
@@ -1201,6 +1438,14 @@ class Benefits():
             
         return lapsilisat
     
+    def lapsilisa2023(self,yksinhuoltajakorotus=False):
+        lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
+        if yksinhuoltajakorotus:
+            # yksinhuoltajakorotus 53,30 e/lapsi
+            lapsilisat += 63.3
+            
+        return lapsilisat
+    
     def laske_lapsilisa(self,lapsia,yksinhuoltajakorotus=0):
         lapsilisat=self.lapsilisa(yksinhuoltajakorotus=yksinhuoltajakorotus)
 
@@ -1236,6 +1481,10 @@ class Benefits():
                 tuki=350.28 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2021:
                 tuki=355.05# +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2022:
+                tuki=355.05# +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2023:
+                tuki=355.05# +650*0.4 = opintolainahyvitys mukana?
         else:
             if self.year==2018:
                 tuki=250.28 #+650*0.4 # opintolainahyvitys mukana
@@ -1244,6 +1493,10 @@ class Benefits():
             elif self.year==2020:
                 tuki=250.28 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2021:
+                tuki=253.69 # +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2022:
+                tuki=253.69 # +650*0.4 = opintolainahyvitys mukana?
+            elif self.year==2023:
                 tuki=253.69 # +650*0.4 = opintolainahyvitys mukana?
             
         if self.year==2018:
@@ -1254,6 +1507,12 @@ class Benefits():
             raja=667
         elif self.year==2021:
             raja=696
+        elif self.year==2022:
+            raja=696
+        elif self.year==2023:
+            raja=696
+        else:
+            print('error')
 
         if palkka>raja: #+222/12: # oletetaan että täysiaikainen opiskelija
             tuki=0
@@ -1268,6 +1527,8 @@ class Benefits():
         for alku in set(['omat_','puoliso_','']):
             if alku+'alive' not in p:
                 p[alku+'alive']=1
+            if alku+'peruspaivarahalla' not in p:
+                p[alku+'peruspaivarahalla']=0
             if alku+'elake_maksussa' not in p:
                 p[alku+'elake_maksussa']=0
             if alku+'opiskelija' not in p:
@@ -2125,6 +2386,8 @@ class Benefits():
         alv=(0.24+self.additional_vat)/(1.24+self.additional_vat)
         if self.year==2022:
             return alv*kateen
+        elif self.year==2023:
+            return alv*kateen
         elif self.year==2021:
             return alv*kateen
         elif self.year==2020:
@@ -2330,7 +2593,45 @@ class Benefits():
             tuki=0
     
         return tuki
+        
+    def asumistuki2023(self,palkkatulot,muuttulot,vuokra,p):
+        # Ruokakunnan koko
+        # henkilöä    I kuntaryhmä,
+        # e/kk    II kuntaryhmä,
+        # e/kk    III kuntaryhmä,
+        # e/kk    IIII kuntaryhmä,
+        # e/kk
+        # 1    508    492    411    362
+        # 2    735    706    600    527
+        # 3    937    890    761    675
+        # 4    1095    1038    901    804
+        # + lisähenkilöä kohden, e/kk
+        # 
+        # 137    130    123    118
+        # enimmaismenot kuntaryhmittain kun hloita 1-4
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
+        max_lisa=np.array([144, 137, 124, 119])
+        # kuntaryhma=3
+
+        max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
+
+        prosentti=0.8 # vastaa 80 %
+        suojaosa=300*p['aikuisia']
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(619+103*p['aikuisia']+228*p['lapsia'])))
+        if perusomavastuu<10:
+            perusomavastuu=0
+        if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
+            perusomavastuu=0
+            
+        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu)*prosentti)
+
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
+            
+        if tuki<15:
+            tuki=0
     
+        return tuki    
     def elakkeensaajan_asumistuki_2018(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
@@ -2520,6 +2821,42 @@ class Benefits():
             tuki=tuki*self.extra_ppr_factor
     
         return tuki        
+        
+    def elakkeensaajan_asumistuki_2023(self,palkkatulot,muuttulot,vuokra,p,puolisolla_oikeus=False):
+        # Ruokakunnan koko
+        # henkilöä    I kuntaryhmä,
+        # e/kk    II kuntaryhmä,
+        # e/kk    III kuntaryhmä,
+        #
+        max_menot=np.array([8_433,7_755,6_804])
+        max_meno=max_menot[max(0,p['kuntaryhma']-1)]
+
+        prosentti=0.85 # vastaa 85 %
+        perusomavastuu=52.66 # e/kk, 2019
+        if p['aikuisia']<2:
+            tuloraja=9_534/12
+        else:
+            tuloraja=15_565/12
+            #if puolisolla_oikeus:
+            #    tuloraja=15_565/12
+            #else:
+            #    tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
+            
+        lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
+            
+        tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
+        
+        if p['aikuisia']>1:
+            if tuki<6.92:
+                tuki=0
+        else:
+            if tuki<3.46:
+                tuki=0
+        
+        if self.use_extra_ppr:
+            tuki=tuki*self.extra_ppr_factor
+    
+        return tuki                
 
     # hallituksen päätöksenmukaiset päivähoitomenot 2018
     def paivahoitomenot2018(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
@@ -2879,7 +3216,80 @@ class Benefits():
             maksu=0
         
         return maksu                
-    
+        
+    def paivahoitomenot2023(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
+        '''
+        Päivähoitomaksut 1.8.2021
+        '''
+        minimimaksu=27
+
+        if prosentti1==None:
+            prosentti1=0.107
+        if prosentti2==None:
+            prosentti2=0.4
+        if prosentti3==None:
+            prosentti3=0.2
+            
+        if maksimimaksu==None:
+            maksimimaksu=288
+
+        if p['lapsia']>0:
+            vakea=p['lapsia']+p['aikuisia']
+            if vakea==1:
+                alaraja=2789
+                prosentti=prosentti1
+            elif vakea==2:
+                alaraja=2789
+                prosentti=prosentti1
+            elif vakea==3:
+                alaraja=3610
+                prosentti=prosentti1
+            elif vakea==4:
+                alaraja=4099
+                prosentti=prosentti1
+            elif vakea==5:
+                alaraja=4588
+                prosentti=prosentti1
+            elif vakea==6:
+                alaraja=5075
+                prosentti=prosentti1
+            else:
+                alaraja=5075+138*(vakea-6)
+                prosentti=prosentti1
+
+            pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
+            if hoidossa==0:
+                kerroin=0
+            elif hoidossa==1:
+                if pmaksu<minimimaksu:
+                    kerroin=0
+                else:
+                    kerroin=1
+            elif hoidossa==2:
+                if pmaksu<minimimaksu:
+                    kerroin=0
+                else:
+                    if (prosentti2*pmaksu<minimimaksu):
+                        kerroin=1
+                    else:
+                        kerroin=1+prosentti2
+            else:
+                if pmaksu<minimimaksu:
+                    kerroin=0
+                else:
+                    if prosentti2*pmaksu<minimimaksu:
+                        kerroin=1
+                    else:
+                        if (prosentti3*pmaksu<minimimaksu):
+                            kerroin=1+prosentti2
+                        else:
+                            kerroin=1+prosentti2+prosentti3*(p['lapsia']-2)
+            maksu=kerroin*pmaksu
+        else:
+            maksu=0
+        
+        return maksu
+        
     def laske_kansanelake2018(self,ika,tyoelake,yksin,disability=False,lapsia=0):
         if yksin>0:
             maara=628.85
@@ -2996,6 +3406,28 @@ class Benefits():
             
         return maara
         
+    def laske_kansanelake2023(self,ika,tyoelake,yksin,disability=False,lapsia=0):
+        if yksin>0:
+            maara=679.50
+        else:
+            maara=606.65
+        if lapsia>0:
+            maara += 22.71*lapsia
+            
+        if disability:
+            maara = max(0,maara-np.maximum(0,(tyoelake-57.45))/2)
+        else:
+            if ika>=65:
+                maara = max(0,maara*(1.0+0.072*(ika-65))-np.maximum(0,(tyoelake-57.45))/2)
+            elif ika>=62: # varhennus
+                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-57.45))/2)
+            else:
+                maara=0
+                
+        if maara<6.92:
+            maara=0
+            
+        return maara        
     def laske_takuuelake2018(self,ika,muuelake,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
@@ -3058,6 +3490,22 @@ class Benefits():
         return elake
         
     def laske_takuuelake2022(self,ika,muuelake,disability=False,lapsia=0):
+        if ika<63 and not disability:
+            return 0
+            
+        lapsikorotus=22.71*lapsia
+        
+        if muuelake<855.48+lapsikorotus:
+            elake=855.48+lapsikorotus-muuelake
+        else:
+            elake=0
+        
+        if elake<6.92:
+            elake=0
+
+        return elake        
+
+    def laske_takuuelake2023(self,ika,muuelake,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
             
@@ -3163,7 +3611,9 @@ class Benefits():
         elif self.year==2023:
             minimi=29.67*25
             taite1=39_144/12  
-            taite2=60_225/12  
+            taite2=60_225/12
+        else:
+            print('isyysraha: unknown year',year)  
 
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
         raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
@@ -3234,6 +3684,22 @@ class Benefits():
 
         return raha
         
+    def aitiysraha2023(self,vakiintunutpalkka,kesto):
+        if kesto<56/260:
+            minimi=0
+            taite1=39_144/12  
+            taite2=60_225/12 
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
+        else: 
+            minimi=29.67*25
+            taite1=39_144/12  
+            taite2=60_225/12 
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
+
+        return raha
+        
     def sairauspaivaraha2018(self,vakiintunutpalkka):
         minimi=24.64*25
         taite1=30_394/12
@@ -3272,6 +3738,15 @@ class Benefits():
         return raha
         
     def sairauspaivaraha2022(self,vakiintunutpalkka):
+        minimi=29.67*25
+        taite1=32_011/12  
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
+                    
+        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
+
+        return raha
+
+    def sairauspaivaraha2023(self,vakiintunutpalkka):
         minimi=29.67*25
         taite1=32_011/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
@@ -3571,6 +4046,27 @@ class Benefits():
             self.paivahoitomenot=self.paivahoitomenot2022
             self.sairauspaivaraha=self.sairauspaivaraha2022
             self.toimeentulotuki_param=self.toimeentulotuki_param2022
+        elif vuosi==2023:
+            self.laske_kansanelake=self.laske_kansanelake2023
+            self.laske_takuuelake=self.laske_takuuelake2023
+            self.aitiysraha=self.aitiysraha2023
+            self.isyysraha=self.isyysraha_perus
+            self.peruspaivaraha=self.peruspaivaraha2023
+            self.valtionvero_asteikko=self.valtionvero_asteikko_2023
+            self.raippavero=self.raippavero2023
+            self.laske_ylevero=self.laske_ylevero2023
+            self.elaketulovahennys=self.elaketulovahennys2023
+            self.tyotulovahennys=self.tyotulovahennys2023
+            self.perusvahennys=self.perusvahennys2023
+            self.ansiotulovahennys=self.ansiotulovahennys2023
+            self.veroparam=self.veroparam2023
+            self.lapsilisa=self.lapsilisa2023
+            self.asumistuki=self.asumistuki2023
+            self.elakkeensaajan_asumistuki=self.elakkeensaajan_asumistuki_2023
+            self.kotihoidontuki=self.kotihoidontuki2023
+            self.paivahoitomenot=self.paivahoitomenot2023
+            self.sairauspaivaraha=self.sairauspaivaraha2023
+            self.toimeentulotuki_param=self.toimeentulotuki_param2023
         elif vuosi==2018:
             self.laske_kansanelake=self.laske_kansanelake2018
             self.laske_takuuelake=self.laske_takuuelake2018
@@ -3596,6 +4092,7 @@ class Benefits():
             print('Vuoden {v} aineisto puuttuu'.format(v=vuosi))
             
         self.sotumaksu=self.laske_sotumaksu(vuosi)
+        self.setup_tmtuki_param(vuosi)
 
             
     def get_tyelpremium(self):

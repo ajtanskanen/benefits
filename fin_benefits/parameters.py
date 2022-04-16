@@ -718,6 +718,17 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==57: # 2+0, tm-tuella molemmat
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=2
+        vakiintunutpalkka=5000    
+        tyoton=1    
+        saa_ansiopaivarahaa=0
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=1
+        puoliso_saa_ansiopaivarahaa=0    
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
@@ -802,6 +813,24 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         print(selite)
     
     return p,selite
+    
+def make_filename(p):
+    if p['elakkeella']>0:
+        selite='eläkkellä'
+    elif p['tyoton']>0:
+        if p['saa_ansiopaivarahaa']>0:
+            selite='ansiopv'
+        else:
+            selite='tmtuella'
+    elif p['opiskelija']>0:
+        selite='opiskelija'
+    elif p['kotihoidontuella']>0:
+        selite='kht'
+    else:
+        selite="töissä"        
+    nimi='{}_{}_{}'.format(p['aikuisia'],p['lapsia'],selite)
+    
+    return nimi
 
 def tee_selite(p,p2=None,short=False):
     if p['aikuisia']>1:
@@ -832,7 +861,7 @@ def tee_selite(p,p2=None,short=False):
             #if p['lapsia_alle_3v']>0:
             #    selite+=" Lapsista {alle3v} alle 3v.".format(alle3v=p['lapsia_alle_3v'])
         else:
-            selite=selite+", ei lapsia."
+            selite=selite+", ei lapsia"
     else:
         if p['lapsia']>0:
             if p['lapsia']>1:
@@ -905,12 +934,12 @@ def tee_selite(p,p2=None,short=False):
                 if p['puoliso_saa_ansiopaivarahaa']>0:
                     selite+=" (ansiopäiväraha, peruste {v} e/kk).".format(v=p['puoliso_vakiintunutpalkka'])
                 else:
-                    selite+=" (työmarkkinatuki)."
+                    selite+=" (työmarkkinatuki)"
             else:
                 selite+=", puoliso töissä"
                 selite+=" ({p} e/kk).".format(p=p['puoliso_tulot'])
         else:
-            selite+=", ei puolisoa."
+            selite+=", ei puolisoa"
         
         #selite+=" Asumismenot {a} e/kk".format(a=p['asumismenot_toimeentulo'])
             
