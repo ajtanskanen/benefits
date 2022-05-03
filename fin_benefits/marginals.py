@@ -106,7 +106,7 @@ class Marginals():
                 incl_perustulo=False,incl_elake=True,fig=None,ax=None,incl_opintotuki=False,
                 incl_alv=False,
                 plot_kotihoidontuki=False,
-                plot_osatva=True,header=True,source='Lähde: EK',palette=None,palette_EK=True,square=False):
+                plot_osatva=True,header=True,source='Lähde: EK',palette=None,palette_EK=False,square=False):
         netto=np.zeros(max_salary+1)
         palkka=np.zeros(max_salary+1)
         tva=np.zeros(max_salary+1)
@@ -354,7 +354,7 @@ class Marginals():
                         labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elatustuki'],self.labels['kotihoidontuki']),
                         colors=pal)
             
-            axs.plot(netto)
+            axs.plot(netto,lw=0.5)
             axs.set_xlabel(self.labels['wage'],**csfont)
             axs.set_ylabel(self.labels['net income'],**csfont)
             plt.yticks(**csfont)
@@ -584,7 +584,7 @@ class Marginals():
             axs.legend(loc='lower right')
         plt.show()
 
-    def laske_ja_plottaa_hila(self,min_salary=0,max_salary=6000,type='eff',dt=100,maxn=None,dire=None,grayscale=False):
+    def laske_ja_plottaa_hila(self,min_salary=0,max_salary=6000,type='eff',dt=100,maxn=None,dire=None,palette_EK=True,grayscale=False):
         if maxn is None:
             maxn=36
         fig,axs = plt.subplots(int(maxn/5),5,sharex=True,sharey=True)
@@ -594,7 +594,7 @@ class Marginals():
             #ax=plt.subplot(10,3,k)
             p,_=perheparametrit(k)
             self.lp_marginaalit_apu(axs[y,x],otsikko='Tapaus '+str(k),p=p,min_salary=min_salary,
-                max_salary=max_salary,type=type,dt=dt,grayscale=grayscale)
+                max_salary=max_salary,type=type,dt=dt,grayscale=grayscale,palette_EK=palette_EK)
 
         if dire is not None:
             fig.savefig(dire+'multiple_'+type+'.eps',bbox_inches='tight')
@@ -725,7 +725,7 @@ class Marginals():
             plt.show()    
 
     def lp_marginaalit_apu(self,axs,otsikko='',p=None,min_salary=0,max_salary=6000,type='eff',dt=100,selite=False,
-                            include_perustulo=None,include_opintotuki=False,include_elake=False,grayscale=False):
+                            include_perustulo=None,include_opintotuki=False,include_elake=False,grayscale=False,palette_EK=True):
                             
         if include_perustulo is None:
             include_perustulo=self.include_perustulo

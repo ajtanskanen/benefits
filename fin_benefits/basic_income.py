@@ -100,6 +100,9 @@ class BasicIncomeBenefits(Benefits):
         super().veroparam2018()
         self.kunnallisvero_pros=0.0    
         
+    def veroparam2018_perustulo_sotu(self):
+        super().veroparam2018()
+        
     def veroparam2019_perustulokokeilu(self):
         super().veroparam2018()
 
@@ -130,6 +133,7 @@ class BasicIncomeBenefits(Benefits):
 
     def setup_basic_income(self):
         self.nyky_soviteltu_peruspaivaraha=super().soviteltu_peruspaivaraha
+        self.laske_perustulovero=self.laske_perustulovero_perus
         if self.year==2018:
             self.veroparam2018=self.veroparam2018_perustulo
             self.veroparam=self.veroparam2018_perustulo
@@ -165,6 +169,7 @@ class BasicIncomeBenefits(Benefits):
             self.valtionvero_asteikko=self.valtionvero_asteikko_2018
             self.verotus=super().verotus
             self.veroparam2018=self.veroparam2018_perustulokokeilu
+            self.veroparam=self.veroparam2018            
             # ei muutosta verotukseen, ei aktiivimallia toteutettuna
         elif self.perustulomalli=='Kela':
             # Kela-malli
@@ -174,6 +179,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_perusvahennys=0
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
+            self.veroparam=self.veroparam2018            
             self.valtionvero_asteikko=self.valtionvero_asteikko_perustulo_Kela
         elif self.perustulomalli=='BI':
             # Artikkelin BI-malli
@@ -183,6 +189,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_perusvahennys=0
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
+            self.veroparam=self.veroparam2018            
             self.valtionvero_asteikko=self.valtionvero_asteikko_perustulo_BI
         elif self.perustulomalli in set(['vasemmistoliitto','Vasemmistoliitto']):        
             # Vasemmistoliitto
@@ -191,8 +198,31 @@ class BasicIncomeBenefits(Benefits):
             self.max_tyotulovahennys=0
             self.max_perusvahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
+            self.veroparam=self.veroparam2018            
             self.max_ansiotulovahennys=0
             self.valtionvero_asteikko=self.valtionvero_asteikko_perustulo_vasemmistoliitto
+        elif self.perustulomalli in set(['sotu','Sotu','SOTU']):        
+            # Vasemmistoliitto
+            self.perustulo=self.laske_perustulo_sotu
+            self.asumistuen_suojaosa=self.perustulo
+            self.max_tyotulovahennys=0
+            self.max_perusvahennys=0
+            self.veroparam2018=self.veroparam2018_perustulo_sotu
+            self.veroparam=self.veroparam2018            
+            self.laske_perustulovero=self.laske_perustulovero_sotu
+            self.max_ansiotulovahennys=0
+            self.valtionvero_asteikko=self.valtionvero_asteikko_2018 # valtionvero_asteikko_2018 # valtionvero_asteikko_perustulo_sotu
+        elif self.perustulomalli in set(['sotu_matala','Sotu_matala','SOTU_matala']):        
+            # Vasemmistoliitto
+            self.perustulo=self.laske_perustulo_sotu_matala
+            self.asumistuen_suojaosa=self.perustulo
+            self.max_tyotulovahennys=0
+            self.max_perusvahennys=0
+            self.veroparam2018=self.veroparam2018_perustulo_sotu
+            self.veroparam=self.veroparam2018            
+            self.laske_perustulovero=self.laske_perustulovero_sotu
+            self.max_ansiotulovahennys=0
+            self.valtionvero_asteikko=self.valtionvero_asteikko_2018
         elif self.perustulomalli in set (['asetettava']):
             # asetettava
             self.perustulo=self.laske_perustulo_asetettava
@@ -202,6 +232,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_perusvahennys=0
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
+            self.veroparam=self.veroparam2018            
             self.valtionvero_asteikko=self.valtionvero_asteikko_perustulo_asetettava
             self.peruspaivaraha=self.peruspaivaraha_bi
         elif self.perustulomalli in set (['kela_asetettava']):
@@ -213,6 +244,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_perusvahennys=0
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
+            self.veroparam=self.veroparam2018            
             self.valtionvero_asteikko=self.valtionvero_asteikko_perustulo_asetettava
             self.peruspaivaraha=self.peruspaivaraha_bi
         elif self.perustulomalli in set (['vihreat','Vihreät','vihreät','Vihreat']):
@@ -223,6 +255,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_perusvahennys=0
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
+            self.veroparam=self.veroparam2018            
             self.valtionvero_asteikko=self.valtionvero_asteikko_perustulo_vihreat
             self.peruspaivaraha=self.peruspaivaraha_bi
         elif self.perustulomalli=='tonni':        
@@ -233,6 +266,7 @@ class BasicIncomeBenefits(Benefits):
             self.max_perusvahennys=0
             self.max_ansiotulovahennys=0
             self.veroparam2018=self.veroparam2018_perustulo
+            self.veroparam=self.veroparam2018            
             self.valtionvero_asteikko=self.valtionvero_asteikko_perustulo_tonni
             self.peruspaivaraha=self.peruspaivaraha_bi
         elif self.perustulomalli=='puolitoista':        
@@ -271,6 +305,12 @@ class BasicIncomeBenefits(Benefits):
     def laske_perustulo_vasemmistoliitto(self):
         return 800.0
     
+    def laske_perustulo_sotu(self):
+        return 800.0
+    
+    def laske_perustulo_sotu_matala(self):
+        return 300.0
+    
     def laske_perustulo_tonni(self):
         return 1000.0
         
@@ -289,7 +329,7 @@ class BasicIncomeBenefits(Benefits):
     
     def valtionvero_asteikko_perustulo_BI(self):
         rajat=np.array([12*600,50000,9999999,9999999])/self.kk_jakaja
-        pros=np.array([0.40,0.40,0.40,0.40]) # 500 e/kk
+        pros=np.array([0.5475,0.5475,0.5475,0.5475]) # 800 e/kk # tasavero 52,5 % vastaa 750e ja 48% 650e
         return rajat,pros
     
     def valtionvero_asteikko_perustulo_vihreat(self):
@@ -338,6 +378,12 @@ class BasicIncomeBenefits(Benefits):
             return max(0,vakpalkka-tyotaikaisettulot) 
             
         return ansiopaivarahamaara   
+
+    def laske_perustulovero_perus(self,tulo,puhdas_ansiotulo):
+        return 0.0
+
+    def laske_perustulovero_sotu(self,tulo,puhdas_ansiotulo):
+        return min(0.25*tulo,3_383/self.kk_jakaja)+0.0037*puhdas_ansiotulo
         
     def laske_sotumaksu(self,vuosi):
         if vuosi==2018:
@@ -413,7 +459,7 @@ class BasicIncomeBenefits(Benefits):
                 perus=self.perustulo()
                 tuki=max(0,ansiopaivarahamaara-perus)
                 ansiopaivarahamaara=max(0,ansiopaivarahamaara-perus)
-                perus=0
+                perus=0 # perustulo maksetaan muualla
             else:
                 ansiopaivarahamaara=0    
                 perus=0 #self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
@@ -658,9 +704,13 @@ class BasicIncomeBenefits(Benefits):
     
         ylevero=self.laske_ylevero(palkkatulot_puhdas,elaketulot_puhdas)
         #valtionvero=ylevero
-    
         peritytverot += ylevero
-
+        
+        # perustulovero
+        perustulovero=self.laske_perustulovero(palkkatulot_puhdas,puhdas_ansiotulo)
+        #valtionvero=ylevero
+        peritytverot += perustulovero
+    
         # työtulovähennys vähennetään valtionveroista
         
         max_tyotulovahennys,ttulorajat,ttulopros=self.tyotulovahennys()
@@ -699,6 +749,7 @@ class BasicIncomeBenefits(Benefits):
             valtionvero=max(0,valtionvero-tyotulovahennys)
 
         peritytverot += valtionvero
+        valtionvero += perustulovero
 
         # kunnallisverotus
         rajat,maxvahennys,ansvah=self.ansiotulovahennys()
@@ -756,8 +807,8 @@ class BasicIncomeBenefits(Benefits):
         d1=peritytverot
         d2=valtionvero+kunnallisvero+ptel+tyotvakmaksu+ylevero+sairausvakuutusmaksu
         
-#         if np.abs(d2-d1)>1e-6:
-#             print('verotus',d2-d1)
+        if np.abs(d2-d1)>1e-6:
+            print('verotus',d2-d1)
 
         return netto,peritytverot,valtionvero,kunnallisvero,kunnallisveronperuste,\
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
@@ -1375,8 +1426,8 @@ class BasicIncomeBenefits(Benefits):
                 else:
                     omavastuukerroin=1.0
                 q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=\
-                	self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],
-                		p['tyottomyyden_kesto'],p,omavastuukerroin=omavastuukerroin)
+                    self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],
+                        p['tyottomyyden_kesto'],p,omavastuukerroin=omavastuukerroin)
                 q['perustulo']=self.perustulo() # ei opiskelijoille?
             else:
                 q['perustulo']=self.perustulo() # ei opiskelijoille?
@@ -1433,8 +1484,8 @@ class BasicIncomeBenefits(Benefits):
                     q['puoliso_perustulo']=self.perustulo() # ei opiskelijoille?
                 elif p['puoliso_tyoton']>0:
                     q['puoliso_ansiopvraha'],q['puoliso_puhdasansiopvraha'],q['puoliso_peruspvraha']=\
-                    	self.ansiopaivaraha(p['puoliso_tyoton'],p['puoliso_vakiintunutpalkka'],p['lapsia'],p['puoliso_tulot'],
-                    		p['puoliso_saa_ansiopaivarahaa'],p['puoliso_tyottomyyden_kesto'],p)
+                        self.ansiopaivaraha(p['puoliso_tyoton'],p['puoliso_vakiintunutpalkka'],p['lapsia'],p['puoliso_tulot'],
+                            p['puoliso_saa_ansiopaivarahaa'],p['puoliso_tyottomyyden_kesto'],p)
                     q['puoliso_perustulo']=self.perustulo() # ei opiskelijoille?
                 else:
                     q['puoliso_perustulo']=self.perustulo() # ei opiskelijoille?

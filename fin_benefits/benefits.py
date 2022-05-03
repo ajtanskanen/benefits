@@ -2,7 +2,7 @@
 
     benefits
     
-    implements social security and social insurance benefits in the Finnish social security schemes
+    implements social security benefits and taxation in the Finnish social security schemes
 
 
 """
@@ -20,7 +20,7 @@ class Benefits():
         The Finnish Earnings-related Social Security
 
     Source:
-        AT
+        Antti J. Tanskanen
 
     """
     
@@ -1055,9 +1055,9 @@ class Benefits():
 
         # valtioverotus
         # varsinainen verotus
-        valtionveroperuste=tulot_valtio
-        valtionvero=self.laske_valtionvero(valtionveroperuste,p)
-        valtionvero+=self.raippavero(elaketulot_valtio)
+        valtionveroperuste = tulot_valtio
+        valtionvero = self.laske_valtionvero(valtionveroperuste,p)
+        valtionvero += self.raippavero(elaketulot_valtio)
         
         # työtulovähennys
         valtionvero=max(0,valtionvero-lapsivahennys)
@@ -1070,6 +1070,7 @@ class Benefits():
             valtionvero=max(0,valtionvero-tyotulovahennys)
 
         peritytverot += valtionvero
+        
 
         # kunnallisverotus
         rajat,maxvahennys,ansvah=self.ansiotulovahennys()
@@ -3290,7 +3291,7 @@ class Benefits():
         
         return maksu
         
-    def laske_kansanelake2018(self,ika,tyoelake,yksin,disability=False,lapsia=0):
+    def laske_kansanelake2018(self,ika : int,tyoelake : float,yksin,disability=False,lapsia=0):
         if yksin>0:
             maara=628.85
         else:
@@ -3314,7 +3315,7 @@ class Benefits():
             
         return maara
             
-    def laske_kansanelake2019(self,ika,tyoelake,yksin,disability=False,lapsia=0):
+    def laske_kansanelake2019(self,ika : int,tyoelake : float,yksin,disability=False,lapsia=0):
         if yksin>0:
             maara=628.85
         else:
@@ -3337,7 +3338,7 @@ class Benefits():
             
         return maara
         
-    def laske_kansanelake2020(self,ika,tyoelake,yksin,disability=False,lapsia=0):
+    def laske_kansanelake2020(self,ika : int,tyoelake : float,yksin,disability=False,lapsia=0):
         if yksin>0:
             maara=662.86
         else:
@@ -3360,7 +3361,7 @@ class Benefits():
             
         return maara
         
-    def laske_kansanelake2021(self,ika,tyoelake,yksin,disability=False,lapsia=0):
+    def laske_kansanelake2021(self,ika : int,tyoelake : float,yksin,disability=False,lapsia=0):
         if yksin>0:
             maara=665.29
         else:
@@ -3383,7 +3384,7 @@ class Benefits():
             
         return maara
         
-    def laske_kansanelake2022(self,ika,tyoelake,yksin,disability=False,lapsia=0):
+    def laske_kansanelake2022(self,ika : int,tyoelake : float,yksin : int,disability=False,lapsia=0):
         if yksin>0:
             maara=679.50
         else:
@@ -3406,7 +3407,7 @@ class Benefits():
             
         return maara
         
-    def laske_kansanelake2023(self,ika,tyoelake,yksin,disability=False,lapsia=0):
+    def laske_kansanelake2023(self,ika : int,tyoelake : float,yksin : int,disability=False,lapsia=0):
         if yksin>0:
             maara=679.50
         else:
@@ -3537,7 +3538,7 @@ class Benefits():
              else:
                  return max(0,elake-self.laske_kansanelake(ika,0,1)*indeksi)
                  
-    def laske_puhdas_tyoelake_v2(self,ika,tyoelake,kansanelake,disability=False,yksin=1,lapsia=0):
+    def laske_puhdas_tyoelake_v2(self,ika : int,tyoelake : float,kansanelake : float,disability=False,yksin=1,lapsia=0):
         '''
         Vähentää työeläkkeestä kansaneläkkeen ja takuueläkkeen
         '''
@@ -3587,7 +3588,7 @@ class Benefits():
     
         return kokoelake
 
-    def isyysraha_perus(self,vakiintunutpalkka):
+    def isyysraha_perus(self,vakiintunutpalkka : float):
         if self.year==2018:
             minimi=27.86*25
             taite1=37_861/12  
@@ -3620,7 +3621,7 @@ class Benefits():
 
         return raha
         
-    def aitiysraha2019(self,vakiintunutpalkka,kesto):
+    def aitiysraha2019(self,vakiintunutpalkka : float,kesto : float):
         if kesto<56/260:
             minimi=0
             taite1=37_861/12  
@@ -3636,7 +3637,7 @@ class Benefits():
 
         return raha
         
-    def aitiysraha2020(self,vakiintunutpalkka,kesto):
+    def aitiysraha2020(self,vakiintunutpalkka : float,kesto : float):
         if kesto<56/260:
             minimi=0
             taite1=37_861/12  
@@ -3652,7 +3653,7 @@ class Benefits():
 
         return raha
         
-    def aitiysraha2021(self,vakiintunutpalkka,kesto):
+    def aitiysraha2021(self,vakiintunutpalkka : float,kesto : float):
         if kesto<56/260:
             minimi=0
             taite1=39_144/12  
@@ -3668,7 +3669,7 @@ class Benefits():
 
         return raha
         
-    def aitiysraha2022(self,vakiintunutpalkka,kesto):
+    def aitiysraha2022(self,vakiintunutpalkka : float,kesto : float):
         if kesto<56/260:
             minimi=0
             taite1=39_144/12  
@@ -3684,7 +3685,7 @@ class Benefits():
 
         return raha
         
-    def aitiysraha2023(self,vakiintunutpalkka,kesto):
+    def aitiysraha2023(self,vakiintunutpalkka : float,kesto : float):
         if kesto<56/260:
             minimi=0
             taite1=39_144/12  
