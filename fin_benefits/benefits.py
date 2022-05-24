@@ -1529,6 +1529,9 @@ class Benefits():
             p['toimeentulotuki_vahennys']=0
         if 'lapsikorotus_lapsia' not in p:
             p['lapsikorotus_lapsia']=p['lapsia']
+        if 'osaaikainen_paivahoito' not in p:
+            p['osaaikainen_paivahoito']=0
+        
         for alku in set(['omat_','puoliso_','']):
             if alku+'alive' not in p:
                 p[alku+'alive']=1
@@ -2047,7 +2050,7 @@ class Benefits():
         
         return q
         
-    def laske_tulot_v2(self,p,tt_alennus=0,include_takuuelake=True,omat='omat_',omatalku='',puoliso='puoliso_',puolisoalku='puoliso_'):
+    def laske_tulot_v2(self,p,tt_alennus=0,include_takuuelake=True,omat='omat_',omatalku='',puoliso='puoliso_',puolisoalku='puoliso_',include_alv=True):
         '''
         v4:ää varten tehty tulonlaskenta
         - eroteltu paremmin omat ja puolison tulot ja etuudet 
@@ -2296,7 +2299,10 @@ class Benefits():
         q['alv']=self.laske_alv(max(0,kateen-asumismeno)) # vuokran ylittävä osuus tuloista menee kulutukseen
         
         # nettotulo, joka huomioidaan elinkaarimallissa alkaen versiosta 4. sisältää omat tulot ja puolet vuokrasta
-        q['netto']=max(0,kateen-q['alv'])
+        if include_alv:
+            q['netto']=max(0,kateen-q['alv'])
+        else:
+            q['netto']=max(0,kateen)
         
         if p['aikuisia']>1:
             brutto_puoliso=q[puoliso+'opintotuki']+q[puoliso+'kokoelake']+q[puoliso+'palkkatulot']+q[puoliso+'aitiyspaivaraha']\
@@ -2398,7 +2404,7 @@ class Benefits():
         return kateen,q
         
     def add_q(self,benefitq1,benefitq2):
-        q= { k: benefitq1.get(k, 0) + benefitq2.get(k, 0) for k in set(benefitq1) }
+        q= { k: benefitq1.get(k, 0) + benefitq2.get(k, 0) for k in set(benefitq1).union(set(benefitq2)) }
         
         return q
         
@@ -2909,6 +2915,11 @@ class Benefits():
     def paivahoitomenot2018(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
         minimimaksu=10
 
+        if p['osaaikainen_paivahoito']>0:
+            osaaikainen=True
+        else:
+            osaaikainen=False
+
         if prosentti1==None:
             prosentti1=0.107
         if prosentti2==None:
@@ -2973,6 +2984,9 @@ class Benefits():
             maksu=kerroin*pmaksu
         else:
             maksu=0
+            
+        if osaaikainen:
+            maksu *= 0.6
         
         return maksu
         
@@ -2980,6 +2994,11 @@ class Benefits():
     def paivahoitomenot2019(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
         minimimaksu=10
 
+        if p['osaaikainen_paivahoito']>0:
+            osaaikainen=True
+        else:
+            osaaikainen=False
+
         if prosentti1==None:
             prosentti1=0.107
         if prosentti2==None:
@@ -3044,12 +3063,20 @@ class Benefits():
             maksu=kerroin*pmaksu
         else:
             maksu=0
+
+        if osaaikainen:
+            maksu *= 0.6
         
         return maksu
         
     # hallituksen päätöksenmukaiset päivähoitomenot 2018
     def paivahoitomenot2020(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
         minimimaksu=10
+
+        if p['osaaikainen_paivahoito']>0:
+            osaaikainen=True
+        else:
+            osaaikainen=False
 
         if prosentti1==None:
             prosentti1=0.107
@@ -3116,6 +3143,9 @@ class Benefits():
         else:
             maksu=0
         
+        if osaaikainen:
+            maksu *= 0.6
+        
         return maksu
         
     def paivahoitomenot2021(self,hoidossa,tulot,p,prosentti1=None,prosentti2=None,prosentti3=None,maksimimaksu=None):
@@ -3123,6 +3153,11 @@ class Benefits():
         Päivähoitomaksut 1.8.2021
         '''
         minimimaksu=27
+
+        if p['osaaikainen_paivahoito']>0:
+            osaaikainen=True
+        else:
+            osaaikainen=False
 
         if prosentti1==None:
             prosentti1=0.107
@@ -3188,6 +3223,9 @@ class Benefits():
             maksu=kerroin*pmaksu
         else:
             maksu=0
+        
+        if osaaikainen:
+            maksu *= 0.6
         
         return maksu        
         
@@ -3197,6 +3235,11 @@ class Benefits():
         '''
         minimimaksu=27
 
+        if p['osaaikainen_paivahoito']>0:
+            osaaikainen=True
+        else:
+            osaaikainen=False
+
         if prosentti1==None:
             prosentti1=0.107
         if prosentti2==None:
@@ -3261,6 +3304,9 @@ class Benefits():
             maksu=kerroin*pmaksu
         else:
             maksu=0
+        
+        if osaaikainen:
+            maksu *= 0.6
         
         return maksu                
         
@@ -3270,6 +3316,11 @@ class Benefits():
         '''
         minimimaksu=27
 
+        if p['osaaikainen_paivahoito']>0:
+            osaaikainen=True
+        else:
+            osaaikainen=False
+
         if prosentti1==None:
             prosentti1=0.107
         if prosentti2==None:
@@ -3334,6 +3385,9 @@ class Benefits():
             maksu=kerroin*pmaksu
         else:
             maksu=0
+        
+        if osaaikainen:
+            maksu *= 0.6
         
         return maksu
         

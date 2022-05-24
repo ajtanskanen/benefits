@@ -988,7 +988,6 @@ class Marginals():
         p3=p.copy()
             
         n0,q0=self.laske_tulot(p2b)
-        basenetto[0]
         k=0
         for t in np.arange(min_salary,max_salary+step_salary,step_salary):
             p3['t']=t # palkka
@@ -1015,7 +1014,34 @@ class Marginals():
             return netto,eff,tva,osa_tva,basenetto
         else:
             return netto,eff,tva,osa_tva
+            
+    def comp_emtr(self,p,t,dt=100):
+    
+        p2b=p.copy()
+        p3=p.copy()
+            
+        n0,q0=self.laske_tulot(p2b)
+        k=0
         
+        p3['t']=t # palkka
+        n1,q1=self.laske_tulot(p3)
+        p3['t']=t+dt # palkka
+        n2,q2=self.laske_tulot(p3)
+        p3['t']=2*t # palkka
+        n3,q3=self.laske_tulot(p3)
+        netto=n1
+        palkka=t
+        eff=(1-(n2-n1)/dt)*100
+        if t>0:
+            tva=(1-(n1-n0)/t)*100
+            osa_tva=(1-(n3-n1)/t)*100
+        else:
+            tva=0
+            osa_tva=0
+        p2b['t']=t # palkka
+
+        return netto,eff,tva,osa_tva        
+            
     def comp_taxes(self,p=None,p2=None,min_salary=0,max_salary=6000,step_salary=1,dt=100):
         n_salary=int((max_salary+step_salary-min_salary)/step_salary)+1
         netto=np.zeros(n_salary)
@@ -1064,3 +1090,109 @@ class Marginals():
         
         return eff[0]
         
+        
+    def laske_marginaalit(self,q1,q2,dt,laske_tyollistymisveroaste=0):
+    
+        if dt<1:
+            dt=1
+
+        # lasketaan marginaalit
+        marg={}        
+        marg['asumistuki']=(-q2['asumistuki']+q1['asumistuki'])*100/dt
+        marg['kotihoidontuki']=(-q2['kotihoidontuki_netto']+q1['kotihoidontuki_netto'])*100/dt
+        marg['ansiopvraha']=(+q1['ansiopvraha_netto']-q2['ansiopvraha_netto']+q1['puoliso_ansiopvraha_netto']-q2['puoliso_ansiopvraha_netto'])*100/dt 
+        marg['pvhoito']=(-q1['pvhoito']+q2['pvhoito'])*100/dt
+        marg['toimeentulotuki']=(+q1['toimeentulotuki']-q2['toimeentulotuki'])*100/dt
+        marg['palkkaverot']=(-q1['verot_ilman_etuuksia']+q2['verot_ilman_etuuksia']-q1['puoliso_verot_ilman_etuuksia']+q2['puoliso_verot_ilman_etuuksia'])*100/dt
+        marg['valtionvero']=(-q1['valtionvero']+q2['valtionvero'])*100/dt
+        marg['alv']=(-q1['alv']+q2['alv'])*100/dt
+        marg['elake']=(q1['kokoelake_netto']-q2['kokoelake_netto'])*100/dt
+        marg['opintotuki']=(q1['opintotuki_netto']-q2['opintotuki_netto'])*100/dt
+        marg['kunnallisvero']=(-q1['kunnallisvero']+q2['kunnallisvero'])*100/dt
+        #marg['ansiotulovah']=(+q1['ansiotulovahennys']-q2['ansiotulovahennys'])*100/dt
+        #marg['tyotulovahennys']=(+q1['tyotulovahennys']-q2['tyotulovahennys'])*100/dt
+        #marg['perusvahennys']=(+q1['perusvahennys']-q2['perusvahennys'])*100/dt
+        #marg['tyotulovahennys_kunnallisveroon']=(+q1['tyotulovahennys_kunnallisveroon']-q2['tyotulovahennys_kunnallisveroon'])*100/dt
+        marg['ptel']=(-q1['ptel']+q2['ptel']-q1['puoliso_ptel']+q2['puoliso_ptel'])*100/dt
+        marg['sairausvakuutusmaksu']=(-q1['sairausvakuutusmaksu']+q2['sairausvakuutusmaksu']-q1['puoliso_sairausvakuutusmaksu']+q2['puoliso_sairausvakuutusmaksu'])*100/dt
+        marg['tyotvakmaksu']=(-q1['tyotvakmaksu']+q2['tyotvakmaksu']-q1['puoliso_tyotvakmaksu']+q2['puoliso_tyotvakmaksu'])*100/dt
+        marg['puoliso_verot']=(-q1['puoliso_verot']+q2['puoliso_verot'])*100/dt
+        marg['perustulo']=(-q2['perustulo_nettonetto']+q1['perustulo_nettonetto']-q2['puoliso_perustulo_nettonetto']+q1['puoliso_perustulo_nettonetto'])*100/dt
+    
+        marg['sivukulut']=marg['tyotvakmaksu']+marg['sairausvakuutusmaksu']+marg['ptel'] # sisältyvät jo veroihin
+        marg['etuudet']=marg['ansiopvraha']+marg['asumistuki']+marg['toimeentulotuki']+marg['kotihoidontuki']
+        marg['verot']=marg['palkkaverot'] # sisältää sivukulut
+        marg['ansioverot']=marg['palkkaverot']+marg['elake'] # sisältää sivukulut
+        marg['marginaali']=marg['pvhoito']+marg['etuudet']+marg['verot']+marg['elake']
+    
+        # ja käteen jää
+        tulot={}
+        tulot['kateen1']=q1['kateen']
+        tulot['kateen2']=q2['kateen']
+    
+        if 'omattulot_netto' in q1: # v1
+            omattulotnetto1=q1['omattulot_netto'] # ilman etuuksia
+            omattulotnetto2=q2['omattulot_netto'] # ilman etuuksia
+            puolisontulotnetto1=q1['puoliso_tulot_netto'] # ilman etuuksia
+            puolisontulotnetto2=q2['puoliso_tulot_netto'] # ilman etuuksia
+        else:
+            omattulotnetto1=q1['omat_netto'] # ilman etuuksia
+            omattulotnetto2=q2['omat_netto'] # ilman etuuksia
+            puolisontulotnetto1=q1['puoliso_netto'] # ilman etuuksia
+            puolisontulotnetto2=q2['puoliso_netto'] # ilman etuuksia
+
+        if laske_tyollistymisveroaste>0:
+            tulot['tulotnetto']=omattulotnetto2+puolisontulotnetto2
+            #tulot['puolisotulotnetto']=puolisontulotnetto2
+            #tulot['omattulotnetto']=omattulotnetto2
+        else:
+            tulot['tulotnetto']=omattulotnetto1+puolisontulotnetto1
+            #tulot['puolisotulotnetto']=puolisontulotnetto1
+            #tulot['omattulotnetto']=omattulotnetto1
+            
+        marg['marginaaliveroprosentti']=100-(tulot['kateen2']-tulot['kateen1'])*100/dt 
+    
+        return tulot,marg
+        
+    def laske_ja_selita(self,p=None,p0=None,min_salary=0,max_salary=3000,step_salary=1500,
+            basenetto=None,baseeff=None,basetva=None,baseosatva=None,
+            dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
+            figname=None,grayscale=None,source='Lähde: EK',header=True):
+            
+        head_text=tee_selite(p,short=False)
+
+        if p0 is None:
+            netto,eff,tva,osa_tva=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
+                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
+                
+            tyottomana_base=basenetto[0]
+            tyottomana_vaihtoehto=netto[0]
+            tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
+            tyossa_base=basenetto[2]
+            tyossa_vaihtoehto=netto[2]
+            tyossa_ero=tyossa_vaihtoehto-tyossa_base
+            osatyossa_base=basenetto[1]
+            osatyossa_vaihtoehto=netto[1]
+            osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
+        else:
+            netto,eff,tva,osa_tva,basenetto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
+                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
+            tyottomana_base=basenetto[0]
+            tyottomana_vaihtoehto=netto[0]
+            tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
+            tyossa_base=basenetto[2]
+            tyossa_vaihtoehto=netto[2]
+            tyossa_ero=tyossa_vaihtoehto-tyossa_base
+            osatyossa_base=basenetto[1]
+            osatyossa_vaihtoehto=netto[1]
+            osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
+        
+
+        if header:
+            print(head_text)
+        print(f'Nettotulot työttömänä {tyottomana_vaihtoehto:.2f} perus {tyottomana_base:.2f}  ero {tyottomana_ero:.2f}')
+        print(f'Nettotulot työssä (palkka {max_salary:.2f} e/kk) {tyossa_vaihtoehto:.2f} perus {tyossa_base:.2f}  ero {tyossa_ero:.2f} tva {tva[2]:.3f}%')
+        print(f'Nettotulot 50% osa-aikatyössä (palkka {max_salary/2:.2f} e/k) {osatyossa_vaihtoehto:.2f} perus {osatyossa_base:.2f} ero {osatyossa_ero:.2f}  tva {tva[1]:.3f}%')
+        
+        return netto,eff,tva,osa_tva        

@@ -90,30 +90,29 @@ class SingleBenefit(Benefits):
         super().veroparam2022()
 
     def setup_single_benefit(self):
-        return
         if self.year==2018:
-            self.veroparam2018=self.veroparam2018_perustulo
-            self.veroparam=self.veroparam2018_perustulo
+            self.veroparam2018=self.veroparam2018_single_benefit
+            self.veroparam=self.veroparam2018
             self.nykyperuspaivaraha=super().peruspaivaraha2018
         elif self.year==2019:
-            self.veroparam2018=self.veroparam2019_perustulo
-            self.veroparam=self.veroparam2019_perustulo
+            self.veroparam2019=self.veroparam2019_single_benefit
+            self.veroparam=self.veroparam2019
             self.nykyperuspaivaraha=super().peruspaivaraha2019
         elif self.year==2020:
-            self.veroparam2018=self.veroparam2020_perustulo
-            self.veroparam=self.veroparam2020_perustulo
+            self.veroparam2020=self.veroparam2020_single_benefit
+            self.veroparam=self.veroparam2020
             self.nykyperuspaivaraha=super().peruspaivaraha2020
         elif self.year==2021:
-            self.veroparam2018=self.veroparam2021_perustulo
-            self.veroparam=self.veroparam2021_perustulo
+            self.veroparam2021=self.veroparam2021_single_benefit
+            self.veroparam=self.veroparam2021
             self.nykyperuspaivaraha=super().peruspaivaraha2021
         elif self.year==2022:
-            self.veroparam2018=self.veroparam202_perustulo
-            self.veroparam=self.veroparam2022_perustulo
+            self.veroparam2022=self.veroparam2022_single_benefit
+            self.veroparam=self.veroparam2022
             self.nykyperuspaivaraha=super().peruspaivaraha2022
         elif self.year==2023:
-            self.veroparam2018=self.veroparam2023_perustulo
-            self.veroparam=self.veroparam2023_perustulo
+            self.veroparam2023=self.veroparam2023_single_benefit
+            self.veroparam=self.veroparam2023
             self.nykyperuspaivaraha=super().peruspaivaraha2023
         
     def kotihoidontuki(self,lapsia,allekolmev,alle_kouluikaisia):
@@ -510,7 +509,7 @@ class SingleBenefit(Benefits):
         
         if puhdas_ansiotulo>rajat[2]:
             ansiotulovahennys=max(0,ansiotulovahennys-ansvah[2]*(puhdas_ansiotulo-rajat[2]))
-        
+            
         # perusvähennys
         perusvahennys_pros,max_perusvahennys=self.perusvahennys()
         peruste=max(0,tulot_kunnallis-ansiotulovahennys)

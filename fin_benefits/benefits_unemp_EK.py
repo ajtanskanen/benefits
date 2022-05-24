@@ -282,3 +282,5 @@ class BenefitsEK(Benefits):
             maksu=0
         
         return maksu                    
+        
+        

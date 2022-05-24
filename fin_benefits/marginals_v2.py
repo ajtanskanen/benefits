@@ -1017,7 +1017,43 @@ class Marginals():
             return netto,eff,tva,osa_tva,basenetto
         else:
             return netto,eff,tva,osa_tva
+            
+            
+    def comp_emtr(self,p0,p1,t,dt=1200,alku='',display=False):
+        '''
+        Computes EMTR at wage t
+        '''
+        p3=p1.copy()
+            
+        n0,q0=self.ben.laske_tulot_v2(p0,include_alv=False)
+        k=0
         
+        t=t/12
+        dt=dt/12
+        
+        p3[alku+'t']=t # palkka nykytilassa
+        n1,q1=self.ben.laske_tulot_v2(p3,include_alv=False)
+        p3[alku+'t']=t+dt # palkka
+        n2,q2=self.ben.laske_tulot_v2(p3,include_alv=False)
+        #p3[alku+'t']=2*t # palkka
+        #n3,q3=self.ben.laske_tulot_v2(p3)
+        netto=n1
+        palkka=t
+        eff=(1-(n2-n1)/dt)*100
+        if t>0:
+            tva=(1-(n1-n0)/t)*100
+            #osa_tva=(1-(n3-n1)/t)*100
+        else:
+            tva=np.nan
+            #osa_tva=0
+            
+        if tva<0 or display:
+            print(tva,n0,n1,t)
+            
+        #print(n0,n1,tva,t)
+
+        return netto,eff,tva#,osa_tva        
+
     def comp_taxes(self,p=None,p2=None,min_salary=0,max_salary=6000,step_salary=1,dt=100):
         n_salary=int((max_salary+step_salary-min_salary)/step_salary)+1
         netto=np.zeros(n_salary)

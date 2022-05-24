@@ -39,6 +39,7 @@ class BasicIncomeBenefits(Benefits):
         self.tyel_perusvuosi=1970 # ikäluokan syntymävuosi
         self.irr_vain_tyoelake=False
         self.include_perustulo=True
+        self.perustulomalli='Sotu'
         
         self.osittainen_perustulo=True
         self.perustulo_korvaa_toimeentulotuen=False
