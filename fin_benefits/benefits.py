@@ -93,7 +93,7 @@ class Benefits():
             selite=tee_selite(p)
             print(selite)
             
-    def laske_vaihtuva_tyoelakemaksu(self,ika):
+    def laske_vaihtuva_tyoelakemaksu(self,ika : int):
         vuosi=int(self.floor(self.tyel_perusvuosi+ika)) # alkuvuonna 18
         
         # prosenttia palkoista, vuodesta 2017 alkaen, jatkettu päätepisteen tasolla vuoden 2085 jälkeen
@@ -176,7 +176,7 @@ class Benefits():
         yksinasuva=514.82
         return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
         
-    def setup_tmtuki_param(self,vuosi):
+    def setup_tmtuki_param(self,vuosi : int):
         if vuosi==2018:
             self.tmtuki_suojaosa_perheellinen=800
             self.tmtuki_puoliso_suojaosa=560
@@ -213,8 +213,8 @@ class Benefits():
             self.tmtuki_lisa=13
             self.tmtuki_suojaosa_yksin=311
         
-    def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,
-                             muuttulot,verot,asumismenot,muutmenot,p,omavastuuprosentti=0.0,alennus=0):
+    def toimeentulotuki(self,omabruttopalkka : float,omapalkkavero : float,puolison_bruttopalkka : float,puolison_palkkavero : float,
+                             muuttulot : float,verot : float,asumismenot : float,muutmenot : float,p : dict,omavastuuprosentti=0.0,alennus=0):
 
         omavastuu=omavastuuprosentti*asumismenot
         menot=max(0,asumismenot-omavastuu)+muutmenot
@@ -290,7 +290,7 @@ class Benefits():
         return 0
     
     # tmtuki samankokoinen
-    def peruspaivaraha2018(self,lapsia):
+    def peruspaivaraha2018(self,lapsia : int):
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
@@ -309,7 +309,7 @@ class Benefits():
         return tuki
         
     # tmtuki samankokoinen
-    def peruspaivaraha2019(self,lapsia):
+    def peruspaivaraha2019(self,lapsia : int):
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
@@ -328,7 +328,7 @@ class Benefits():
         return tuki
 
     # tmtuki samankokoinen
-    def peruspaivaraha2020(self,lapsia):
+    def peruspaivaraha2020(self,lapsia : int):
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
@@ -347,7 +347,7 @@ class Benefits():
         return tuki
 
     # tmtuki samankokoinen
-    def peruspaivaraha2021(self,lapsia):
+    def peruspaivaraha2021(self,lapsia : int):
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
@@ -365,7 +365,7 @@ class Benefits():
     
         return tuki
 
-    def peruspaivaraha2022(self,lapsia):
+    def peruspaivaraha2022(self,lapsia : int):
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
@@ -383,7 +383,7 @@ class Benefits():
     
         return tuki
 
-    def peruspaivaraha2023(self,lapsia):
+    def peruspaivaraha2023(self,lapsia : int):
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
@@ -401,13 +401,13 @@ class Benefits():
     
         return tuki
                 
-    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,peruspvraha):
+    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara : float,tyotaikaisettulot : float,vakpalkka : float,vakiintunutpalkka : float,peruspvraha : float):
         if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
             return max(0,vakpalkka-tyotaikaisettulot) 
             
         return ansiopaivarahamaara   
         
-    def laske_sotumaksu(self,vuosi):
+    def laske_sotumaksu(self,vuosi : int):
         if vuosi==2018:
             sotumaksu=0.0448+0.6*self.additional_tyel_premium
         elif vuosi==2019:
@@ -425,7 +425,7 @@ class Benefits():
             
         return sotumaksu
         
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
+    def ansiopaivaraha(self,tyoton : int,vakiintunutpalkka,lapsia : int,tyotaikaisettulot : float,saa_ansiopaivarahaa : int,kesto : float,p : dict,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
     
@@ -500,7 +500,7 @@ class Benefits():
 
         return tuki,ansiopaivarahamaara,perus
 
-    def soviteltu_peruspaivaraha(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p):
+    def soviteltu_peruspaivaraha(self,lapsia : int,tyotaikaisettulot : float,ansiopvrahan_suojaosa : int,p : dict):
         suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa,p)
 
         pvraha=self.peruspaivaraha(lapsia)
@@ -517,7 +517,7 @@ class Benefits():
             
         return suojaosa
         
-    def tmtuki_vahentavatulo(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p):
+    def tmtuki_vahentavatulo(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa : int,p):
         if p['aikuisia']>1:
             puoliso=True
         else:
@@ -541,7 +541,7 @@ class Benefits():
             
         return vahentavattulo
         
-    def soviteltu_tmtuki(self,lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p):
+    def soviteltu_tmtuki(self,lapsia : int,tyotaikaisettulot : float,ansiopvrahan_suojaosa : int,p):
         if True: # ei tarveharkintaa, koska tarveharkinta kohdistuu vain pääomatuloihin yms. ove pitäisi tarveharkita
             return self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)
         else:
@@ -563,42 +563,42 @@ class Benefits():
     
             return tuki
         
-    def elaketulovahennys2018(self,elaketulot,tulot):
+    def elaketulovahennys2018(self,elaketulot : float,tulot : float):
         max_elaketulovahennys_valtio=11560/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
         max_elaketulovahennys_kunnallis=9040/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
-    def elaketulovahennys2019(self,elaketulot,tulot):
+    def elaketulovahennys2019(self,elaketulot : float,tulot : float):
         max_elaketulovahennys_valtio=11590/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
         max_elaketulovahennys_kunnallis=9050/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
-    def elaketulovahennys2020(self,elaketulot,tulot):
+    def elaketulovahennys2020(self,elaketulot : float,tulot : float):
         max_elaketulovahennys_valtio=11540/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
         max_elaketulovahennys_kunnallis=9230/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
-    def elaketulovahennys2021(self,elaketulot,tulot):
+    def elaketulovahennys2021(self,elaketulot : float,tulot : float):
         max_elaketulovahennys_valtio=11150/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
         max_elaketulovahennys_kunnallis=9270/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
-    def elaketulovahennys2022(self,elaketulot,tulot):
+    def elaketulovahennys2022(self,elaketulot : float,tulot : float):
         max_elaketulovahennys_valtio=11150/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
         max_elaketulovahennys_kunnallis=9270/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
-    def elaketulovahennys2023(self,elaketulot,tulot):
+    def elaketulovahennys2023(self,elaketulot : float,tulot : float):
         max_elaketulovahennys_valtio=11150/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
         max_elaketulovahennys_kunnallis=9270/self.kk_jakaja
@@ -1553,11 +1553,11 @@ class Benefits():
                 p[alku+'disabled']=0
             if alku+'saa_elatustukea' not in p:
                 p[alku+'saa_elatustukea']=0
-        return p
 
     def laske_tulot(self,p,tt_alennus=0,include_takuuelake=True,legacy=True):
         q={} # tulokset tänne
-        p=self.check_p(p)
+        
+        self.check_p(p)
         q['perustulo']=0
         q['puoliso_perustulo']=0
         q['puhdas_tyoelake']=0
@@ -2056,7 +2056,7 @@ class Benefits():
         - eroteltu paremmin omat ja puolison tulot ja etuudet 
         - perusmuuttujat ovat summamuuttujia
         '''
-        p=self.check_p(p)
+        self.check_p(p)
 
         q=self.setup_omat_q(p,omat=omat,alku=omatalku,include_takuuelake=include_takuuelake)
         q=self.setup_puoliso_q(p,q,puoliso=puoliso)
@@ -3529,7 +3529,7 @@ class Benefits():
             maara=0
             
         return maara        
-    def laske_takuuelake2018(self,ika,muuelake,disability=False,lapsia=0):
+    def laske_takuuelake2018(self,ika : int,muuelake : float,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
         
@@ -3544,7 +3544,7 @@ class Benefits():
 
         return elake
     
-    def laske_takuuelake2019(self,ika,muuelake,disability=False,lapsia=0):
+    def laske_takuuelake2019(self,ika : int,muuelake : float,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
         
@@ -3559,7 +3559,7 @@ class Benefits():
 
         return elake
     
-    def laske_takuuelake2020(self,ika,muuelake,disability=False,lapsia=0):
+    def laske_takuuelake2020(self,ika : int,muuelake : float,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
         
@@ -3574,7 +3574,7 @@ class Benefits():
 
         return elake
         
-    def laske_takuuelake2021(self,ika,muuelake,disability=False,lapsia=0):
+    def laske_takuuelake2021(self,ika : int,muuelake : float,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
             
@@ -3590,7 +3590,7 @@ class Benefits():
 
         return elake
         
-    def laske_takuuelake2022(self,ika,muuelake,disability=False,lapsia=0):
+    def laske_takuuelake2022(self,ika : int,muuelake : float,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
             
@@ -3606,7 +3606,7 @@ class Benefits():
 
         return elake        
 
-    def laske_takuuelake2023(self,ika,muuelake,disability=False,lapsia=0):
+    def laske_takuuelake2023(self,ika : int,muuelake : float,disability=False,lapsia=0):
         if ika<63 and not disability:
             return 0
             
@@ -3622,7 +3622,7 @@ class Benefits():
 
         return elake        
         
-    def laske_puhdas_tyoelake(self,ika,elake,disability=False,yksin=1,lapsia=0):
+    def laske_puhdas_tyoelake(self,ika : int,elake : float,disability=False,yksin=1,lapsia=0):
          '''
          Vähentää työeläkkeestä kansaneläkkeen ja takuueläkkeen
          '''
@@ -3655,7 +3655,7 @@ class Benefits():
         else:
             return max(0,tyoelake-vahennys1)
     
-    def laske_kokonaiselake(self,ika,muuelake,yksin=1,include_takuuelake=True,include_kansanelake=False,disability=False,lapsia=0):
+    def laske_kokonaiselake(self,ika : int,muuelake,yksin=1,include_takuuelake=True,include_kansanelake=False,disability=False,lapsia=0):
         '''
         by default, kansaneläke is not included, since this function is called annually
         kansaneläke sisältyy muuelake-muuttujaan
@@ -3672,7 +3672,7 @@ class Benefits():
     
         return kokoelake
         
-    def laske_kokonaiselake_v2(self,ika,muuelake,kansanelake,yksin=1,include_takuuelake=True,include_kansanelake=False,disability=False,lapsia=0):
+    def laske_kokonaiselake_v2(self,ika : int,muuelake,kansanelake,yksin=1,include_takuuelake=True,include_kansanelake=False,disability=False,lapsia=0):
         '''
         by default, kansaneläke is not included, since this function is called annually
         kansaneläke lasketaan erikseen
@@ -3801,7 +3801,7 @@ class Benefits():
 
         return raha
         
-    def sairauspaivaraha2018(self,vakiintunutpalkka):
+    def sairauspaivaraha2018(self,vakiintunutpalkka : float):
         minimi=24.64*25
         taite1=30_394/12
         taite2=58_252/12
@@ -3810,7 +3810,7 @@ class Benefits():
 
         return raha
         
-    def sairauspaivaraha2019(self,vakiintunutpalkka):
+    def sairauspaivaraha2019(self,vakiintunutpalkka : float):
         minimi=27.86*25
         taite1=30_394/12
         taite2=57_183/12
@@ -3820,7 +3820,7 @@ class Benefits():
 
         return raha
 
-    def sairauspaivaraha2020(self,vakiintunutpalkka):
+    def sairauspaivaraha2020(self,vakiintunutpalkka : float):
         minimi=28.94*25
         taite1=31_595/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
@@ -3829,7 +3829,7 @@ class Benefits():
 
         return raha
         
-    def sairauspaivaraha2021(self,vakiintunutpalkka):
+    def sairauspaivaraha2021(self,vakiintunutpalkka : float):
         minimi=29.05*25
         taite1=32_011/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
@@ -3838,7 +3838,7 @@ class Benefits():
 
         return raha
         
-    def sairauspaivaraha2022(self,vakiintunutpalkka):
+    def sairauspaivaraha2022(self,vakiintunutpalkka : float):
         minimi=29.67*25
         taite1=32_011/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
@@ -3847,7 +3847,7 @@ class Benefits():
 
         return raha
 
-    def sairauspaivaraha2023(self,vakiintunutpalkka):
+    def sairauspaivaraha2023(self,vakiintunutpalkka : float):
         minimi=29.67*25
         taite1=32_011/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
@@ -3857,7 +3857,7 @@ class Benefits():
         return raha
         
     # valitaan oikeat funktiot vuoden mukaan
-    def set_year(self,vuosi):
+    def set_year(self,vuosi : int):
         '''
         korvataan etuusfunktiot oikeiden vuosien etuusfunktioilla
         '''
