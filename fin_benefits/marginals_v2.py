@@ -14,7 +14,33 @@ from .ben_utils import get_palette_EK,get_style_EK
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.font_manager as font_manager
+import math
 
+    
+def print_q(a):
+    '''
+    pretty printer for dict
+    '''
+    for x in a.keys():
+        if a[x]>0 or a[x]<0:
+            print('{}:{:.2f} '.format(x,a[x]),end='')
+            
+    print('')
+        
+        
+def compare_q_print(q,q2,omat='omat_',puoliso='puoliso_'):
+    '''
+    Helper function that prettyprints arrays
+    '''
+    for key in q:
+        if key in q and key in q2:
+            if not math.isclose(q[key],q2[key]):
+                print(f'{key}: {q[key]:.2f} vs {q2[key]:.2f}')
+        else:
+            if key in q:
+                print(key,' not in q2')
+            else:
+                print(key,' not in q')
 class Marginals():
     """
     Description:
@@ -1034,7 +1060,9 @@ class Marginals():
         p3[alku+'t']=t # palkka nykytilassa
         n1,q1=self.ben.laske_tulot_v2(p3,include_alv=False)
         p3[alku+'t']=t+dt # palkka
+        n1b=q1['omat_netto']
         n2,q2=self.ben.laske_tulot_v2(p3,include_alv=False)
+        n2b=q2['omat_netto']
         #p3[alku+'t']=2*t # palkka
         #n3,q3=self.ben.laske_tulot_v2(p3)
         netto=n1
@@ -1048,7 +1076,10 @@ class Marginals():
             #osa_tva=0
             
         if tva<0 or display:
-            print(tva,n0,n1,t)
+            print('eff',eff,'tva',tva,'netto1',n1,'netto2',n2,'palkka',t,'dt',dt)
+            print('n1',n1,n1b)
+            print('n2',n2,n2b)
+            compare_q_print(q1,q2)
             
         #print(n0,n1,tva,t)
 

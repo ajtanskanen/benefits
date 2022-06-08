@@ -729,6 +729,19 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=1
         puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==58: # TK 1160
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1
+        vakiintunutpalkka=0
+        tyoton=0
+        elakkeella=1
+        elake=1160
+        saa_ansiopaivarahaa=0
+        puolison_tulot=0    
+        puolison_vakiintunutpalkka=0    
+        puoliso_tyoton=1
+        puoliso_saa_ansiopaivarahaa=0    
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
