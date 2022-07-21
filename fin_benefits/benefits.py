@@ -2115,9 +2115,6 @@ class Benefits():
             q['asumistuki']=self.asumistuki(q['palkkatulot'],q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
                                             +q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
                                             p['asumismenot_asumistuki'],p)
-#             print(q['palkkatulot'],q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
-#                                             +q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
-#                                             p['asumismenot_asumistuki'])
             
         if p['lapsia']>0:
             if p['aikuisia']>1:
