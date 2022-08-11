@@ -6,3 +6,4 @@ fin_benefits.egg-info/*
 .DS_store
 .ipynb_checkpoints/*.ipynb
 .ipynb_checkpoints/*-checkpoint.ipynb
+*.png
