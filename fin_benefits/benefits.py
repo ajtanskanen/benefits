@@ -208,10 +208,10 @@ class Benefits():
             self.tmtuki_lisa=106
             self.tmtuki_suojaosa_yksin=211
         else:
-            self.tmtuki_suojaosa_perheellinen=1044
+            self.tmtuki_suojaosa_perheellinen=800
             self.tmtuki_puoliso_suojaosa=560
-            self.tmtuki_lisa=13
-            self.tmtuki_suojaosa_yksin=311
+            self.tmtuki_lisa=106
+            self.tmtuki_suojaosa_yksin=211
         
     def toimeentulotuki(self,omabruttopalkka : float,omapalkkavero : float,puolison_bruttopalkka : float,puolison_palkkavero : float,
                              muuttulot : float,verot : float,asumismenot : float,muutmenot : float,p : dict,omavastuuprosentti=0.0,alennus=0):
@@ -387,16 +387,16 @@ class Benefits():
         if lapsia==0:
             lisa=0    
         elif lapsia==1:
-            lisa=5.41     # e/pv
+            lisa=5.41*1.035     # e/pv
         elif lapsia==2:
-            lisa=7.95     # e/pv
+            lisa=7.95*1.035     # e/pv
         else:
-            lisa=10.25     # e/pv 
+            lisa=10.25*1.035     # e/pv 
         
         if self.use_extra_ppr:
-            pvraha=21.5*(34.50+lisa)*self.extra_ppr_factor
+            pvraha=21.5*(34.50*1.035+lisa)*self.extra_ppr_factor
         else:
-            pvraha=21.5*(34.50+lisa)
+            pvraha=21.5*(34.50*1.035+lisa)
         tuki=max(0,pvraha)    
     
         return tuki
@@ -449,7 +449,7 @@ class Benefits():
                 lapsikorotus=np.array([0,5.41,7.95,10.25])*21.5    
                 taite=3277.50    
             elif self.year==2023:
-                lapsikorotus=np.array([0,5.41,7.95,10.25])*21.5    
+                lapsikorotus=np.array([0,5.41,7.95,10.25])*21.5*1.035   
                 taite=3277.50    
             else:
                 lapsikorotus=np.array([0,5.23,7.68,9.90])*21.5    
@@ -592,16 +592,23 @@ class Benefits():
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
     def elaketulovahennys2022(self,elaketulot : float,tulot : float):
-        max_elaketulovahennys_valtio=11150/self.kk_jakaja
+        max_elaketulovahennys_valtio=11190/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
-        max_elaketulovahennys_kunnallis=9270/self.kk_jakaja
+        max_elaketulovahennys_kunnallis=9500/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
     def elaketulovahennys2023(self,elaketulot : float,tulot : float):
-        max_elaketulovahennys_valtio=11150/self.kk_jakaja
+        max_elaketulovahennys_valtio=11190/self.kk_jakaja
         elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
-        max_elaketulovahennys_kunnallis=9270/self.kk_jakaja
+        max_elaketulovahennys_kunnallis=9500/self.kk_jakaja
+        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
+        return elaketulovahennys_valtio,elaketulovahennys_kunnallis
+
+    def elaketulovahennys2024(self,elaketulot : float,tulot : float):
+        max_elaketulovahennys_valtio=11190/self.kk_jakaja
+        elaketulovahennys_valtio=max(0,min(elaketulot,max_elaketulovahennys_valtio-0.38*max(0,tulot-max_elaketulovahennys_valtio)))
+        max_elaketulovahennys_kunnallis=9500/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
@@ -630,15 +637,21 @@ class Benefits():
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def tyotulovahennys2022(self):
-        max_tyotulovahennys=1840/self.kk_jakaja
+        max_tyotulovahennys=1930/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
-        ttulopros=np.array([0.127,0.0189,0])
+        ttulopros=np.array([0.13,0.0196,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def tyotulovahennys2023(self):
-        max_tyotulovahennys=1840/self.kk_jakaja
+        max_tyotulovahennys=1930/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
-        ttulopros=np.array([0.127,0.0189,0])
+        ttulopros=np.array([0.13,0.0196,0])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2024(self):
+        max_tyotulovahennys=1930/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
+        ttulopros=np.array([0.13,0.0196,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def ansiotulovahennys2018(self):
@@ -678,6 +691,12 @@ class Benefits():
         return rajat,maxvahennys,ansvah
 
     def ansiotulovahennys2023(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+
+    def ansiotulovahennys2024(self):
         rajat=np.array([2500,7230,14000])/self.kk_jakaja
         maxvahennys=3570/self.kk_jakaja
         ansvah=np.array([0.51,0.28,0.045])
@@ -835,7 +854,7 @@ class Benefits():
             self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
             self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
-        self.tyonantajan_sairausvakuutusmaksu=0.0153
+        self.tyonantajan_sairausvakuutusmaksu=0.0134
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
@@ -848,7 +867,7 @@ class Benefits():
         self.paivarahamaksu_pros=0.0118 # palkka
         self.paivarahamaksu_raja=15128/self.kk_jakaja    
         
-        self.elakemaksu_alaraja=61.37
+        self.elakemaksu_alaraja=62.88
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
     def laske_ylevero2018(self,palkkatulot,elaketulot):
@@ -1341,7 +1360,7 @@ class Benefits():
         if self.year==2018:
             elatustuki=156.39*lapsia
         elif self.year==2019:
-            elatustuki=167.35*lapsia
+            elatustuki=158.74*lapsia
         elif self.year==2020:
             elatustuki=167.35*lapsia
         elif self.year==2021:
@@ -1500,9 +1519,9 @@ class Benefits():
             elif self.year==2021:
                 tuki=253.69 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2022:
-                tuki=253.69 # +650*0.4 = opintolainahyvitys mukana?
+                tuki=259.10 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2023:
-                tuki=253.69 # +650*0.4 = opintolainahyvitys mukana?
+                tuki=259.10 # +650*0.4 = opintolainahyvitys mukana?
             
         if self.year==2018:
             raja=696
@@ -2472,7 +2491,7 @@ class Benefits():
         # 
         # 137    130    123    118
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
+        max_menot=np.array([[508, 492, 390, 344],[735, 706, 570, 501],[937, 890, 723, 641],[1095, 1038, 856, 764]])
         max_lisa=np.array([137, 130, 123, 118])
         # kuntaryhma=3
 
@@ -2480,7 +2499,7 @@ class Benefits():
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -2511,15 +2530,15 @@ class Benefits():
         # 
         # 137    130    123    118
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([137, 130, 123, 118])
+        max_menot=np.array([[516, 499, 396, 349],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
+        max_lisa=np.array([139, 132, 119, 114])
         # kuntaryhma=3
 
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -2551,8 +2570,8 @@ class Benefits():
         # 
         # 137    130    123    118
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[508, 492, 411, 362],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([137, 130, 123, 118])
+        max_menot=np.array([[520, 503, 399, 352],[752, 722, 583, 513],[958, 910, 740, 656],[1120, 1062, 876, 781]])
+        max_lisa=np.array([140, 133, 120, 115])
         # kuntaryhma=3
 
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
@@ -2599,7 +2618,7 @@ class Benefits():
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(606+100*p['aikuisia']+224*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -2852,7 +2871,7 @@ class Benefits():
         # e/kk    II kuntaryhmä,
         # e/kk    III kuntaryhmä,
         #
-        max_menot=np.array([8_433,7_755,6_804])
+        max_menot=np.array([8_613,7_921,6_949])
         max_meno=max_menot[max(0,p['kuntaryhma']-1)]
 
         prosentti=0.85 # vastaa 85 %

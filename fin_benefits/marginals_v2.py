@@ -115,6 +115,55 @@ class Marginals():
         if self.vaihtuva_tyelmaksu:
             self.get_tyelpremium()        
             
+    def plot_marg_extra(self,axs,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
+            incl_perustulo=False,incl_elake=False,incl_opintotuki=False,plot_kotihoidontuki=True,incl_alv=False):
+            
+        if not incl_alv:
+            if incl_perustulo:
+                axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,
+                    labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']),
+                    colors=pal)
+            else:
+                if incl_elake:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki']),
+                        colors=pal)
+                elif incl_opintotuki:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margopintotuki,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
+                        colors=pal)
+                elif plot_kotihoidontuki:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margpvhoito,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito']),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
+                        colors=pal)
+        else:
+            if incl_perustulo:
+                axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,
+                    labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo'],self.labels['alv']),
+                    colors=pal)
+            else:
+                if incl_elake:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margalv,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['alv']),
+                        colors=pal)
+                elif incl_opintotuki:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margopintotuki,margalv,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki'],self.labels['alv']),
+                        colors=pal)
+                elif plot_kotihoidontuki:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margpvhoito,margalv,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito'],self.labels['alv']),
+                        colors=pal)
+                else:
+                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,#margalv,
+                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),#self.labels['alv']),
+                        colors=pal)
+
+            
     def setup_EK_fonts(self):
         pal=get_palette_EK()
         #csfont = {'fontname':'Comic Sans MS'}
@@ -311,27 +360,8 @@ class Marginals():
                 axs=ax
             #sns.set_theme()
             axs.set_axisbelow(False)
-            if incl_perustulo:
-                axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,
-                    labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo'],self.labels['alv']),
-                    colors=pal)
-            else:
-                if incl_elake:
-                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margalv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['alv']),
-                        colors=pal)
-                elif incl_opintotuki:
-                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margopintotuki,margalv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki'],self.labels['alv']),
-                        colors=pal)
-                elif plot_kotihoidontuki:
-                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margpvhoito,margalv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito'],self.labels['alv']),
-                        colors=pal)
-                else:
-                    axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,#margalv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),#self.labels['alv']),
-                        colors=pal)
+            self.plot_marg_extra(axs,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
+                incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,plot_kotihoidontuki=plot_kotihoidontuki,incl_alv=incl_alv)
                         
             axs.set_xlabel(self.labels['wage'],**csfont)
             axs.set_ylabel(self.labels['effective'],**csfont)
@@ -362,27 +392,8 @@ class Marginals():
                 axs=ax
             #sns.set_theme(**csfont)
             axs.set_axisbelow(False)
-            if incl_perustulo:
-                axs.stackplot(palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,perustulo,
-                    labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),
-                    colors=pal)
-            else:
-                if incl_elake:
-                    axs.stackplot(palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,kotihoidontuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['kotihoidontuki']),
-                        colors=pal)
-                elif incl_opintotuki:
-                    axs.stackplot(palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,opintotuki,elatustuki,kotihoidontuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['opintotuki'],self.labels['elatustuki'],self.labels['kotihoidontuki']),
-                        colors=pal)
-                elif plot_kotihoidontuki:
-                    axs.stackplot(palkka,nettopalkka,asumistuki,toimeentulotuki,lapsilisa,elatustuki,kotihoidontuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],'Lapsilisä',self.labels['elatustuki'],self.labels['kotihoidontuki']),
-                        colors=pal)
-                else:
-                    axs.stackplot(palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elatustuki,kotihoidontuki,
-                        labels=('Nettopalkka',self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],'Lapsilisä',self.labels['elatustuki'],self.labels['kotihoidontuki']),
-                        colors=pal)
+            self.plot_marg_extra(axs,palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
+                incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,plot_kotihoidontuki=plot_kotihoidontuki,incl_alv=incl_alv)
             
             axs.plot(netto,lw=4.5)
             axs.set_xlabel(self.labels['wage'],**csfont)
@@ -414,27 +425,8 @@ class Marginals():
                 axs=ax
             #sns.set_theme(**csfont)
             axs.set_axisbelow(False)
-            if incl_perustulo:
-                axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_perustulo,tva_alv,
-                    labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo'],self.labels['alv']),
-                    colors=pal)
-            else:
-                if incl_elake:
-                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_kotihoidontuki,tva_alv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['kotihoidontuki'],self.labels['alv']),
-                        colors=pal)
-                elif incl_opintotuki:
-                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_opintotuki,tva_kotihoidontuki,tva_alv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki'],self.labels['kotihoidontuki'],self.labels['alv']),
-                        colors=pal)
-                elif plot_kotihoidontuki:
-                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_pvhoito,tva_kotihoidontuki,tva_alv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito'],self.labels['kotihoidontuki'],self.labels['alv']),
-                        colors=pal)
-                else:
-                    axs.stackplot(palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_alv,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['alv']),
-                        colors=pal)
+            self.plot_marg_extra(axs,palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_perustulo,tva_alv,pal,
+                incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,plot_kotihoidontuki=plot_kotihoidontuki,incl_alv=incl_alv)
 
             #axs.plot(tva,label='Vaihtoehto',lw=2)
             #axs.plot(tva_yht,label='Vaihtoehto2',lw=2)
@@ -469,27 +461,8 @@ class Marginals():
                 axs=ax
             #sns.set_theme(**csfont)
             axs.set_axisbelow(False)
-            if incl_perustulo:
-                axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,
-                    labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki'],self.labels['perustulo']),
-                    colors=pal)
-            else:
-                if incl_elake:
-                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['elake'],self.labels['opintotuki']),
-                        colors=pal)
-                elif incl_opintotuki:
-                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_opintotuki,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['opintotuki']),
-                        colors=pal)
-                elif plot_kotihoidontuki:
-                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_pvhoito,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['paivahoito']),
-                        colors=pal)
-                else:
-                    axs.stackplot(palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,
-                        labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito']),
-                        colors=pal)
+            self.plot_marg_extra(axs,palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,osatva_alv,pal,
+                incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,plot_kotihoidontuki=plot_kotihoidontuki,incl_alv=incl_alv)
 
             #axs.plot(tva,label='Vaihtoehto')
             #axs.plot(tva_yht,label='Vaihtoehto2')
