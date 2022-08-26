@@ -950,7 +950,7 @@ def tee_selite(p,p2=None,short=False):
                     selite+=" (työmarkkinatuki)"
             else:
                 selite+=", puoliso töissä"
-                selite+=" ({p} e/kk).".format(p=p['puoliso_tulot'])
+                selite+=" ({p} e/kk).".format(p=p['puoliso_t'])
         else:
             selite+=", ei puolisoa"
         
