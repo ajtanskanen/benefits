@@ -882,7 +882,7 @@ class Marginals():
         '''
     
         if dt<1:
-            dt=1
+            dt=np.nan
 
         # lasketaan marginaalit
         marg={}        
@@ -1168,29 +1168,29 @@ class Marginals():
                     eff[t]=(1-(n2_alv-n1_alv)/dt)*100
                 else:
                     eff[t]=np.nan
-                if t>0:
-                    tva[t]=(1-(n1_alv-n0_alv)/t)*100
-                else:
-                    tva[t]=np.nan
+                #if t>0:
+                #    tva[t]=(1-(n1_alv-n0_alv)/t)*100
+                #else:
+                #    tva[t]=np.nan
                 
-                if deltat>0:
-                    osatva[t]=(1-(n3_alv-n1_alv)/deltat)*100
-                else:
-                    osatva[t]=np.nan
+                #if deltat>0:
+                #    osatva[t]=(1-(n3_alv-n1_alv)/deltat)*100
+                #else:
+                #    osatva[t]=np.nan
             else:
                 if dt>0:
                     eff[t]=(1-(n2_noalv-n1_noalv)/dt)*100
                 else:
                     eff[t]=np.nan
-                if t>0:
-                    tva[t]=(1-(n1_noalv-n0_noalv)/t)*100
-                else:
-                    tva[t]=np.nan
+                #if t>0:
+                #    tva[t]=(1-(n1_noalv-n0_noalv)/t)*100
+                #else:
+                #    tva[t]=np.nan
                 
-                if deltat>0:
-                    osatva[t]=(1-(n3_noalv-n1_noalv)/deltat)*100
-                else:
-                    osatva[t]=np.nan
+                #if deltat>0:
+                #    osatva[t]=(1-(n3_noalv-n1_noalv)/deltat)*100
+                #else:
+                #    osatva[t]=np.nan
                     
         return netto,palkka,nettopalkka,tva,osatva,eff,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,\
             elake,elatustuki,perustulo,opintotuki,kotihoidontuki,effmarg,margasumistuki,margtoimeentulotuki,\
