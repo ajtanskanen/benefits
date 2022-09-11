@@ -1,6 +1,7 @@
 
 import seaborn as sns
 import matplotlib.font_manager as font_manager
+import math
 
 
 def get_palette_EK():
@@ -53,3 +54,30 @@ def get_style_EK():
      'axes.spines.top': False}
      
     return axes
+    
+    
+def print_q(a):
+    '''
+    pretty printer for dict
+    '''
+    for x in a.keys():
+        if a[x]>0 or a[x]<0:
+            print('{}:{:.2f} '.format(x,a[x]),end='')
+            
+    print('')
+        
+        
+def compare_q_print(q,q2,omat='omat_',puoliso='puoliso_'):
+    '''
+    Helper function that prettyprints arrays
+    '''
+    for key in q:
+        if key in q and key in q2:
+            if not math.isclose(q[key],q2[key]):
+                d=q[key]-q2[key]
+                print(f'{key}: {q[key]:.2f} vs {q2[key]:.2f} delta {d:.2f}')
+        else:
+            if key in q:
+                print(key,' not in q2')
+            else:
+                print(key,' not in q')

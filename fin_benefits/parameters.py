@@ -742,6 +742,39 @@ def perheparametrit(perhetyyppi=10,tulosta=False):
         puolison_vakiintunutpalkka=0    
         puoliso_tyoton=1
         puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==59: # 2+0, puoliso töissä
+        lapsia=0
+        paivahoidossa=0
+        aikuisia=2
+        vakiintunutpalkka=2500    
+        tyoton=0    
+        saa_ansiopaivarahaa=0    
+        puolison_tulot=1250    
+        puolison_vakiintunutpalkka=2500    
+        puoliso_tyoton=0
+        puoliso_saa_ansiopaivarahaa=0            
+    elif perhetyyppi==60: # 2+0, ansioturvalla
+        lapsia=0  
+        paivahoidossa=0
+        aikuisia=2
+        vakiintunutpalkka=2500    
+        tyoton=0    
+        saa_ansiopaivarahaa=1    
+        puolison_tulot=1250    
+        puolison_vakiintunutpalkka=2500    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0            
+    elif perhetyyppi==61: # 2+0, puoliso ansioturvalla
+        lapsia=0  
+        paivahoidossa=0
+        aikuisia=2    
+        vakiintunutpalkka=3500    
+        tyoton=0    
+        saa_ansiopaivarahaa=0    
+        puolison_tulot=1250    
+        puolison_vakiintunutpalkka=2500    
+        puoliso_tyoton=1
+        puoliso_saa_ansiopaivarahaa=1
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
@@ -845,7 +878,11 @@ def make_filename(p):
     
     return nimi
 
-def tee_selite(p,p2=None,short=False):
+def tee_selite(p,p0=None,short=False):
+    if p0 is not None:
+        if p==p0:
+            p0=None
+
     if p['aikuisia']>1:
         selite="{aikuisia} aikuista".format(aikuisia=p['aikuisia'])
     elif p['aikuisia']>0:
@@ -884,11 +921,29 @@ def tee_selite(p,p2=None,short=False):
         else:
             selite=selite+", ei lapsia."   
                  
-    if p2 is not None:
+    if p0 is not None:
         selite+=' Siirtyy'
+        if p0['elakkeella']<1:
+            if p0['tyoton']>0:
+                selite+=" työttömästä"
+                if p0['saa_ansiopaivarahaa']>0:
+                    if short:
+                        selite+=" (ansiopäiväraha)"
+                    else:
+                        selite+=" (ansiopäiväraha, peruste {v} e/kk)".format(v=p0['vakiintunutpalkka'])
+                else:
+                    selite+=" (työmarkkinatuki)"
+            elif p0['opiskelija']>0:
+                selite+=" opiskelijast"
+            elif p0['kotihoidontuella']>0:
+                selite+=" kotihoidontuelta"
+            else:
+                selite+=" töistä"
+        else:
+            selite+=" Vanhuuseläkkeellä (työeläke {e} e/kk)".format(e=p['tyoelake'])
         if p['elakkeella']<1:
             if p['tyoton']>0:
-                selite+=" työttömästä"
+                selite+=" työttömäksi"
                 if p['saa_ansiopaivarahaa']>0:
                     if short:
                         selite+=" (ansiopäiväraha)"
@@ -897,26 +952,8 @@ def tee_selite(p,p2=None,short=False):
                 else:
                     selite+=" (työmarkkinatuki)"
             elif p['opiskelija']>0:
-                selite+=" opiskelijast"
-            elif p['kotihoidontuella']>0:
-                selite+=" kotihoidontuelta"
-            else:
-                selite+=" töistä"
-        else:
-            selite+=" Vanhuuseläkkeellä (työeläke {e} e/kk)".format(e=p['tyoelake'])
-        if p2['elakkeella']<1:
-            if p2['tyoton']>0:
-                selite+=" työttömäksi"
-                if p2['saa_ansiopaivarahaa']>0:
-                    if short:
-                        selite+=" (ansiopäiväraha)"
-                    else:
-                        selite+=" (ansiopäiväraha, peruste {v} e/kk)".format(v=p['vakiintunutpalkka'])
-                else:
-                    selite+=" (työmarkkinatuki)"
-            elif p2['opiskelija']>0:
                 selite+=" opiskelijaks"
-            elif p2['kotihoidontuella']>0:
+            elif p['kotihoidontuella']>0:
                 selite+=" kotihoidontuelle"
             else:
                 selite+=" töihin"
