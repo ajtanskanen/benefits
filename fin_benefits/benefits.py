@@ -2476,11 +2476,11 @@ class Benefits():
         
         q=self.summaa_q(p,q,omat=omat,puoliso=puoliso)
 
-        if p[puolisoalku+'alive']<1 and p[omatalku+'alive']<1:
+        if p[puolisoalku+'alive']<1 and p[omatalku+'alive']<1: # asumistuki nolla, jos kumpikaan ei hengissä
             q['asumistuki'] = 0
-        elif p[omatalku+'elakkeella']>0 and p[puolisoalku+'elakkeella']>0 :
+        elif p[omatalku+'elakkeella']>0 and p[puolisoalku+'elakkeella']>0 : # eläkkeensaajan asumistuki vain, jos molemmat eläkkeellä
             q['asumistuki']=self.elakkeensaajan_asumistuki(q['palkkatulot'],q['kokoelake'],p['asumismenot_asumistuki'],p)
-        else:
+        else: # muuten yleinen asumistuki
             q['asumistuki']=self.asumistuki(q['palkkatulot'],q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
                                             +q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
                                             p['asumismenot_asumistuki'],p)
@@ -2564,6 +2564,7 @@ class Benefits():
         #q['etuustulo_nettonetto']=q['etuustulo_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
             
         asumismeno=p['asumismenot_asumistuki']
+        q['asumismeno']=asumismeno
             
         if include_alv:
             q['alv']=self.laske_alv(max(0,kateen-asumismeno)) # vuokran ylittävä osuus tuloista menee kulutukseen
@@ -2742,6 +2743,7 @@ class Benefits():
                 kateen_puoliso=0
                 brutto_puoliso=0
                 etuusnetto_puoliso=0
+                q[puoliso+'palkkatulot_nettonetto']=0
                 q[puoliso+'toimeentulotuki_nettonetto']=0
                 q[puoliso+'asumistuki_nettonetto']=0
                 q[puoliso+'pvhoito']=0

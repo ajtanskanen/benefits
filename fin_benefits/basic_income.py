@@ -5,6 +5,8 @@
     implements universal basic income on top of benefits module
 
 
+    - pitääkö asumistuen suojaosa olla 300 e/kk vai 600 e/kk?? Nyt 600 e/kk.
+
 """
 
 import numpy as np
@@ -1025,7 +1027,7 @@ class BasicIncomeBenefits(Benefits):
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
+        suojaosa=600*p['aikuisia']
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
@@ -1064,7 +1066,7 @@ class BasicIncomeBenefits(Benefits):
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
+        suojaosa=600*p['aikuisia']
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
@@ -1105,7 +1107,7 @@ class BasicIncomeBenefits(Benefits):
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
+        suojaosa=600*p['aikuisia']
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
@@ -1145,7 +1147,7 @@ class BasicIncomeBenefits(Benefits):
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
+        suojaosa=600*p['aikuisia']
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(606+100*p['aikuisia']+224*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
@@ -1184,7 +1186,7 @@ class BasicIncomeBenefits(Benefits):
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
+        suojaosa=600*p['aikuisia']
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(619+103*p['aikuisia']+228*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
@@ -1223,7 +1225,7 @@ class BasicIncomeBenefits(Benefits):
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
+        suojaosa=600*p['aikuisia']
         perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(619+103*p['aikuisia']+228*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
