@@ -1157,6 +1157,22 @@ class Benefits():
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
                tyotulovahennys_kunnallisveroon,ptel,sairausvakuutusmaksu,tyotvakmaksu,koko_tyoelakemaksu,ylevero
 
+    def hoitolisa(self,perheentulot,perhekoko):
+        '''
+        vuoden 2022 tasossa, PÄIVITÄ
+        '''
+        perustuki=187.45
+        if perhekoko==2:
+            tuki=max(0,perustuki-max(0,perheentulot-1160)*0.115)
+        elif perhekoko==3:
+            tuki=max(0,perustuki-max(0,perheentulot-1430)*0.095)
+        elif perhekoko>3:
+            tuki=max(0,perustuki-max(0,perheentulot-1700)*0.079)
+        else:
+            tuki=0
+        
+        return tuki
+
     def kotihoidontuki2018(self,lapsia,allekolmev,alle_kouluikaisia):
         if lapsia<1:
             arvo=0
@@ -2476,6 +2492,14 @@ class Benefits():
         q[puoliso+'elatustuki']=0
         
         q=self.summaa_q(p,q,omat=omat,puoliso=puoliso)
+        
+        if q['kotihoidontuki']>0:
+            hoitol = self.hoitolisa(p['aikuisia']+p['lapsia'],q['palkkatulot']+q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['sairauspaivaraha']+q['opintotuki'])
+            q['kotihoidontuki'] += hoitol
+            if q[omat+'kotihoidontuki']>0:
+                q[omat+'kotihoidontuki'] += hoitol
+            else:
+                q[puoliso+'kotihoidontuki'] += hoitol
 
         if p[puolisoalku+'alive']<1 and p[omatalku+'alive']<1: # asumistuki nolla, jos kumpikaan ei hengissä
             q['asumistuki'] = 0
