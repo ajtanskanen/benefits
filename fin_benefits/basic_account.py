@@ -33,26 +33,17 @@ class BasicAccountBenefits(Benefits):
         else:
             kwarg={}
         for key, value in kwarg.items():
-            if key=='perustulomalli':
-                if value is not None:
-                    self.perustulomalli=value
-            elif key=='osittainen_perustulo':
-                if value is not None:
-                    self.osittainen_perustulo=value
-            elif key=='valtionverotaso':
+            if key=='valtionverotaso':
                 if value is not None:
                     self.valtionverotaso=value
             elif key=='perustulo_asetettava':
                 if value is not None:
                     self.perustulo_asetettava=value
-            elif key=='perustulo_korvaa_toimeentulotuen':
-                if value is not None:
-                    self.perustulo_korvaa_toimeentulotuen=value
                     
-        print(f'UBI-model {self.perustulomalli}\nPartial UBI {self.osittainen_perustulo}\nperustulo_korvaa_toimeentulotuen {self.perustulo_korvaa_toimeentulotuen}')
+        print(f'UBI-model\valtionverotaso {self.valtionverotaso}\nperustulo_asetettava {perustulo_asetettava}')
                     
         super().__init__(**kwargs)
-        self.setup_basic_income()
+        self.setup_basic_account()
         
     def set_year(self,vuosi):
         super().set_year(vuosi)

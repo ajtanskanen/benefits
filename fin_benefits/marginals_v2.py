@@ -24,7 +24,7 @@ class Marginals():
 
     Source:
         AT
-        
+
     v2: takes care of household issues
 
     """
@@ -44,12 +44,12 @@ class Marginals():
         self.irr_vain_tyoelake=False
         self.include_perustulo=False
         self.ben=ben
-        
+
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
         else:
             kwarg=kwargs
-            
+    
         for key, value in kwarg.items():
             if key=='year':
                 if value is not None:
@@ -77,7 +77,7 @@ class Marginals():
                     self.vaihtuva_tyelmaksu=value
             elif key=='tyel_perusvuosi':
                 if value is not None:
-                    self.tyel_perusvuosi=value                    
+                    self.tyel_perusvuosi=value            
             elif key=='extra_ppr':
                 if value is not None:
                     self.use_extra_ppr=True
@@ -87,9 +87,9 @@ class Marginals():
         self.ben.set_year(self.year)
         self.lab=Labels()
         self.labels=self.lab.ben_labels(self.language)
-        
+
         if self.vaihtuva_tyelmaksu:
-            self.get_tyelpremium()        
+            self.get_tyelpremium()
 
     def plot_tva_marg(self,tva,palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_perustulo,tva_alv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,
@@ -122,12 +122,12 @@ class Marginals():
         if header is not None:
             #axs.title.set_text(head_text,csfont)
             axs.set_title(head_text,**csfont)
-            
+    
         if figname is not None:
             plt.savefig(figname+'_tva.png',dpi=200)
         if show:
             plt.show()    
-            
+    
     def plot_eff_marg(self,eff,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,show_xlabel=True,show_ylabel=True,
                 csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True,baseline_eff=None):
@@ -139,7 +139,7 @@ class Marginals():
         axs.set_axisbelow(False)
         self.plot_marg_extra(axs,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
             incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,incl_alv=incl_alv)
-                    
+            
         axs.plot(eff,'k',lw=2.0)
         if baseline_eff is not None:
             axs.plot(baseline_eff,'g--',lw=3)
@@ -147,7 +147,7 @@ class Marginals():
             axs.set_xlabel(self.labels['wage'],**csfont)
         if show_ylabel:
             axs.set_ylabel(self.labels['effective'],**csfont)
-            
+    
         plt.yticks(**csfont)
         plt.xticks(**csfont)
         axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
@@ -162,12 +162,12 @@ class Marginals():
         if header is not None:
             #axs.title.set_text(head_text,csfont)
             axs.set_title(head_text,**csfont)
-            
+    
         if figname is not None:
             plt.savefig(figname+'_eff.png')
         if show:
-            plt.show()            
-            
+            plt.show()    
+    
     def plot_osatva_marg(self,osatva,palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,osatva_alv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,
                 csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True):
@@ -197,16 +197,16 @@ class Marginals():
         if header is not None:
             #axs.title.set_text(head_text,csfont)
             axs.set_title(head_text,**csfont)
-            
+    
         if figname is not None:
             plt.savefig(figname+'_osatva.png',dpi=200)
         if show:
-            plt.show()                        
-            
+            plt.show()                
+    
     def plot_netto_income(self,netto,palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
             ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=True,
             csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True):
-            
+    
         if ax is None:
             figi,axs = plt.subplots()
         else:
@@ -214,7 +214,7 @@ class Marginals():
             axs=ax
         #sns.set_theme(**csfont)
         axs.set_axisbelow(False)
-        
+
         if incl_perustulo:
             axs.stackplot(palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,
                 labels=(self.labels['wage'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['kotihoidontuki'],self.labels['lapsilisa'],
@@ -236,7 +236,7 @@ class Marginals():
                 axs.stackplot(palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,
                     labels=(self.labels['wage'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['kotihoidontuki'],self.labels['lapsilisa'],
                         self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),colors=pal)
-            
+    
         axs.plot(netto,'k',lw=3)
         axs.set_xlabel(self.labels['wage'],**csfont)
         axs.set_ylabel(self.labels['net income'],**csfont)
@@ -245,7 +245,7 @@ class Marginals():
         axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
         axs.set_facecolor('white')
         axs.set_xlim(min_salary, max_salary)
-        if legend:        
+        if legend:
             #axs.legend(loc='lower right')
             handles, labels = axs.get_legend_handles_labels()
             lgd=axs.legend(handles[::-1], labels[::-1], loc='lower right')
@@ -254,15 +254,71 @@ class Marginals():
         if header is not None:
             #axs.title.set_text(head_text,csfont)
             axs.set_title(head_text,**csfont)
-            
+    
         if figname is not None:
             plt.savefig(figname+'_netto.png')
         if show:
             plt.show()
             
+    def plot_brutto_income(self,brutto,palkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
+            ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=True,
+            csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True):
+    
+        if ax is None:
+            figi,axs = plt.subplots()
+        else:
+            #figi=fig
+            axs=ax
+        #sns.set_theme(**csfont)
+        axs.set_axisbelow(False)
+
+        if incl_perustulo:
+            axs.stackplot(palkka,palkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,
+                labels=(self.labels['wage'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['kotihoidontuki'],self.labels['lapsilisa'],
+                    self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),colors=pal)
+        else:
+            if incl_elake:
+                axs.stackplot(palkka,palkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,elatustuki,perustulo,
+                    labels=(self.labels['wage'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['kotihoidontuki'],self.labels['lapsilisa'],
+                        self.labels['elake'],self.labels['elatustuki'],self.labels['perustulo']),colors=pal)
+            elif incl_opintotuki:
+                axs.stackplot(palkka,palkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,
+                    labels=(self.labels['wage'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['kotihoidontuki'],self.labels['lapsilisa'],
+                        self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),colors=pal)
+            elif incl_kotihoidontuki:
+                axs.stackplot(palkka,palkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,
+                    labels=(self.labels['wage'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['kotihoidontuki'],self.labels['lapsilisa'],
+                        self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),colors=pal)
+            else:
+                axs.stackplot(palkka,palkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,
+                    labels=(self.labels['wage'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['kotihoidontuki'],self.labels['lapsilisa'],
+                        self.labels['elake'],self.labels['opintotuki'],self.labels['elatustuki'],self.labels['perustulo']),colors=pal)
+    
+        axs.plot(netto,'k',lw=3)
+        axs.set_xlabel(self.labels['wage'],**csfont)
+        axs.set_ylabel(self.labels['brutto income'],**csfont)
+        plt.yticks(**csfont)
+        plt.xticks(**csfont)
+        axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+        axs.set_facecolor('white')
+        axs.set_xlim(min_salary, max_salary)
+        if legend:
+            #axs.legend(loc='lower right')
+            handles, labels = axs.get_legend_handles_labels()
+            lgd=axs.legend(handles[::-1], labels[::-1], loc='lower right')
+        if source is not None:
+            self.add_source(source,**csfont)
+        if header is not None:
+            #axs.title.set_text(head_text,csfont)
+            axs.set_title(head_text,**csfont)
+    
+        if figname is not None:
+            plt.savefig(figname+'_netto.png')
+        if show:
+            plt.show()    
     def plot_marg_extra(self,axs,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
             incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=True,incl_alv=False):
-            
+    
         if not incl_alv:
             if incl_perustulo:
                 axs.stackplot(palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,
@@ -308,7 +364,7 @@ class Marginals():
                         labels=(self.labels['taxes'],self.labels['asumistuki'],self.labels['toimeentulotuki'],self.labels['tyottomyysturva'],self.labels['paivahoito'],self.labels['alv']),
                         colors=pal)
 
-            
+    
     def setup_EK_fonts(self):
         pal=get_palette_EK()
         #csfont = {'fontname':'Comic Sans MS'}
@@ -318,13 +374,13 @@ class Marginals():
         custom_params = {"axes.spines.right": False, "axes.spines.top": False, "axes.spines.left": False, 'ytick.left': False}
         sns.set_theme(style="ticks", font=fontname,rc=custom_params)
         linecolors = {'color':'red'}
-        
+
         return csfont,pal
-        
+
     def lp_marginaalit_apu(self,axs,otsikko='',p=None,min_salary=0,max_salary=8000,type='eff',dt=100,selite=False,source=False,
                             header=False,head_text='',incl_perustulo=None,grayscale=False,palette_EK=True,incl_alv=False,
                             legend=False,figname=None,show=True):
-        
+
         if type=='eff':
             self.laske_ja_plottaa_marginaalit(p=p,p0=None,min_salary=min_salary,max_salary=max_salary,
                     dt=dt,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",legend=legend,ret=False,
@@ -349,18 +405,18 @@ class Marginals():
                     plot_tva=False,plot_eff=False,plot_netto=True,figname=None,grayscale=False,head_text=head_text,
                     incl_perustulo=incl_perustulo,incl_elake=True,ax=axs,incl_alv=incl_alv,show=show,
                     plot_osatva=False,header=header,source=source,palette=None,palette_EK=palette_EK,square=False)
-                            
-                                        
+                    
+                                
     def laske_ja_plottaa_marginaalit(self,p=None,p0=None,min_salary=0,max_salary=8000,
-                basenetto=None,baseeff=None,basetva=None,dt=100,plottaa=True,
+                basenetto=None,baseeff=None,basetva=None,basebrutto=None,dt=100,plottaa=True,
                 otsikko="Vaihtoehto",otsikkobase="Perustapaus",legend=True,ret=False,
-                plot_tva=True,plot_eff=True,plot_netto=True,figname=None,grayscale=False,
+                plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=False,figname=None,grayscale=False,
                 incl_perustulo=False,incl_elake=True,fig=None,ax=None,incl_opintotuki=False,
                 incl_alv=False,incl_kotihoidontuki=False,show=True,head_text=None,
                 plot_osatva=True,header=True,source='Lähde: EK',palette=None,palette_EK=False,
                 baseline_eff=None,
                 square=False):
-        
+
         if grayscale:
             plt.style.use('grayscale')
             plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
@@ -372,7 +428,7 @@ class Marginals():
 
         if palette is not None:
             pal=sns.color_palette(palette, 12)
-            
+    
         if palette_EK:
             csfont,pal=self.setup_EK_fonts()
         else:
@@ -380,7 +436,7 @@ class Marginals():
 
         if p is None:
             p,selite=self.get_default_parameter()
-            
+    
         if header:
             if head_text is None:
                 head_text=tee_selite(p,p0=p0,short=False)
@@ -393,18 +449,26 @@ class Marginals():
             margkotihoidontuki,tva,tva_asumistuki,tva_kotihoidontuki,tva_toimeentulotuki,tva_ansiopvraha,tva_verot,\
             tva_alv,tva_elake,tva_pvhoito,tva_perustulo,tva_opintotuki,tva_yht,osatva,osatva_asumistuki,\
             osatva_kotihoidontuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_verot,osatva_alv,osatva_elake,\
-            osatva_pvhoito,osatva_perustulo,osatva_opintotuki,osatva_yht\
+            osatva_pvhoito,osatva_perustulo,osatva_opintotuki,osatva_yht,\
+            elake_brutto,asumistuki_brutto,toimeentulotuki_brutto,opintotuki_brutto,ansiopvraha_brutto,\
+            lapsilisa_brutto,perustulo_brutto,elatustuki_brutto,bruttotulot,kotihoidontuki_brutto\
             =self.comp_all_margs(p,p0=p0,incl_alv=incl_alv,min_salary=min_salary,max_salary=max_salary,dt=dt)
-                
+        
         if plot_eff and plottaa:
             self.plot_eff_marg(effmarg,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
                 ax=ax,incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,incl_alv=incl_alv,
                 csfont=csfont,min_salary=min_salary, max_salary=max_salary,legend=legend,source=source,header=header,head_text=head_text,figname=figname,show=show,
                 baseline_eff=baseline_eff)
-        
+
         if plot_netto and plottaa:
             # ALV:ia ei plotata nettotuloissa
             self.plot_netto_income(netto,palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
+                ax=ax,incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,
+                csfont=csfont,min_salary=min_salary, max_salary=max_salary,legend=legend,source=source,header=header,head_text=head_text,figname=figname,show=show)
+
+        if plot_brutto and plottaa:
+            # ALV:ia ei plotata bruttotuloissa
+            self.plot_brutto_income(bruttotulot,palkka,asumistuki_brutto,toimeentulotuki_brutto,ansiopvraha_brutto,kotihoidontuki_brutto,lapsilisa_brutto,elake_brutto,opintotuki_brutto,elatustuki_brutto,perustulo_brutto,pal,
                 ax=ax,incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,
                 csfont=csfont,min_salary=min_salary, max_salary=max_salary,legend=legend,source=source,header=header,head_text=head_text,figname=figname,show=show)
 
@@ -412,16 +476,16 @@ class Marginals():
             self.plot_tva_marg(tva,palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_perustulo,tva_alv,pal,
                 ax=ax,incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,incl_alv=incl_alv,
                 csfont=csfont,min_salary=min_salary, max_salary=max_salary,legend=legend,source=source,header=header,head_text=head_text,figname=figname,show=show)
-            
+    
         if plot_osatva and plottaa:
             self.plot_osatva_marg(osatva,palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,osatva_alv,pal,
                 ax=ax,incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,incl_alv=incl_alv,
                 csfont=csfont,min_salary=min_salary, max_salary=max_salary,legend=legend,source=source,header=header,head_text=head_text,figname=figname,show=show)
-               
+       
         if ret: 
-            return netto,effmarg,tva,osatva
-            
-            
+            return netto,effmarg,tva,osatva,brutto
+    
+    
     def add_source(self,source,**csfont):
         plt.annotate(source, xy=(0.88,-0.1), xytext=(0,0), xycoords='axes fraction', textcoords='offset points', va='top', **csfont)
 
@@ -429,26 +493,26 @@ class Marginals():
             basetva=None,dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Perustapaus",selite=True,palette_EK=True,include_alv=True,figname=None,
             ret=False,source='Lähde: EK'):
         palkka=np.zeros(max_salary+1)
-        margtyotvakmaksu=np.zeros(max_salary+1)        
+        margtyotvakmaksu=np.zeros(max_salary+1)
         margsairausvakuutusmaksu=np.zeros(max_salary+1)
         margptel=np.zeros(max_salary+1)
         margtyotulovah=np.zeros(max_salary+1)
         margansiotulovah=np.zeros(max_salary+1)
         margalv=np.zeros(max_salary+1)
-        margverot=np.zeros(max_salary+1)        
-        margkunnallisvero=np.zeros(max_salary+1)        
+        margverot=np.zeros(max_salary+1)
+        margkunnallisvero=np.zeros(max_salary+1)
         margvaltionvero=np.zeros(max_salary+1)  
         margperusvahennys=np.zeros(max_salary+1)  
         margpuolisonverot=np.zeros(max_salary+1)  
         margperustulovero=np.zeros(max_salary+1) 
-        tyotvakmaksu=np.zeros(max_salary+1)        
+        tyotvakmaksu=np.zeros(max_salary+1)
         sairausvakuutusmaksu=np.zeros(max_salary+1)
         ptel=np.zeros(max_salary+1)
         nettoverot=np.zeros(max_salary+1)
         tyotulovah=np.zeros(max_salary+1)
-        ansiotulovah=np.zeros(max_salary+1)        
-        verot=np.zeros(max_salary+1)        
-        kunnallisvero=np.zeros(max_salary+1)        
+        ansiotulovah=np.zeros(max_salary+1)
+        verot=np.zeros(max_salary+1)
+        kunnallisvero=np.zeros(max_salary+1)
         valtionvero=np.zeros(max_salary+1)  
         perusvahennys=np.zeros(max_salary+1)  
         puolisonverot=np.zeros(max_salary+1)  
@@ -456,12 +520,12 @@ class Marginals():
         valtionveroperuste=np.zeros(max_salary+1)  
         kunnallisveroperuste=np.zeros(max_salary+1)  
         #brutto=np.zeros(max_salary+1)  
-        
+
         if p is None:
             p,selite=self.get_default_parameter()
-            
+    
         p2=p.copy()
-        
+
         if palette_EK:
             csfont,pal=self.setup_EK_fonts()
         else:
@@ -475,7 +539,7 @@ class Marginals():
             p2['t']=t+dt # palkka
             n2,q2=self.ben.laske_tulot_v3(p2,include_alv=incl_alv)
             palkka[t]=t
-            
+    
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
             margvaltionvero[t]=marg['valtionvero']
             margkunnallisvero[t]=marg['kunnallisvero']
@@ -501,7 +565,7 @@ class Marginals():
                 perustulovero[t]=q1['perustulovero']
             puolisonverot[t]=0 #q1['puolisoverot']
             #brutto[t]=q1['bruttotulot']
-            
+    
         fig,axs = plt.subplots()
         if incl_perustulo:
             axs.stackplot(palkka,margvaltionvero,margkunnallisvero,margptel,margsairausvakuutusmaksu,margtyotvakmaksu,margpuolisonverot,margperustulovero,
@@ -522,7 +586,7 @@ class Marginals():
         if source is not None:
             self.add_source(source,**csfont)
         plt.show()
-        
+
         fig,axs = plt.subplots()
         if incl_perustulo:
             axs.stackplot(palkka,tyotvakmaksu,sairausvakuutusmaksu,ptel,kunnallisvero,valtionvero,puolisonverot,perustulovero,
@@ -535,12 +599,12 @@ class Marginals():
         axs.set_ylabel('Verot yhteensä (e/kk)')
         axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
         axs.set_xlim(0, max_salary)
-        if selite:        
+        if selite:
             axs.legend(loc='upper left')
         if source is not None:
             self.add_source(source,**csfont)
         plt.show()
-        
+
         fig,axs = plt.subplots()
         axs.plot(palkka,valtionveroperuste,label='valtionveroperuste')
         axs.plot(palkka,kunnallisveroperuste,label='kunnallisveroperuste')
@@ -548,20 +612,20 @@ class Marginals():
         axs.set_ylabel('Veroperuste')
         axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
         axs.set_xlim(0, max_salary)
-        if selite:        
+        if selite:
             axs.legend(loc='lower right')
         if source is not None:
             self.add_source(source,**csfont)
         plt.show()
-        
+
         if ret:
             return q1
-        
+
     def laske_ja_plottaa_hila(self,min_salary=0,max_salary=8000,type='eff',dt=100,maxn=None,dire=None,palette_EK=True,grayscale=False,
             incl_perustulo=False,incl_alv=False,source='Lähde: EK'):
         if maxn is None:
             maxn=36
-            
+    
         fig,axs = plt.subplots(int(maxn/5),5,sharex=True,sharey=True)
         for k in range(1,maxn):
             x=(k-1) % 5
@@ -572,7 +636,7 @@ class Marginals():
                 max_salary=max_salary,type=type,dt=dt,grayscale=grayscale,palette_EK=palette_EK,incl_perustulo=incl_perustulo,
                 incl_alv=incl_alv,show=False,head_text='#'+str(k),header=True)
 
-        csfont,pal=self.setup_EK_fonts()            
+        csfont,pal=self.setup_EK_fonts()    
         if source is not None:
             self.add_source(source,**csfont)
 
@@ -582,30 +646,30 @@ class Marginals():
 
         plt.show()
 
-    def plot_insentives(self,netto,eff,tva,osa_tva,
+    def plot_insentives(self,netto,eff,tva,osa_tva,brutto=None,
             min_salary=0,max_salary=6000,step_salary=1,
-            basenetto=None,baseeff=None,basetva=None,baseosatva=None,
+            basenetto=None,baseeff=None,basetva=None,baseosatva=None,basebrutto=None,
             dt=100,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
-            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=False,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=False,plot_brutto=False,
             figname=None,grayscale=False,source=None,header=None,palette_EK=True):
-            
+    
         if grayscale:
             plt.style.use('grayscale')
             plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
             pal=sns.dark_palette("darkgray", 6, reverse=True)
             reverse=True
         else:
-            pal=sns.color_palette()            
-            
+            pal=sns.color_palette()    
+    
         if palette_EK:
             csfont,pal=self.setup_EK_fonts()
         else:
             csfont = {}
             linecolors ={}
-            
+    
         linestyle={'linewidth': 3}
         legendstyle={'frameon': False}
-            
+    
         x=np.arange(min_salary,max_salary,step_salary)
         if plot_netto:
             fig, axs = plt.subplots()
@@ -622,16 +686,42 @@ class Marginals():
             axs.set_xlim(0, max_salary)
             if source is not None:
                 self.add_source(source,**csfont)
-            
+    
             if header is not None:
                 #axs.title.set_text(head_text,csfont)
                 axs.set_title(header,**csfont)
-                
+        
             if figname is not None:
-                plt.savefig(figname+'_netto.eps', format='eps')
+                #plt.savefig(figname+'_netto.eps', format='eps')
                 plt.savefig(figname+'_netto.png', format='png',dpi=300)
-                
+        
             plt.show()
+            
+        if plot_brutto:
+            fig, axs = plt.subplots()
+            if basebrutto is not None:
+                axs.plot(x,basebrutto,label=otsikkobase,**linestyle)
+                axs.plot(x,brutto,label=otsikko,**linestyle)
+                if selite:
+                    axs.legend(loc='upper right',**legendstyle)
+            else:
+                axs.plot(x,brutto,**linestyle)
+            axs.set_xlabel(self.labels['wage'],**csfont)
+            axs.set_ylabel(self.labels['brutto income'],**csfont)
+            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+            axs.set_xlim(0, max_salary)
+            if source is not None:
+                self.add_source(source,**csfont)
+    
+            if header is not None:
+                #axs.title.set_text(head_text,csfont)
+                axs.set_title(header,**csfont)
+        
+            if figname is not None:
+                #plt.savefig(figname+'_brutto.eps', format='eps')
+                plt.savefig(figname+'_brutto.png', format='png',dpi=300)
+        
+            plt.show()            
 
         if plot_eff:
             fig, axs = plt.subplots()
@@ -649,7 +739,7 @@ class Marginals():
             axs.set_ylim(0, 119)
             if source is not None:
                 self.add_source(source,**csfont)
-            
+    
             if header is not None:
                 #axs.title.set_text(head_text,csfont)
                 axs.set_title(header,**csfont)
@@ -673,7 +763,7 @@ class Marginals():
             axs.set_ylim(0, 120)
             if source is not None:
                 self.add_source(source,**csfont)
-            
+    
             if header is not None:
                 #axs.title.set_text(head_text,csfont)
                 axs.set_title(header,**csfont)
@@ -690,7 +780,7 @@ class Marginals():
                     axs.legend(loc='upper right',**legendstyle)
             else:
                 axs.plot(x,osa_tva,**linestyle)
-                       
+               
             axs.set_xlabel('Osatyön palkka (e/kk)',**csfont)
             axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.rajavero (%)',**csfont)
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
@@ -705,28 +795,28 @@ class Marginals():
             plt.show()    
     
     def laske_ja_plottaa(self,p=None,p0=None,min_salary=0,max_salary=8000,step_salary=1,
-            basenetto=None,baseeff=None,basetva=None,baseosatva=None,
+            basenetto=None,baseeff=None,basetva=None,baseosatva=None,basebrutto=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
-            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,incl_alv=False,
-            figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
-            
-        netto,eff,tva,osa_tva=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,incl_alv=incl_alv,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,plot_brutto=True,
+            incl_alv=False,figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
+    
+        netto,eff,tva,osa_tva,brutto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,incl_alv=incl_alv,
                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
-                
+        
         if header:
             head_text=tee_selite(p,p0=p0,short=short)
         else:
             head_text=None
-                
-        if plottaa:
-            self.plot_insentives(netto,eff,tva,osa_tva,min_salary=min_salary,max_salary=max_salary+1,
-                step_salary=step_salary,
-                basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
-                dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
-                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
-                figname=figname,grayscale=grayscale,source=source,header=head_text)
         
-        return netto,eff,tva,osa_tva
+        if plottaa:
+            self.plot_insentives(netto,eff,tva,osa_tva,brutto=brutto,min_salary=min_salary,max_salary=max_salary+1,
+                step_salary=step_salary,
+                basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,basebrutto=basebrutto,
+                dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
+                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,plot_brutto=plot_brutto,
+                figname=figname,grayscale=grayscale,source=source,header=head_text)
+
+        return netto,eff,tva,osa_tva,brutto
 
     
     def plot(self,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,
@@ -734,15 +824,15 @@ class Marginals():
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
             figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
-            
-        netto,eff,tva,osa_tva=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
+    
+        netto,eff,tva,osa_tva,brutto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
                                                 max_salary=max_salary,step_salary=step_salary,dt=dt)
-                
+        
         if header:
             head_text=tee_selite(p,short=short)
         else:
             head_text=None
-                
+        
         if plottaa:
             self.plot_insentives(netto,eff,tva,osa_tva,min_salary=min_salary,max_salary=max_salary+1,
                 step_salary=step_salary,
@@ -750,10 +840,10 @@ class Marginals():
                 dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
                 plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
                 figname=figname,grayscale=grayscale,source=source,header=head_text)
-        
+
         return netto,eff,tva,osa_tva
 
-        
+
     def comp_insentives(self,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,dt=100,incl_alv=False):
         '''
         Laskee marginaalit ja nettotulot
@@ -762,12 +852,13 @@ class Marginals():
     
         n_salary=int((max_salary+step_salary-min_salary)/step_salary)
         netto=np.zeros(n_salary)
+        brutto=np.zeros(n_salary)
         basenetto=np.zeros(n_salary)
         palkka=np.zeros(n_salary)
         tva=np.zeros(n_salary)
         osa_tva=np.zeros(n_salary)
         eff=np.zeros(n_salary)
-        
+
         if p is None:
             p,selite=self.get_default_parameter()
 
@@ -775,9 +866,9 @@ class Marginals():
             p2b=p.copy()
         else:
             p2b=p0.copy()
-        
+
         p3=p.copy()
-            
+    
         n0,q0=self.ben.laske_tulot_v3(p2b,include_alv=incl_alv)
         k=0
         for t in np.arange(min_salary,max_salary+step_salary,step_salary):
@@ -788,6 +879,7 @@ class Marginals():
             p3['t']=t+max(t,dt) # palkka
             n3,q3=self.ben.laske_tulot_v3(p3,include_alv=incl_alv)
             netto[k]=n1
+            brutto[k]=q1['brutto']
             palkka[k]=t
             eff[k]=(1-(n2-n1)/dt)*100
             delta_t=max(t,dt)
@@ -808,25 +900,25 @@ class Marginals():
 #                 print('tva',tva[k],':',n1,n0,t)
 
             k=k+1
-            
+    
         if p0 is not None:
-            return netto,eff,tva,osa_tva#,basenetto
+            return netto,eff,tva,osa_tva,brutto#,basenetto
         else:
-            return netto,eff,tva,osa_tva
-            
-            
+            return netto,eff,tva,osa_tva,brutto
+    
+    
     def comp_emtr(self,p0,p1,t,dt=1200,alku='',display=False):
         '''
         Computes EMTR at wage t
         '''
         p3=p1.copy()
-            
+    
         n0,q0=self.ben.laske_tulot_v3(p0,include_alv=False)
         k=0
-        
+
         t=t/12
         dt=dt/12
-        
+
         p3[alku+'t']=t # palkka nykytilassa
         n1,q1=self.ben.laske_tulot_v3(p3,include_alv=False)
         p3[alku+'t']=t+dt # palkka
@@ -842,16 +934,16 @@ class Marginals():
         else:
             tva=np.nan
             #osa_tva=0
-            
+    
         if tva<0 or display:
             print('eff',eff,'tva',tva,'netto1',n1,'netto2',n2,'palkka',t,'dt',dt)
             print('n1',n1,n1b)
             print('n2',n2,n2b)
             compare_q_print(q1,q2)
-            
+    
         #print(n0,n1,tva,t)
 
-        return netto,eff,tva#,osa_tva        
+        return netto,eff,tva#,osa_tva
 
     def comp_taxes(self,p=None,p2=None,min_salary=0,max_salary=6000,step_salary=1,dt=100,incl_alv=False):
         n_salary=int((max_salary+step_salary-min_salary)/step_salary)+1
@@ -860,7 +952,7 @@ class Marginals():
         taxes=np.zeros(n_salary)
         contributions=np.zeros(n_salary)
         eff=np.zeros(n_salary)
-        
+
         if p is None:
             p,selite=self.get_default_parameter()
 
@@ -880,28 +972,28 @@ class Marginals():
             palkka[k]=t
             eff[k]=(1-(n2-n1)/dt)*100
             taxes[k]=q1['verot']
-            
+    
             #print(f"{t:.2f},{q1['verot']:.2f},{q1['valtionvero']:.2f},{q1['kunnallisvero']:.2f}")
             #print(f"sv:{q1['ptel']:.2f},{q1['sairausvakuutusmaksu']:.2f},{q1['tyotvakmaksu']:.2f},{q1['tyel_kokomaksu']:.2f},{q1['ylevero']}")
             #print(f"vä:{q1['ansiotulovahennys']:.2f},{q1['perusvahennys']:.2f},{q1['tyotulovahennys']:.2f},{q1['tyotulovahennys_kunnallisveroon']}")
             #print(f"pe:{t:.2f},{q1['kunnallisveronperuste']:.2f},{q1['valtionveroperuste']:.2f}")
 
             k=k+1
-            
+    
         return wages,netto,eff,taxes
-        
-        
+
+
     def comp_top_marginaali(self,p=None,incl_alv=False):
     
         if p==None:
             p,selite=perheparametrit(perhetyyppi=1)
         salary=150_000/12.5
-        n,eff,_,_=self.comp_insentives(p=p,min_salary=salary,max_salary=salary+1,step_salary=1,dt=100,incl_alv=incl_alv)
+        n,eff,_,_,_=self.comp_insentives(p=p,min_salary=salary,max_salary=salary+1,step_salary=1,dt=100,incl_alv=incl_alv)
         #print(n,eff)
-        
+
         return eff[0]
 
-        
+
     def laske_marginaalit(self,q1,q2,dt,incl_perustulo=False):
         '''
         Apurutiini
@@ -911,7 +1003,7 @@ class Marginals():
             dt=np.nan
 
         # lasketaan marginaalit
-        marg={}        
+        marg={}
         marg['asumistuki']=(-q2['asumistuki']+q1['asumistuki'])*100/dt
         marg['kotihoidontuki']=(-q2['kotihoidontuki_netto']+q1['kotihoidontuki_netto'])*100/dt
         marg['ansiopvraha']=(+q1['ansiopvraha_netto']-q2['ansiopvraha_netto'])*100/dt # verot mukana
@@ -947,45 +1039,34 @@ class Marginals():
         tulot['kateen1']=q1['netto']
         tulot['kateen2']=q2['netto']
         tulot['tulotnetto']=q1['netto']
-            
+        tulot['brutto1']=q1['brutto']
+        tulot['brutto2']=q2['brutto']
+    
         marg['marginaaliveroprosentti']=100-(tulot['kateen2']-tulot['kateen1'])*100/dt 
     
         return tulot,marg
-        
+
     def laske_ja_selita(self,p=None,p0=None,min_salary=0,max_salary=3000,step_salary=1500,
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,incl_alv=False,
             figname=None,grayscale=None,source='Lähde: EK',header=True):
-            
+    
         head_text=tee_selite(p,short=False)
 
-        if p0 is None:
-            netto,eff,tva,osa_tva=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,incl_alv=incl_alv,
-                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
-                
-            tyottomana_base=basenetto[0]
-            tyottomana_vaihtoehto=netto[0]
-            tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
-            tyossa_base=basenetto[2]
-            tyossa_vaihtoehto=netto[2]
-            tyossa_ero=tyossa_vaihtoehto-tyossa_base
-            osatyossa_base=basenetto[1]
-            osatyossa_vaihtoehto=netto[1]
-            osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
-        else:
-            netto,eff,tva,osa_tva,basenetto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,incl_alv=incl_alv,
-                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
-            tyottomana_base=basenetto[0]
-            tyottomana_vaihtoehto=netto[0]
-            tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
-            tyossa_base=basenetto[2]
-            tyossa_vaihtoehto=netto[2]
-            tyossa_ero=tyossa_vaihtoehto-tyossa_base
-            osatyossa_base=basenetto[1]
-            osatyossa_vaihtoehto=netto[1]
-            osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
-        
+        netto,eff,tva,osa_tva,brutto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,incl_alv=incl_alv,
+                                                max_salary=max_salary,step_salary=step_salary,dt=dt)
+    
+        tyottomana_base=basenetto[0]
+        tyottomana_vaihtoehto=netto[0]
+        tyottomana_ero=tyottomana_vaihtoehto-tyottomana_base
+        tyossa_base=basenetto[2]
+        tyossa_vaihtoehto=netto[2]
+        tyossa_ero=tyossa_vaihtoehto-tyossa_base
+        osatyossa_base=basenetto[1]
+        osatyossa_vaihtoehto=netto[1]
+        osatyossa_ero=osatyossa_vaihtoehto-osatyossa_base
+
 
         if header:
             print(head_text)
@@ -996,10 +1077,9 @@ class Marginals():
             print('Alv mukana')
         else:
             print('Alv ei mukana')
-        
-        return netto,eff,tva,osa_tva        
-        
-        
+
+        return netto,eff,tva,osa_tva
+
     def comp_all_margs(self,p,p0=None,incl_alv=False,min_salary=0,max_salary=6_000,dt=100):
         '''
         Jaottelee marginaalit ja tulot eriin
@@ -1018,8 +1098,18 @@ class Marginals():
         elake=np.zeros(max_salary+1)    
         elatustuki=np.zeros(max_salary+1)
         perustulo=np.zeros(max_salary+1)
-        opintotuki=np.zeros(max_salary+1)        
+        opintotuki=np.zeros(max_salary+1)
         kotihoidontuki=np.zeros(max_salary+1)    
+        asumistuki_brutto=np.zeros(max_salary+1)
+        toimeentulotuki_brutto=np.zeros(max_salary+1)
+        ansiopvraha_brutto=np.zeros(max_salary+1)
+        bruttotulot=np.zeros(max_salary+1)
+        lapsilisa_brutto=np.zeros(max_salary+1)
+        elake_brutto=np.zeros(max_salary+1)    
+        elatustuki_brutto=np.zeros(max_salary+1)
+        perustulo_brutto=np.zeros(max_salary+1)
+        opintotuki_brutto=np.zeros(max_salary+1)
+        kotihoidontuki_brutto=np.zeros(max_salary+1)    
         effmarg=np.zeros(max_salary+1)
         margasumistuki=np.zeros(max_salary+1)
         margtoimeentulotuki=np.zeros(max_salary+1)
@@ -1027,8 +1117,8 @@ class Marginals():
         margverot=np.zeros(max_salary+1)    
         margalv=np.zeros(max_salary+1)    
         margelake=np.zeros(max_salary+1)    
-        margpvhoito=np.zeros(max_salary+1)        
-        margyht=np.zeros(max_salary+1)        
+        margpvhoito=np.zeros(max_salary+1)
+        margyht=np.zeros(max_salary+1)
         margperustulo=np.zeros(max_salary+1)    
         margopintotuki=np.zeros(max_salary+1)    
         margkotihoidontuki=np.zeros(max_salary+1)    
@@ -1037,26 +1127,26 @@ class Marginals():
         tva_kotihoidontuki=np.zeros(max_salary+1)    
         tva_toimeentulotuki=np.zeros(max_salary+1)
         tva_ansiopvraha=np.zeros(max_salary+1)
-        tva_verot=np.zeros(max_salary+1)        
+        tva_verot=np.zeros(max_salary+1)
         tva_alv=np.zeros(max_salary+1)    
-        tva_elake=np.zeros(max_salary+1)        
-        tva_pvhoito=np.zeros(max_salary+1)        
-        tva_perustulo=np.zeros(max_salary+1)        
-        tva_opintotuki=np.zeros(max_salary+1)        
-        tva_yht=np.zeros(max_salary+1)        
+        tva_elake=np.zeros(max_salary+1)
+        tva_pvhoito=np.zeros(max_salary+1)
+        tva_perustulo=np.zeros(max_salary+1)
+        tva_opintotuki=np.zeros(max_salary+1)
+        tva_yht=np.zeros(max_salary+1)
         osatva=np.zeros(max_salary+1)
         osatva_asumistuki=np.zeros(max_salary+1)
         osatva_kotihoidontuki=np.zeros(max_salary+1)    
         osatva_toimeentulotuki=np.zeros(max_salary+1)
         osatva_ansiopvraha=np.zeros(max_salary+1)
-        osatva_verot=np.zeros(max_salary+1)        
+        osatva_verot=np.zeros(max_salary+1)
         osatva_alv=np.zeros(max_salary+1)    
-        osatva_elake=np.zeros(max_salary+1)        
-        osatva_pvhoito=np.zeros(max_salary+1)        
-        osatva_perustulo=np.zeros(max_salary+1)        
-        osatva_opintotuki=np.zeros(max_salary+1)        
-        osatva_yht=np.zeros(max_salary+1)        
-        
+        osatva_elake=np.zeros(max_salary+1)
+        osatva_pvhoito=np.zeros(max_salary+1)
+        osatva_perustulo=np.zeros(max_salary+1)
+        osatva_opintotuki=np.zeros(max_salary+1)
+        osatva_yht=np.zeros(max_salary+1)
+
         if p0 is None:
             p_finale=p.copy()
             p_initial=p.copy()
@@ -1064,7 +1154,7 @@ class Marginals():
             p_finale=p.copy()
             p_initial=p0.copy()
             plot_eff=False  
-        
+
         p_initial['t']=0 # palkka
         n0,q0=self.ben.laske_tulot_v3(p_initial,include_alv=incl_alv)
         for t in range(0,max_salary+1):
@@ -1075,7 +1165,7 @@ class Marginals():
             deltat=max(t,dt)
             p_finale['t']=t+deltat # palkka
             n3,q3=self.ben.laske_tulot_v3(p_finale,include_alv=incl_alv)
-            
+    
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
             _,tvat=self.laske_marginaalit(q0,q1,t)
             _,osatvat=self.laske_marginaalit(q1,q3,deltat)
@@ -1084,7 +1174,7 @@ class Marginals():
             effmarg[t]=marg['marginaaliveroprosentti']
             margyht[t]=marg['marginaali']
             margalv[t]=marg['alv']
-                
+        
             margasumistuki[t]=marg['asumistuki']
             margtoimeentulotuki[t]=marg['toimeentulotuki']
             margverot[t]=marg['verot']
@@ -1094,7 +1184,7 @@ class Marginals():
             margperustulo[t]=marg['perustulo']
             margkotihoidontuki[t]=marg['kotihoidontuki']
             margopintotuki[t]=marg['opintotuki']
-            
+    
             elake[t]=q1['kokoelake_nettonetto']
             asumistuki[t]=q1['asumistuki_nettonetto']
             toimeentulotuki[t]=q1['toimeentulotuki']
@@ -1103,14 +1193,25 @@ class Marginals():
             lapsilisa[t]=q1['lapsilisa_nettonetto']
             perustulo[t]=q1['perustulo_nettonetto']
             elatustuki[t]=q1['elatustuki_nettonetto']
-            nettotulot[t]=tulot['tulotnetto']
+            nettotulot[t]=tulot['kateen1']
             nettopalkka[t]=q1['palkkatulot_nettonetto']
             kotihoidontuki[t]=q1['kotihoidontuki_nettonetto']
-            
+
+            elake_brutto[t]=q1['kokoelake']
+            asumistuki_brutto[t]=q1['asumistuki']
+            toimeentulotuki_brutto[t]=q1['toimeentulotuki']
+            opintotuki_brutto[t]=q1['opintotuki']
+            ansiopvraha_brutto[t]=q1['ansiopvraha']
+            lapsilisa_brutto[t]=q1['lapsilisa']
+            perustulo_brutto[t]=q1['perustulo']
+            elatustuki_brutto[t]=q1['elatustuki']
+            bruttotulot[t]=tulot['brutto1']
+            kotihoidontuki_brutto[t]=q1['kotihoidontuki']
+    
             tva[t]=tvat['marginaaliveroprosentti']
             tva_yht[t]=tvat['marginaali']
             tva_alv[t]=tvat['alv']
-                
+        
             tva_asumistuki[t]=tvat['asumistuki']
             tva_kotihoidontuki[t]=tvat['kotihoidontuki']
             tva_toimeentulotuki[t]=tvat['toimeentulotuki']
@@ -1120,11 +1221,11 @@ class Marginals():
             tva_ansiopvraha[t]=tvat['ansiopvraha']
             tva_opintotuki[t]=tvat['opintotuki']
             tva_pvhoito[t]=tvat['pvhoito']
-            
+    
             osatva[t]=osatvat['marginaaliveroprosentti']
             osatva_yht[t]=osatvat['marginaali']
             osatva_alv[t]=osatvat['alv']
-                
+        
             osatva_asumistuki[t]=osatvat['asumistuki']
             osatva_kotihoidontuki[t]=osatvat['kotihoidontuki']
             osatva_toimeentulotuki[t]=osatvat['toimeentulotuki']
@@ -1134,11 +1235,13 @@ class Marginals():
             osatva_ansiopvraha[t]=osatvat['ansiopvraha']
             osatva_opintotuki[t]=osatvat['opintotuki']
             osatva_pvhoito[t]=osatvat['pvhoito']
-                    
+            
         return netto,palkka,nettopalkka,tva,osatva,effmarg,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,\
             elake,elatustuki,perustulo,opintotuki,kotihoidontuki,margasumistuki,margtoimeentulotuki,\
             margansiopvraha,margverot,margalv,margelake,margpvhoito,margyht,margperustulo,margopintotuki,\
             margkotihoidontuki,tva,tva_asumistuki,tva_kotihoidontuki,tva_toimeentulotuki,tva_ansiopvraha,tva_verot,\
             tva_alv,tva_elake,tva_pvhoito,tva_perustulo,tva_opintotuki,tva_yht,osatva,osatva_asumistuki,\
             osatva_kotihoidontuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_verot,osatva_alv,osatva_elake,\
-            osatva_pvhoito,osatva_perustulo,osatva_opintotuki,osatva_yht
+            osatva_pvhoito,osatva_perustulo,osatva_opintotuki,osatva_yht,\
+            elake_brutto,asumistuki_brutto,toimeentulotuki_brutto,opintotuki_brutto,ansiopvraha_brutto,\
+            lapsilisa_brutto,perustulo_brutto,elatustuki_brutto,bruttotulot,kotihoidontuki_brutto
