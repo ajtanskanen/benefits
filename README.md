@@ -6,23 +6,22 @@ The aim is to enable analysis of any social security scheme easily.
 For example, the module enables computation of net income at various levels given the current state of a person-
 
 <p>
-<img src='kuvat/verkkoon_gs__netto.png'>
+<img src='kuvat/verkkoon_netto.png'><br>
 Figure 1. Net income as a function of wage taking into account social security benefits and taxation.
 
 Incentive to work more is often considered via the effective tax rate.
 
 <p>
-<img src='kuvat/verkkoon_gs__eff.png'>
+<img src='kuvat/verkkoon_eff.png'><br>
 Figure 2. Effective marginal tax rate as a function of wage taking into account social security benefits and taxation.
 
 Incentive to work at all is often considered via the participation tax rate.
 
 <p>
-<img src='kuvat/verkkoon_gs__ptr.png'>
-Figure 2. Effective marginal tax rate as a function of wage taking into account social security benefits and taxation.
+<img src='kuvat/verkkoon_ptr.png'><br>
+Figure 3. Participation marginal tax rate as a function of wage taking into account social security benefits and taxation.
 
-
-Further, the code is implemented in a modular way to enable embedding in a more comprehensive model, such as a life cycle model.
+Further, the code is implemented in a modular way to enable embedding in a more complex model, such as <a href='https://github.com/ajtanskanen/lifecycle-rl'>a life cycle model</a>.
 
 Social security reform
 ----

@@ -116,8 +116,14 @@ class Benefits():
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=412.68    
         yksinasuva=485.50
+        # Helsinki: 694 869 993 1089
+        # Kangasala: 492 621 747 793 99
+        # Heinola: 398 557 675 746 96
+        # Kihniö: 352 463 568 617 96
+        max_asumismenot=np.array([[694, 492, 398, 352],[869, 621, 557, 463],[993, 747, 675, 568],[1089, 793, 746, 617]])
+        max_lisa=np.array([122, 99, 96, 96])
         
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa
     
     def toimeentulotuki_param2019(self):
         min_etuoikeutettuosa=150
@@ -128,7 +134,14 @@ class Benefits():
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=422.70    
         yksinasuva=497.29
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        # Helsinki: 694 869 993 1089
+        # Kangasala: 492 621 747 793 99
+        # Heinola: 398 557 675 746 96
+        # Kihniö: 352 463 568 617 96
+        max_asumismenot=np.array([[694, 492, 398, 352],[869, 621, 557, 463],[993, 747, 675, 568],[1089, 793, 746, 617]])
+        max_lisa=np.array([122, 99, 96, 96])
+        
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa
 
     def toimeentulotuki_param2020(self):
         min_etuoikeutettuosa=150
@@ -139,7 +152,14 @@ class Benefits():
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=412.68    
         yksinasuva=502.21
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        # Helsinki: 694 869 993 1089
+        # Kangasala: 492 621 747 793 99
+        # Heinola: 398 557 675 746 96
+        # Kihniö: 352 463 568 617 96
+        max_asumismenot=np.array([[694, 492, 398, 352],[869, 621, 557, 463],[993, 747, 675, 568],[1089, 793, 746, 617]])
+        max_lisa=np.array([122, 99, 96, 96])
+        
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa
         
     def toimeentulotuki_param2021(self):
         min_etuoikeutettuosa=150
@@ -150,7 +170,14 @@ class Benefits():
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=428.45
         yksinasuva=504.16
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        # Helsinki: 694 869 993 1089
+        # Kangasala: 492 621 747 793 99
+        # Heinola: 398 557 675 746 96
+        # Kihniö: 352 463 568 617 96
+        max_asumismenot=np.array([[694, 492, 398, 352],[869, 621, 557, 463],[993, 747, 675, 568],[1089, 793, 746, 617]])
+        max_lisa=np.array([122, 99, 96, 96])
+        
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa
         
     def toimeentulotuki_param2022(self):
         min_etuoikeutettuosa=150
@@ -161,7 +188,14 @@ class Benefits():
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=437.60
         yksinasuva=514.82
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        # Helsinki: 694 869 993 1089
+        # Kangasala: 492 621 747 793 99
+        # Heinola: 398 557 675 746 96
+        # Kihniö: 352 463 568 617 96
+        max_asumismenot=np.array([[694, 492, 398, 352],[869, 621, 557, 463],[993, 747, 675, 568],[1089, 793, 746, 617]])
+        max_lisa=np.array([122, 99, 96, 96])
+        
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa
 
     def toimeentulotuki_param2023(self):
         '''
@@ -175,7 +209,7 @@ class Benefits():
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=437.60*1.052
         yksinasuva=514.82*1.052
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva
+        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa
         
     def setup_tmtuki_param(self,vuosi : int):
         if vuosi==2018:
@@ -217,11 +251,13 @@ class Benefits():
     def toimeentulotuki(self,omabruttopalkka : float,omapalkkavero : float,puolison_bruttopalkka : float,puolison_palkkavero : float,
                              muuttulot : float,verot : float,asumismenot : float,muutmenot : float,p : dict,omavastuuprosentti=0.0,alennus=0):
 
+        min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_asumislisa=self.toimeentulotuki_param()
+        max_asumismeno=max_asumismenot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_asumislisa[p['kuntaryhma']]
+
+        asumismenot = min(asumismenot,max_asumismeno)
         omavastuu=omavastuuprosentti*asumismenot
         menot=max(0,asumismenot-omavastuu)+muutmenot
         
-        min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva=self.toimeentulotuki_param()
-
         #menot=asumismenot+muutmenot    
         bruttopalkka=omabruttopalkka+puolison_bruttopalkka    
         palkkavero=omapalkkavero+puolison_palkkavero    
@@ -660,7 +696,7 @@ class Benefits():
         ttulopros=np.array([0.13,0.0121,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
         
-    def laske_tyotulovahennys2018(self,puhdas_ansiotulo,palkkatulot_puhdas,ika):
+    def laske_tyotulovahennys2018_2022(self,puhdas_ansiotulo,palkkatulot_puhdas,ika):
         '''
         Vuosille 2018-2022
         '''
@@ -1456,7 +1492,7 @@ class Benefits():
         
         return elatustuki
 
-    def laske_valtionvero2018(self,tulot,p):
+    def laske_valtionvero2018_2022(self,tulot,p):
         '''
         Vanha valtionvero vuosille 2018-2022
         '''
@@ -1475,7 +1511,7 @@ class Benefits():
         
         return vero
 
-    def laske_valtionvero2023(self,tulot,p):
+    def laske_valtionvero2023_2024(self,tulot,p):
         '''
         Sote-alueiden vuoksi kunnallisveroa siirrettiin valtionveroon. Rakennemuutos
         '''
@@ -2843,7 +2879,6 @@ class Benefits():
     
         return tuki
 
-        
     def asumistuki2020(self,palkkatulot,muuttulot,vuokra,p):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
@@ -4030,6 +4065,10 @@ class Benefits():
             minimi=29.67*25
             taite1=39_144/12  
             taite2=60_225/12
+        elif self.year==2024:
+            minimi=29.67*25
+            taite1=39_144/12  
+            taite2=60_225/12
         else:
             print('isyysraha: unknown year',year)  
 
@@ -4038,6 +4077,22 @@ class Benefits():
 
         return raha
         
+    def aitiysraha2018(self,vakiintunutpalkka : float,kesto : float):
+        if kesto<56/260:
+            minimi=27.86*25
+            taite1=37_861/12  
+            taite2=58_252/12 
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
+        else: 
+            minimi=27.86*25
+            taite1=37_861/12  
+            taite2=58_252/12 
+            vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
+            raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
+
+        return raha
+                
     def aitiysraha2019(self,vakiintunutpalkka : float,kesto : float):
         if kesto<56/260:
             minimi=27.86*25
@@ -4188,10 +4243,10 @@ class Benefits():
             self.veroparam=self.veroparam2019          
             self.valtionvero_asteikko=self.valtionvero_asteikko_2019
             self.raippavero=self.raippavero2019
-            self.laske_valtionvero=self.laske_valtionvero2018
+            self.laske_valtionvero=self.laske_valtionvero2018_2022
             self.laske_ylevero=self.laske_ylevero2019
             self.elaketulovahennys=self.elaketulovahennys2019
-            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018
+            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018_2022
             self.tyotulovahennys=self.tyotulovahennys2019
             self.ansiotulovahennys=self.ansiotulovahennys2019
             self.perusvahennys=self.perusvahennys2019
@@ -4210,10 +4265,10 @@ class Benefits():
             self.peruspaivaraha=self.peruspaivaraha2020
             self.valtionvero_asteikko=self.valtionvero_asteikko_2020
             self.raippavero=self.raippavero2020
-            self.laske_valtionvero=self.laske_valtionvero2018
+            self.laske_valtionvero=self.laske_valtionvero2018_2022
             self.laske_ylevero=self.laske_ylevero2020
             self.elaketulovahennys=self.elaketulovahennys2020
-            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018
+            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018_2022
             self.tyotulovahennys=self.tyotulovahennys2020
             self.perusvahennys=self.perusvahennys2020
             self.ansiotulovahennys=self.ansiotulovahennys2020
@@ -4233,10 +4288,10 @@ class Benefits():
             self.peruspaivaraha=self.peruspaivaraha2021
             self.valtionvero_asteikko=self.valtionvero_asteikko_2021
             self.raippavero=self.raippavero2021
-            self.laske_valtionvero=self.laske_valtionvero2018
+            self.laske_valtionvero=self.laske_valtionvero2018_2022
             self.laske_ylevero=self.laske_ylevero2021
             self.elaketulovahennys=self.elaketulovahennys2021
-            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018
+            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018_2022
             self.tyotulovahennys=self.tyotulovahennys2021
             self.perusvahennys=self.perusvahennys2021
             self.ansiotulovahennys=self.ansiotulovahennys2021
@@ -4255,11 +4310,11 @@ class Benefits():
             self.isyysraha=self.isyysraha_perus
             self.peruspaivaraha=self.peruspaivaraha2022
             self.valtionvero_asteikko=self.valtionvero_asteikko_2022
-            self.laske_valtionvero=self.laske_valtionvero2018
+            self.laske_valtionvero=self.laske_valtionvero2018_2022
             self.raippavero=self.raippavero2022
             self.laske_ylevero=self.laske_ylevero2022
             self.elaketulovahennys=self.elaketulovahennys2022
-            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018
+            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018_2022
             self.tyotulovahennys=self.tyotulovahennys2022
             self.perusvahennys=self.perusvahennys2022
             self.ansiotulovahennys=self.ansiotulovahennys2022
@@ -4272,65 +4327,64 @@ class Benefits():
             self.sairauspaivaraha=self.sairauspaivaraha2022
             self.toimeentulotuki_param=self.toimeentulotuki_param2022
         elif vuosi==2023:
-            if debug:
-                self.laske_kansanelake=self.laske_kansanelake2022
-                self.laske_takuuelake=self.laske_takuuelake2022
-                self.aitiysraha=self.aitiysraha2022
-                self.isyysraha=self.isyysraha_perus
-                self.peruspaivaraha=self.peruspaivaraha2022
-                self.valtionvero_asteikko=self.valtionvero_asteikko_2023
-                self.raippavero=self.raippavero2023
-                self.laske_valtionvero=self.laske_valtionvero2023
-                self.laske_ylevero=self.laske_ylevero2023
-                self.elaketulovahennys=self.elaketulovahennys2023
-                self.tyotulovahennys=self.tyotulovahennys2022
-                self.laske_tyotulovahennys=self.laske_tyotulovahennys2018
-                self.perusvahennys=self.perusvahennys2023
-                self.ansiotulovahennys=self.ansiotulovahennys2023
-                self.veroparam=self.veroparam2023
-                self.lapsilisa=self.lapsilisa2022
-                self.asumistuki=self.asumistuki2022
-                self.elakkeensaajan_asumistuki=self.elakkeensaajan_asumistuki_2022
-                self.kotihoidontuki=self.kotihoidontuki2022
-                self.paivahoitomenot=self.paivahoitomenot2022
-                self.sairauspaivaraha=self.sairauspaivaraha2022
-                self.toimeentulotuki_param=self.toimeentulotuki_param2022
-            else:
-                self.laske_kansanelake=self.laske_kansanelake2023
-                self.laske_takuuelake=self.laske_takuuelake2023
-                self.aitiysraha=self.aitiysraha2023
-                self.isyysraha=self.isyysraha_perus
-                self.peruspaivaraha=self.peruspaivaraha2023
-                self.valtionvero_asteikko=self.valtionvero_asteikko_2023
-                self.raippavero=self.raippavero2023
-                self.laske_valtionvero=self.laske_valtionvero2023
-                self.laske_ylevero=self.laske_ylevero2023
-                self.elaketulovahennys=self.elaketulovahennys2023
-                self.tyotulovahennys=self.tyotulovahennys2023
-                self.laske_tyotulovahennys=self.laske_tyotulovahennys2023
-                self.perusvahennys=self.perusvahennys2023
-                self.ansiotulovahennys=self.ansiotulovahennys2023
-                self.veroparam=self.veroparam2023
-                self.lapsilisa=self.lapsilisa2023
-                self.asumistuki=self.asumistuki2023
-                self.elakkeensaajan_asumistuki=self.elakkeensaajan_asumistuki_2023
-                self.kotihoidontuki=self.kotihoidontuki2023
-                self.paivahoitomenot=self.paivahoitomenot2023
-                self.sairauspaivaraha=self.sairauspaivaraha2023
-                self.toimeentulotuki_param=self.toimeentulotuki_param2023            
+            self.laske_kansanelake=self.laske_kansanelake2023
+            self.laske_takuuelake=self.laske_takuuelake2023
+            self.aitiysraha=self.aitiysraha2023
+            self.isyysraha=self.isyysraha_perus
+            self.peruspaivaraha=self.peruspaivaraha2023
+            self.valtionvero_asteikko=self.valtionvero_asteikko_2023
+            self.raippavero=self.raippavero2023
+            self.laske_valtionvero=self.laske_valtionvero2023_2024
+            self.laske_ylevero=self.laske_ylevero2023
+            self.elaketulovahennys=self.elaketulovahennys2023
+            self.tyotulovahennys=self.tyotulovahennys2023
+            self.laske_tyotulovahennys=self.laske_tyotulovahennys2023
+            self.perusvahennys=self.perusvahennys2023
+            self.ansiotulovahennys=self.ansiotulovahennys2023
+            self.veroparam=self.veroparam2023
+            self.lapsilisa=self.lapsilisa2023
+            self.asumistuki=self.asumistuki2023
+            self.elakkeensaajan_asumistuki=self.elakkeensaajan_asumistuki_2023
+            self.kotihoidontuki=self.kotihoidontuki2023
+            self.paivahoitomenot=self.paivahoitomenot2023
+            self.sairauspaivaraha=self.sairauspaivaraha2023
+            self.toimeentulotuki_param=self.toimeentulotuki_param2023            
+        elif vuosi==2024:
+            self.laske_kansanelake=self.laske_kansanelake2024
+            self.laske_takuuelake=self.laske_takuuelake2024
+            self.aitiysraha=self.aitiysraha2024
+            self.isyysraha=self.isyysraha_perus
+            self.peruspaivaraha=self.peruspaivaraha2024
+            self.valtionvero_asteikko=self.valtionvero_asteikko_2024
+            self.raippavero=self.raippavero2024
+            self.laske_valtionvero=self.laske_valtionvero2023_2024
+            self.laske_ylevero=self.laske_ylevero2024
+            self.elaketulovahennys=self.elaketulovahennys2024
+            self.tyotulovahennys=self.tyotulovahennys2024
+            self.laske_tyotulovahennys=self.laske_tyotulovahennys2023
+            self.perusvahennys=self.perusvahennys2024
+            self.ansiotulovahennys=self.ansiotulovahennys2024
+            self.veroparam=self.veroparam2024
+            self.lapsilisa=self.lapsilisa2024
+            self.asumistuki=self.asumistuki2024
+            self.elakkeensaajan_asumistuki=self.elakkeensaajan_asumistuki_2024
+            self.kotihoidontuki=self.kotihoidontuki2024
+            self.paivahoitomenot=self.paivahoitomenot2024
+            self.sairauspaivaraha=self.sairauspaivaraha2024
+            self.toimeentulotuki_param=self.toimeentulotuki_param2024            
         elif vuosi==2018:
             self.laske_kansanelake=self.laske_kansanelake2018
             self.laske_takuuelake=self.laske_takuuelake2018
-            self.aitiysraha=self.aitiysraha2019
+            self.aitiysraha=self.aitiysraha2018
             self.isyysraha=self.isyysraha_perus
             self.peruspaivaraha=self.peruspaivaraha2018
             self.veroparam=self.veroparam2018            
             self.elaketulovahennys=self.elaketulovahennys2018
-            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018
+            self.laske_tyotulovahennys=self.laske_tyotulovahennys2018_2022
             self.tyotulovahennys=self.tyotulovahennys2018
             self.perusvahennys=self.perusvahennys2018
             self.ansiotulovahennys=self.ansiotulovahennys2018
-            self.laske_valtionvero=self.laske_valtionvero2018
+            self.laske_valtionvero=self.laske_valtionvero2018_2022
             self.valtionvero_asteikko=self.valtionvero_asteikko_2018
             self.raippavero=self.raippavero2018
             self.laske_ylevero=self.laske_ylevero2018
