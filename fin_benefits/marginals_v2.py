@@ -14,6 +14,7 @@ from .ben_utils import get_palette_EK,get_style_EK, compare_q_print, print_q
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.font_manager as font_manager
+import pandas as pd
 import math
 from celluloid import Camera
 from tqdm import tqdm_notebook as tqdm
@@ -95,7 +96,7 @@ class Marginals():
     def plot_tva_marg(self,tva,palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_ansiopvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_perustulo,tva_alv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,
                 csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True,
-                extraheader=False):
+                extraheader=None):
         if ax is None:
             figi,axs = plt.subplots()
         else:
@@ -138,7 +139,7 @@ class Marginals():
     def plot_eff_marg(self,eff,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,show_xlabel=True,show_ylabel=True,
                 csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True,baseline_eff=None,
-                extraheader=False):
+                extraheader=None):
         if ax is None:
             figi,axs = plt.subplots()
         else:
@@ -182,7 +183,7 @@ class Marginals():
     def plot_osatva_marg(self,osatva,palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,osatva_alv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,
                 csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True,
-                extraheader=False):
+                extraheader=None):
         if ax is None:
             figi,axs = plt.subplots()
         else:
@@ -193,7 +194,7 @@ class Marginals():
 
         axs.plot(osatva,'k',lw=3)
         axs.set_xlabel(self.labels['parttimewage'],**csfont)
-        axs.set_ylabel('Eff. rajaveroaste osa-aikatyöstä kokoaikatyöhön (%)',**csfont)
+        axs.set_ylabel('Ef. rajaveroaste osa-aikatyöstä kokoaikatyöhön (%)',**csfont)
         plt.yticks(**csfont)
         plt.xticks(**csfont)
         axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
@@ -221,7 +222,7 @@ class Marginals():
     def plot_netto_income(self,netto,palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
             ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=True,
             csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True,
-            extraheader=False):
+            extraheader=None):
     
         if ax is None:
             figi,axs = plt.subplots()
@@ -429,6 +430,53 @@ class Marginals():
                     incl_perustulo=incl_perustulo,incl_elake=True,ax=axs,incl_alv=incl_alv,show=show,
                     plot_osatva=False,header=header,source=source,palette=None,palette_EK=palette_EK,square=False)
                     
+    def verotaulukko(self,p=None,p0=None,min_salary=0,max_salary=100_000,step=1_000,
+                dt=100,plottaa=True,header=True,source='Lähde: EK',head_text=None,
+                incl_alv=False,include_tuet=False):
+
+        tulos=pd.DataFrame(columns={'kokonaistulo, e/v','palkka, e/kk','vero [%]','marginaali','netto','brutto','tva'})
+
+        if p is None:
+            p,selite=self.get_default_parameter()
+    
+        if header:
+            if head_text is None:
+                head_text=tee_selite(p,p0=p0,short=False)
+        else:
+            head_text=None
+
+        if not include_tuet:
+            p['asumismenot_asumistuki']=0
+            p['asumismenot_toimeentulotuki']=0
+            p['ei_toimeentulotukea']=1
+
+        kerroin=12
+
+        netto,palkka,nettopalkka,tva,osatva,effmarg,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,\
+        elake,elatustuki,perustulo,opintotuki,kotihoidontuki,margasumistuki,margtoimeentulotuki,\
+        margansiopvraha,margverot,margalv,margelake,margpvhoito,margyht,margperustulo,margopintotuki,\
+        margkotihoidontuki,tva,tva_asumistuki,tva_kotihoidontuki,tva_toimeentulotuki,tva_ansiopvraha,tva_verot,\
+        tva_alv,tva_elake,tva_pvhoito,tva_perustulo,tva_opintotuki,tva_yht,osatva,osatva_asumistuki,\
+        osatva_kotihoidontuki,osatva_toimeentulotuki,osatva_ansiopvraha,osatva_verot,osatva_alv,osatva_elake,\
+        osatva_pvhoito,osatva_perustulo,osatva_opintotuki,osatva_yht,\
+        elake_brutto,asumistuki_brutto,toimeentulotuki_brutto,opintotuki_brutto,ansiopvraha_brutto,\
+        lapsilisa_brutto,perustulo_brutto,elatustuki_brutto,bruttotulot,kotihoidontuki_brutto\
+            =self.comp_all_margs(p,p0=p0,incl_alv=incl_alv,min_salary=min_salary/kerroin,max_salary=max_salary/kerroin,step=1000/kerroin,dt=dt)       
+
+        for k,p in enumerate(palkka):
+            tulos.loc[k,'kokonaistulo, e/v']=p*kerroin
+            tulos.loc[k,'palkka, e/kk']=p
+            tulos.loc[k,'netto']=netto[k]*kerroin
+            tulos.loc[k,'brutto']=bruttotulot[k]*kerroin
+            tulos.loc[k,'vero [%]']=(bruttotulot[k]-netto[k])/bruttotulot[k]*100
+            tulos.loc[k,'tva']=tva[k]
+            tulos.loc[k,'marginaali']=effmarg[k]
+
+        pd.options.display.max_rows = 1000
+        pd.set_option("display.precision", 2)
+        display(tulos)
+
+
     def laske_ja_plottaa_marginaalit(self,p=None,p0=None,min_salary=0,max_salary=8000,
                 basenetto=None,baseeff=None,basetva=None,basebrutto=None,dt=100,plottaa=True,
                 otsikko="Vaihtoehto",otsikkobase="Perustapaus",legend=True,ret=False,
@@ -475,7 +523,7 @@ class Marginals():
             elake_brutto,asumistuki_brutto,toimeentulotuki_brutto,opintotuki_brutto,ansiopvraha_brutto,\
             lapsilisa_brutto,perustulo_brutto,elatustuki_brutto,bruttotulot,kotihoidontuki_brutto\
             =self.comp_all_margs(p,p0=p0,incl_alv=incl_alv,min_salary=min_salary,max_salary=max_salary,dt=dt)
-        
+
         if plot_netto and plottaa:
             # ALV:ia ei plotata nettotuloissa
             self.plot_netto_income(netto,palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
@@ -1196,72 +1244,74 @@ class Marginals():
 
         return netto,eff,tva,osa_tva
 
-    def comp_all_margs(self,p,p0=None,incl_alv=False,min_salary=0,max_salary=6_000,dt=100):
+    def comp_all_margs(self,p,p0=None,incl_alv=False,min_salary=0,max_salary=6_000,dt=100,step=1):
         '''
         Jaottelee marginaalit ja tulot eriin
         '''
-        netto=np.zeros(max_salary+1)
-        palkka=np.zeros(max_salary+1)
-        nettopalkka=np.zeros(max_salary+1)
-        tva=np.zeros(max_salary+1)
-        osatva=np.zeros(max_salary+1)
-        eff=np.zeros(max_salary+1)
-        asumistuki=np.zeros(max_salary+1)
-        toimeentulotuki=np.zeros(max_salary+1)
-        ansiopvraha=np.zeros(max_salary+1)
-        nettotulot=np.zeros(max_salary+1)
-        lapsilisa=np.zeros(max_salary+1)
-        elake=np.zeros(max_salary+1)    
-        elatustuki=np.zeros(max_salary+1)
-        perustulo=np.zeros(max_salary+1)
-        opintotuki=np.zeros(max_salary+1)
-        kotihoidontuki=np.zeros(max_salary+1)    
-        asumistuki_brutto=np.zeros(max_salary+1)
-        toimeentulotuki_brutto=np.zeros(max_salary+1)
-        ansiopvraha_brutto=np.zeros(max_salary+1)
-        bruttotulot=np.zeros(max_salary+1)
-        lapsilisa_brutto=np.zeros(max_salary+1)
-        elake_brutto=np.zeros(max_salary+1)    
-        elatustuki_brutto=np.zeros(max_salary+1)
-        perustulo_brutto=np.zeros(max_salary+1)
-        opintotuki_brutto=np.zeros(max_salary+1)
-        kotihoidontuki_brutto=np.zeros(max_salary+1)    
-        effmarg=np.zeros(max_salary+1)
-        margasumistuki=np.zeros(max_salary+1)
-        margtoimeentulotuki=np.zeros(max_salary+1)
-        margansiopvraha=np.zeros(max_salary+1)
-        margverot=np.zeros(max_salary+1)    
-        margalv=np.zeros(max_salary+1)    
-        margelake=np.zeros(max_salary+1)    
-        margpvhoito=np.zeros(max_salary+1)
-        margyht=np.zeros(max_salary+1)
-        margperustulo=np.zeros(max_salary+1)    
-        margopintotuki=np.zeros(max_salary+1)    
-        margkotihoidontuki=np.zeros(max_salary+1)    
-        tva=np.zeros(max_salary+1)
-        tva_asumistuki=np.zeros(max_salary+1)
-        tva_kotihoidontuki=np.zeros(max_salary+1)    
-        tva_toimeentulotuki=np.zeros(max_salary+1)
-        tva_ansiopvraha=np.zeros(max_salary+1)
-        tva_verot=np.zeros(max_salary+1)
-        tva_alv=np.zeros(max_salary+1)    
-        tva_elake=np.zeros(max_salary+1)
-        tva_pvhoito=np.zeros(max_salary+1)
-        tva_perustulo=np.zeros(max_salary+1)
-        tva_opintotuki=np.zeros(max_salary+1)
-        tva_yht=np.zeros(max_salary+1)
-        osatva=np.zeros(max_salary+1)
-        osatva_asumistuki=np.zeros(max_salary+1)
-        osatva_kotihoidontuki=np.zeros(max_salary+1)    
-        osatva_toimeentulotuki=np.zeros(max_salary+1)
-        osatva_ansiopvraha=np.zeros(max_salary+1)
-        osatva_verot=np.zeros(max_salary+1)
-        osatva_alv=np.zeros(max_salary+1)    
-        osatva_elake=np.zeros(max_salary+1)
-        osatva_pvhoito=np.zeros(max_salary+1)
-        osatva_perustulo=np.zeros(max_salary+1)
-        osatva_opintotuki=np.zeros(max_salary+1)
-        osatva_yht=np.zeros(max_salary+1)
+
+        size=int(max_salary/step)+1
+        netto=np.zeros(size)
+        palkka=np.zeros(size)
+        nettopalkka=np.zeros(size)
+        tva=np.zeros(size)
+        osatva=np.zeros(size)
+        eff=np.zeros(size)
+        asumistuki=np.zeros(size)
+        toimeentulotuki=np.zeros(size)
+        ansiopvraha=np.zeros(size)
+        nettotulot=np.zeros(size)
+        lapsilisa=np.zeros(size)
+        elake=np.zeros(size)    
+        elatustuki=np.zeros(size)
+        perustulo=np.zeros(size)
+        opintotuki=np.zeros(size)
+        kotihoidontuki=np.zeros(size)    
+        asumistuki_brutto=np.zeros(size)
+        toimeentulotuki_brutto=np.zeros(size)
+        ansiopvraha_brutto=np.zeros(size)
+        bruttotulot=np.zeros(size)
+        lapsilisa_brutto=np.zeros(size)
+        elake_brutto=np.zeros(size)    
+        elatustuki_brutto=np.zeros(size)
+        perustulo_brutto=np.zeros(size)
+        opintotuki_brutto=np.zeros(size)
+        kotihoidontuki_brutto=np.zeros(size)    
+        effmarg=np.zeros(size)
+        margasumistuki=np.zeros(size)
+        margtoimeentulotuki=np.zeros(size)
+        margansiopvraha=np.zeros(size)
+        margverot=np.zeros(size)    
+        margalv=np.zeros(size)    
+        margelake=np.zeros(size)    
+        margpvhoito=np.zeros(size)
+        margyht=np.zeros(size)
+        margperustulo=np.zeros(size)    
+        margopintotuki=np.zeros(size)    
+        margkotihoidontuki=np.zeros(size)    
+        tva=np.zeros(size)
+        tva_asumistuki=np.zeros(size)
+        tva_kotihoidontuki=np.zeros(size)    
+        tva_toimeentulotuki=np.zeros(size)
+        tva_ansiopvraha=np.zeros(size)
+        tva_verot=np.zeros(size)
+        tva_alv=np.zeros(size)    
+        tva_elake=np.zeros(size)
+        tva_pvhoito=np.zeros(size)
+        tva_perustulo=np.zeros(size)
+        tva_opintotuki=np.zeros(size)
+        tva_yht=np.zeros(size)
+        osatva=np.zeros(size)
+        osatva_asumistuki=np.zeros(size)
+        osatva_kotihoidontuki=np.zeros(size)    
+        osatva_toimeentulotuki=np.zeros(size)
+        osatva_ansiopvraha=np.zeros(size)
+        osatva_verot=np.zeros(size)
+        osatva_alv=np.zeros(size)    
+        osatva_elake=np.zeros(size)
+        osatva_pvhoito=np.zeros(size)
+        osatva_perustulo=np.zeros(size)
+        osatva_opintotuki=np.zeros(size)
+        osatva_yht=np.zeros(size)
 
         if p0 is None:
             p_finale=p.copy()
@@ -1273,7 +1323,8 @@ class Marginals():
 
         p_initial['t']=0 # palkka
         n0,q0=self.ben.laske_tulot_v3(p_initial,include_alv=incl_alv)
-        for t in range(0,max_salary+1):
+        ind=0
+        for t in np.arange(0,max_salary+1,step):
             p_finale['t']=t # palkka
             n1,q1=self.ben.laske_tulot_v3(p_finale,include_alv=incl_alv)
             p_finale['t']=t+dt # palkka
@@ -1285,72 +1336,74 @@ class Marginals():
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
             _,tvat=self.laske_marginaalit(q0,q1,t)
             _,osatvat=self.laske_marginaalit(q1,q3,deltat)
-            palkka[t]=t
-            netto[t]=n1
-            effmarg[t]=marg['marginaaliveroprosentti']
-            margyht[t]=marg['marginaali']
-            margalv[t]=marg['alv']
+            palkka[ind]=t
+            netto[ind]=n1
+            effmarg[ind]=marg['marginaaliveroprosentti']
+            margyht[ind]=marg['marginaali']
+            margalv[ind]=marg['alv']
         
-            margasumistuki[t]=marg['asumistuki']
-            margtoimeentulotuki[t]=marg['toimeentulotuki']
-            margverot[t]=marg['verot']
-            margelake[t]=marg['elake']
-            margansiopvraha[t]=marg['ansiopvraha']
-            margpvhoito[t]=marg['pvhoito']
-            margperustulo[t]=marg['perustulo']
-            margkotihoidontuki[t]=marg['kotihoidontuki']
-            margopintotuki[t]=marg['opintotuki']
+            margasumistuki[ind]=marg['asumistuki']
+            margtoimeentulotuki[ind]=marg['toimeentulotuki']
+            margverot[ind]=marg['verot']
+            margelake[ind]=marg['elake']
+            margansiopvraha[ind]=marg['ansiopvraha']
+            margpvhoito[ind]=marg['pvhoito']
+            margperustulo[ind]=marg['perustulo']
+            margkotihoidontuki[ind]=marg['kotihoidontuki']
+            margopintotuki[ind]=marg['opintotuki']
     
-            elake[t]=q1['kokoelake_nettonetto']
-            asumistuki[t]=q1['asumistuki_nettonetto']
-            toimeentulotuki[t]=q1['toimeentulotuki']
-            opintotuki[t]=q1['opintotuki_nettonetto']
-            ansiopvraha[t]=q1['ansiopvraha_nettonetto']
-            lapsilisa[t]=q1['lapsilisa_nettonetto']
-            perustulo[t]=q1['perustulo_nettonetto']
-            elatustuki[t]=q1['elatustuki_nettonetto']
-            nettotulot[t]=tulot['kateen1']
-            nettopalkka[t]=q1['palkkatulot_nettonetto']
-            kotihoidontuki[t]=q1['kotihoidontuki_nettonetto']
+            elake[ind]=q1['kokoelake_nettonetto']
+            asumistuki[ind]=q1['asumistuki_nettonetto']
+            toimeentulotuki[ind]=q1['toimeentulotuki']
+            opintotuki[ind]=q1['opintotuki_nettonetto']
+            ansiopvraha[ind]=q1['ansiopvraha_nettonetto']
+            lapsilisa[ind]=q1['lapsilisa_nettonetto']
+            perustulo[ind]=q1['perustulo_nettonetto']
+            elatustuki[ind]=q1['elatustuki_nettonetto']
+            nettotulot[ind]=tulot['kateen1']
+            nettopalkka[ind]=q1['palkkatulot_nettonetto']
+            kotihoidontuki[ind]=q1['kotihoidontuki_nettonetto']
 
-            elake_brutto[t]=q1['kokoelake']
-            asumistuki_brutto[t]=q1['asumistuki']
-            toimeentulotuki_brutto[t]=q1['toimeentulotuki']
-            opintotuki_brutto[t]=q1['opintotuki']
-            ansiopvraha_brutto[t]=q1['ansiopvraha']
-            lapsilisa_brutto[t]=q1['lapsilisa']
-            perustulo_brutto[t]=q1['perustulo']
-            elatustuki_brutto[t]=q1['elatustuki']
-            bruttotulot[t]=tulot['brutto1']
-            kotihoidontuki_brutto[t]=q1['kotihoidontuki']
+            elake_brutto[ind]=q1['kokoelake']
+            asumistuki_brutto[ind]=q1['asumistuki']
+            toimeentulotuki_brutto[ind]=q1['toimeentulotuki']
+            opintotuki_brutto[ind]=q1['opintotuki']
+            ansiopvraha_brutto[ind]=q1['ansiopvraha']
+            lapsilisa_brutto[ind]=q1['lapsilisa']
+            perustulo_brutto[ind]=q1['perustulo']
+            elatustuki_brutto[ind]=q1['elatustuki']
+            bruttotulot[ind]=tulot['brutto1']
+            kotihoidontuki_brutto[ind]=q1['kotihoidontuki']
     
-            tva[t]=tvat['marginaaliveroprosentti']
-            tva_yht[t]=tvat['marginaali']
-            tva_alv[t]=tvat['alv']
+            tva[ind]=tvat['marginaaliveroprosentti']
+            tva_yht[ind]=tvat['marginaali']
+            tva_alv[ind]=tvat['alv']
         
-            tva_asumistuki[t]=tvat['asumistuki']
-            tva_kotihoidontuki[t]=tvat['kotihoidontuki']
-            tva_toimeentulotuki[t]=tvat['toimeentulotuki']
-            tva_verot[t]=tvat['verot']
-            tva_elake[t]=tvat['elake']
-            tva_perustulo[t]=tvat['perustulo']
-            tva_ansiopvraha[t]=tvat['ansiopvraha']
-            tva_opintotuki[t]=tvat['opintotuki']
-            tva_pvhoito[t]=tvat['pvhoito']
+            tva_asumistuki[ind]=tvat['asumistuki']
+            tva_kotihoidontuki[ind]=tvat['kotihoidontuki']
+            tva_toimeentulotuki[ind]=tvat['toimeentulotuki']
+            tva_verot[ind]=tvat['verot']
+            tva_elake[ind]=tvat['elake']
+            tva_perustulo[ind]=tvat['perustulo']
+            tva_ansiopvraha[ind]=tvat['ansiopvraha']
+            tva_opintotuki[ind]=tvat['opintotuki']
+            tva_pvhoito[ind]=tvat['pvhoito']
     
-            osatva[t]=osatvat['marginaaliveroprosentti']
-            osatva_yht[t]=osatvat['marginaali']
-            osatva_alv[t]=osatvat['alv']
+            osatva[ind]=osatvat['marginaaliveroprosentti']
+            osatva_yht[ind]=osatvat['marginaali']
+            osatva_alv[ind]=osatvat['alv']
         
-            osatva_asumistuki[t]=osatvat['asumistuki']
-            osatva_kotihoidontuki[t]=osatvat['kotihoidontuki']
-            osatva_toimeentulotuki[t]=osatvat['toimeentulotuki']
-            osatva_verot[t]=osatvat['verot']
-            osatva_elake[t]=osatvat['elake']
-            osatva_perustulo[t]=osatvat['perustulo']
-            osatva_ansiopvraha[t]=osatvat['ansiopvraha']
-            osatva_opintotuki[t]=osatvat['opintotuki']
-            osatva_pvhoito[t]=osatvat['pvhoito']
+            osatva_asumistuki[ind]=osatvat['asumistuki']
+            osatva_kotihoidontuki[ind]=osatvat['kotihoidontuki']
+            osatva_toimeentulotuki[ind]=osatvat['toimeentulotuki']
+            osatva_verot[ind]=osatvat['verot']
+            osatva_elake[ind]=osatvat['elake']
+            osatva_perustulo[ind]=osatvat['perustulo']
+            osatva_ansiopvraha[ind]=osatvat['ansiopvraha']
+            osatva_opintotuki[ind]=osatvat['opintotuki']
+            osatva_pvhoito[ind]=osatvat['pvhoito']
+
+            ind += 1
             
         return netto,palkka,nettopalkka,tva,osatva,effmarg,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,\
             elake,elatustuki,perustulo,opintotuki,kotihoidontuki,margasumistuki,margtoimeentulotuki,\
