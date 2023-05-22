@@ -2111,9 +2111,9 @@ class Benefits():
             q['elatustuki']=0
         
         if p['elakkeella']>0:
-            q['asumistuki']=self.elakkeensaajan_asumistuki(p['puoliso_tulot']+p['t'],q['kokoelake'],p['asumismenot_asumistuki'],p)
+            q['asumistuki']=self.elakkeensaajan_asumistuki(p['t']+p['puoliso_tulot'],q['kokoelake'],p['asumismenot_asumistuki'],p)
         else:
-            q['asumistuki']=self.asumistuki(p['puoliso_tulot']+p['t'],q['ansiopvraha']+q['puoliso_ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],p['asumismenot_asumistuki'],p)
+            q['asumistuki']=self.asumistuki(p[t],p['puoliso_tulot'],q['ansiopvraha']+q['puoliso_ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],p['asumismenot_asumistuki'],p)
             
         if p['lapsia']>0:
             q['pvhoito']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['puoliso_ansiopvraha']+q['sairauspaivaraha'],p)
@@ -2547,7 +2547,7 @@ class Benefits():
         elif p[omatalku+'elakkeella']>0 and p[puolisoalku+'elakkeella']>0: # eläkkeensaajan asumistuki vain, jos molemmat eläkkeellä
             q['asumistuki']=self.elakkeensaajan_asumistuki(q['palkkatulot'],q['kokoelake'],p['asumismenot_asumistuki'],p)
         else: # muuten yleinen asumistuki
-            q['asumistuki']=self.asumistuki(q['palkkatulot'],q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
+            q['asumistuki']=self.asumistuki(q[omat+'palkkatulot'],q[puoliso+'palkkatulot'],q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
                                             +q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
                                             p['asumismenot_asumistuki'],p)
             
@@ -3057,14 +3057,12 @@ class Benefits():
                 print('12',alku,'ero',d2-d1,puoliso,'d1',d1,'d2',d2)
                 print('palkka',q[alku+'palkkatulot'],'etuus_brutto',q[alku+'etuustulo_brutto'],'verot',q[alku+'verot'],'alv',q[alku+'alv'],'pvhoito',q[alku+'pvhoito'])
         
-    
-
     def laske_alv(self,kateen):
         # kulutusmenoista maksetaan noin 24% alvia (lähde: TK, https://www.stat.fi/tietotrendit/artikkelit/2019/arvonlisavero-haivyttaa-progression-vaikutuksen-pienituloisimmilta/)
         alv=(0.24+self.additional_vat)/(1.24+self.additional_vat)
         return alv*kateen
         
-    def asumistuki2018(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def asumistuki2018(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -3086,8 +3084,8 @@ class Benefits():
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
+        suojaosa=300
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -3103,7 +3101,7 @@ class Benefits():
     
         return tuki
         
-    def asumistuki2019(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def asumistuki2019(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -3125,8 +3123,8 @@ class Benefits():
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
+        suojaosa=300
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(597+99*p['aikuisia']+221*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -3142,7 +3140,7 @@ class Benefits():
     
         return tuki
 
-    def asumistuki2020(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def asumistuki2020(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -3164,8 +3162,8 @@ class Benefits():
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
 
         prosentti=0.8 # vastaa 80 %
-        suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
+        suojaosa=300
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(603+100*p['aikuisia']+223*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -3181,7 +3179,7 @@ class Benefits():
     
         return tuki
         
-    def asumistuki2021(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def asumistuki2021(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -3204,7 +3202,7 @@ class Benefits():
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(606+100*p['aikuisia']+224*p['lapsia'])))
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(606+100*p['aikuisia']+224*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -3220,7 +3218,7 @@ class Benefits():
     
         return tuki
         
-    def asumistuki2022(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def asumistuki2022(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -3243,7 +3241,7 @@ class Benefits():
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(619+103*p['aikuisia']+228*p['lapsia'])))
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(619+103*p['aikuisia']+228*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -3259,7 +3257,7 @@ class Benefits():
     
         return tuki
         
-    def asumistuki2023(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def asumistuki2023(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -3282,7 +3280,7 @@ class Benefits():
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(667+111*p['aikuisia']+246*p['lapsia'])))
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*p['aikuisia']+246*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -3298,7 +3296,7 @@ class Benefits():
     
         return tuki    
         
-    def asumistuki2024(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def asumistuki2024(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -3321,7 +3319,7 @@ class Benefits():
 
         prosentti=0.8 # vastaa 80 %
         suojaosa=300*p['aikuisia']
-        perusomavastuu=max(0,0.42*(max(0,palkkatulot-suojaosa)+muuttulot-(667+111*p['aikuisia']+246*p['lapsia'])))
+        perusomavastuu=max(0,0.42*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*p['aikuisia']+246*p['lapsia'])))
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -3337,7 +3335,7 @@ class Benefits():
     
         return tuki            
 
-    def elakkeensaajan_asumistuki_2018(self,palkkatulot,muuttulot,vuokra,p: dict):
+    def elakkeensaajan_asumistuki_2018(self,palkkatulot1,palkkatulot2,muuttulot,vuokra,p: dict):
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,

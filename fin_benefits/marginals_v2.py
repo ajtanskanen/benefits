@@ -139,7 +139,7 @@ class Marginals():
     def plot_eff_marg(self,eff,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,show_xlabel=True,show_ylabel=True,
                 csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True,baseline_eff=None,
-                extraheader=None):
+                extraheader=None,dodisplay=False):
         if ax is None:
             figi,axs = plt.subplots()
         else:
@@ -148,7 +148,11 @@ class Marginals():
         axs.set_axisbelow(False)
         self.plot_marg_extra(axs,palkka,margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
             incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,incl_alv=incl_alv)
-            
+
+        if dodisplay: 
+            df = pd.DataFrame([margverot,margasumistuki,margtoimeentulotuki,margansiopvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv])
+            display(df)
+
         axs.plot(eff,'k',lw=2.0)
         if baseline_eff is not None:
             axs.plot(baseline_eff,'g--',lw=3)
@@ -1257,6 +1261,7 @@ class Marginals():
         osatva=np.zeros(size)
         eff=np.zeros(size)
         asumistuki=np.zeros(size)
+        asumistuki2=np.zeros(size)
         toimeentulotuki=np.zeros(size)
         ansiopvraha=np.zeros(size)
         nettotulot=np.zeros(size)
@@ -1267,6 +1272,7 @@ class Marginals():
         opintotuki=np.zeros(size)
         kotihoidontuki=np.zeros(size)    
         asumistuki_brutto=np.zeros(size)
+        toimeentulotuki2=np.zeros(size)
         toimeentulotuki_brutto=np.zeros(size)
         ansiopvraha_brutto=np.zeros(size)
         bruttotulot=np.zeros(size)
@@ -1357,7 +1363,9 @@ class Marginals():
     
             elake[ind]=q1['kokoelake_nettonetto']
             asumistuki[ind]=q1['asumistuki_nettonetto']
+            asumistuki2[ind]=q2['asumistuki_nettonetto']
             toimeentulotuki[ind]=q1['toimeentulotuki']
+            toimeentulotuki2[ind]=q2['toimeentulotuki']
             opintotuki[ind]=q1['opintotuki_nettonetto']
             ansiopvraha[ind]=q1['ansiopvraha_nettonetto']
             lapsilisa[ind]=q1['lapsilisa_nettonetto']
@@ -1407,6 +1415,9 @@ class Marginals():
             osatva_pvhoito[ind]=osatvat['pvhoito']
 
             ind += 1
+
+        df = pd.DataFrame([toimeentulotuki,toimeentulotuki2,margtoimeentulotuki,asumistuki,asumistuki2])
+        display(df)
             
         return netto,palkka,nettopalkka,tva,osatva,effmarg,asumistuki,toimeentulotuki,ansiopvraha,nettotulot,lapsilisa,\
             elake,elatustuki,perustulo,opintotuki,kotihoidontuki,margasumistuki,margtoimeentulotuki,\

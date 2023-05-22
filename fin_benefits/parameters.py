@@ -175,8 +175,8 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False):
         vakiintunutpalkka=1500    
         tyoton=1    
         saa_ansiopaivarahaa=1    
-        puolison_tulot=2500    
-        puolison_vakiintunutpalkka=2500    
+        puolison_tulot=1500    
+        puolison_vakiintunutpalkka=1500    
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0            
     elif perhetyyppi==14: # 2+1, puoliso työssä
@@ -567,7 +567,7 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False):
         vakiintunutpalkka=3500    
         tyoton=1
         saa_ansiopaivarahaa=0
-        puolison_tulot=1000
+        puolison_tulot=1500
         puolison_vakiintunutpalkka=3500
         puoliso_tyoton=0
         puoliso_saa_ansiopaivarahaa=0
