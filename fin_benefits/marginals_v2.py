@@ -430,7 +430,7 @@ class Marginals():
                     incl_perustulo=incl_perustulo,incl_elake=True,ax=axs,incl_alv=incl_alv,show=show,
                     plot_osatva=False,header=header,source=source,palette=None,palette_EK=palette_EK,square=False)
                     
-    def verotaulukko(self,p=None,p0=None,min_salary=0,max_salary=100_000,step=1_000,
+    def verotaulukko(self,p=None,p0=None,min_salary=1_000,max_salary=200_000,step=1_000,
                 dt=100,plottaa=True,header=True,source='Lähde: EK',head_text=None,
                 incl_alv=False,include_tuet=False):
 
@@ -461,14 +461,14 @@ class Marginals():
         osatva_pvhoito,osatva_perustulo,osatva_opintotuki,osatva_yht,\
         elake_brutto,asumistuki_brutto,toimeentulotuki_brutto,opintotuki_brutto,ansiopvraha_brutto,\
         lapsilisa_brutto,perustulo_brutto,elatustuki_brutto,bruttotulot,kotihoidontuki_brutto\
-            =self.comp_all_margs(p,p0=p0,incl_alv=incl_alv,min_salary=min_salary/kerroin,max_salary=max_salary/kerroin,step=1000/kerroin,dt=dt)       
+            =self.comp_all_margs(p,p0=p0,incl_alv=incl_alv,min_salary=min_salary/kerroin,max_salary=max_salary/kerroin,step=1000/kerroin,dt=dt,emtr_percent=True)       
 
-        for k,p in enumerate(palkka):
-            tulos.loc[k,'kokonaistulo, e/v']=p*kerroin
-            tulos.loc[k,'palkka, e/kk']=p
+        for k,pa in enumerate(palkka):
+            tulos.loc[k,'kokonaistulo, e/v']=pa*kerroin
+            tulos.loc[k,'palkka, e/kk']=pa
             tulos.loc[k,'netto']=netto[k]*kerroin
             tulos.loc[k,'brutto']=bruttotulot[k]*kerroin
-            tulos.loc[k,'vero [%]']=(bruttotulot[k]-netto[k])/bruttotulot[k]*100
+            tulos.loc[k,'vero [%]']=(bruttotulot[k]-netto[k])/max(1e-9,bruttotulot[k])*100 #np.max(1e-6,bruttotulot[k]*100)
             tulos.loc[k,'tva']=tva[k]
             tulos.loc[k,'marginaali']=effmarg[k]
 
@@ -1244,7 +1244,7 @@ class Marginals():
 
         return netto,eff,tva,osa_tva
 
-    def comp_all_margs(self,p,p0=None,incl_alv=False,min_salary=0,max_salary=6_000,dt=100,step=1):
+    def comp_all_margs(self,p,p0=None,incl_alv=False,min_salary=0,max_salary=6_000,dt=100,step=1,emtr_percent=False):
         '''
         Jaottelee marginaalit ja tulot eriin
         '''
@@ -1325,6 +1325,8 @@ class Marginals():
         n0,q0=self.ben.laske_tulot_v3(p_initial,include_alv=incl_alv)
         ind=0
         for t in np.arange(0,max_salary+1,step):
+            if emtr_percent:
+                dt=0.01 * t
             p_finale['t']=t # palkka
             n1,q1=self.ben.laske_tulot_v3(p_finale,include_alv=incl_alv)
             p_finale['t']=t+dt # palkka
@@ -1334,8 +1336,9 @@ class Marginals():
             n3,q3=self.ben.laske_tulot_v3(p_finale,include_alv=incl_alv)
     
             tulot,marg=self.laske_marginaalit(q1,q2,dt)
-            _,tvat=self.laske_marginaalit(q0,q1,t)
             _,osatvat=self.laske_marginaalit(q1,q3,deltat)
+            #print(n1,n2)
+            _,tvat=self.laske_marginaalit(q0,q1,t)
             palkka[ind]=t
             netto[ind]=n1
             effmarg[ind]=marg['marginaaliveroprosentti']
@@ -1414,3 +1417,33 @@ class Marginals():
             osatva_pvhoito,osatva_perustulo,osatva_opintotuki,osatva_yht,\
             elake_brutto,asumistuki_brutto,toimeentulotuki_brutto,opintotuki_brutto,ansiopvraha_brutto,\
             lapsilisa_brutto,perustulo_brutto,elatustuki_brutto,bruttotulot,kotihoidontuki_brutto
+
+    def comp_test_margs(self,p,p0=None,incl_alv=False,salary=1_000,dt=100,emtr_percent=True):
+        '''
+        Jaottelee marginaalit ja tulot eriin
+        '''
+
+        if p0 is None:
+            p_finale=p.copy()
+            p_initial=p.copy()
+        else:
+            p_finale=p.copy()
+            p_initial=p0.copy()
+            plot_eff=False  
+
+        p_initial['t']=0 # palkka
+        n0,q0=self.ben.laske_tulot_v3(p_initial,include_alv=incl_alv)
+        ind=0
+        if emtr_percent:
+            dt=0.01 * salary
+        p_finale['t']=salary # palkka
+        n1,q1=self.ben.laske_tulot_v3(p_finale,include_alv=incl_alv)
+        p_finale['t']=salary+dt # palkka
+        n2,q2=self.ben.laske_tulot_v3(p_finale,include_alv=incl_alv)
+
+        _,marg=self.laske_marginaalit(q1,q2,dt)
+        _,tvat=self.laske_marginaalit(q0,q1,salary)
+        eff=marg['marginaaliveroprosentti']
+        tva=tvat['marginaaliveroprosentti']
+
+        return eff,tva

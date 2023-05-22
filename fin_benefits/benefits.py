@@ -39,6 +39,8 @@ class Benefits():
         self.tyel_perusvuosi=1970 # ikäluokan syntymävuosi
         self.irr_vain_tyoelake=False
         self.include_perustulo=False
+        self.include_kirkollisvero=False
+        self.kk_jakaja=12
         
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -52,6 +54,9 @@ class Benefits():
             elif key=='language': # language for plotting
                 if value is not None:
                     self.language=value
+            elif key=='include_kirkollisvero': # language for plotting
+                if value is not None:
+                    self.include_kirkollisvero=value
             elif key=='additional_income_tax':
                 if value is not None:
                     self.additional_income_tax=value
@@ -656,6 +661,8 @@ class Benefits():
                 tuki=max(0,pvraha-0.5*vahentavattulo)
     
             return tuki
+
+    ### Verotus
         
     def elaketulovahennys2018(self,elaketulot: float,tulot: float):
         max_elaketulovahennys_valtio=11560/self.kk_jakaja
@@ -692,14 +699,19 @@ class Benefits():
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
-    def elaketulovahennys2023(self,elaketulot: float,tulot: float):
-        max_elaketulovahennys_kunnallis=9500/self.kk_jakaja
-        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
+    def elaketulovahennys2023(self,elaketulot: float,puhdas_ansiotulo: float):
+        raja1_elaketulovahennys_kunnallis=10_320/self.kk_jakaja
+        raja2_elaketulovahennys_kunnallis=22_500/self.kk_jakaja
+        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,raja1_elaketulovahennys_kunnallis
+            -0.51*max(0,min(puhdas_ansiotulo,raja2_elaketulovahennys_kunnallis)-raja1_elaketulovahennys_kunnallis)
+            -0.15*max(0,puhdas_ansiotulo-raja2_elaketulovahennys_kunnallis)))
+        )
         elaketulovahennys_valtio=elaketulovahennys_kunnallis
+
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
     def elaketulovahennys2024(self,elaketulot: float,tulot: float):
-        max_elaketulovahennys_kunnallis=9500/self.kk_jakaja*1.03
+        max_elaketulovahennys_kunnallis=10_320/self.kk_jakaja*1.03
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
         elaketulovahennys_valtio=elaketulovahennys_kunnallis
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
@@ -736,7 +748,12 @@ class Benefits():
 
     def tyotulovahennys2023(self,ika):
         if ika>=60:
-            max_tyotulovahennys=2030/self.kk_jakaja
+            if ika>=62:
+                max_tyotulovahennys=2230/self.kk_jakaja
+            elif ika>=65:
+                max_tyotulovahennys=2430/self.kk_jakaja
+            else:
+                max_tyotulovahennys=2630/self.kk_jakaja
         else:
             max_tyotulovahennys=2030/self.kk_jakaja
         ttulorajat=np.array([0,22000,77000])/self.kk_jakaja # 127000??
@@ -745,7 +762,12 @@ class Benefits():
 
     def tyotulovahennys2024(self,ika):
         if ika>=60:
-            max_tyotulovahennys=2030/self.kk_jakaja*1.032
+            if ika>=62:
+                max_tyotulovahennys=2230/self.kk_jakaja
+            elif ika>=65:
+                max_tyotulovahennys=2430/self.kk_jakaja
+            else:
+                max_tyotulovahennys=2630/self.kk_jakaja
         else:
             max_tyotulovahennys=2030/self.kk_jakaja*1.032
         ttulorajat=np.array([0,22000,77000])/self.kk_jakaja*1.032 # 127000??
@@ -858,6 +880,7 @@ class Benefits():
         
     def veroparam2018(self):
         self.kunnallisvero_pros=max(0,max(0,0.1984+self.additional_kunnallisvero)) # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
+        self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0190 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -885,6 +908,7 @@ class Benefits():
         
     def veroparam2019(self):
         self.kunnallisvero_pros=max(0,0.1988+self.additional_kunnallisvero) # Viitamäen raportista
+        self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0125 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -912,6 +936,7 @@ class Benefits():
         
     def veroparam2020(self):
         self.kunnallisvero_pros=max(0,0.1997+self.additional_kunnallisvero) # Viitamäen raportista
+        self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0125 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -939,6 +964,7 @@ class Benefits():
         
     def veroparam2021(self):
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
+        self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0140 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -968,7 +994,8 @@ class Benefits():
         '''
         Päivitä
         '''
-        self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # +0.0135) # kirkollisvero 
+        self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) 
+        self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0150 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -996,9 +1023,10 @@ class Benefits():
         
     def veroparam2023(self):
         '''
-        Päivitetty 21.9.2022
+        Päivitetty 6.5.2023
         '''
-        self.kunnallisvero_pros=max(0,0.0761+self.additional_kunnallisvero +0.0135) # kirkollisvero
+        self.kunnallisvero_pros=max(0,0.0737+self.additional_kunnallisvero) # +0.0135) 
+        self.kirkollisvero_pros=0.0138
         self.tyottomyysvakuutusmaksu=0.0150 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -1008,7 +1036,7 @@ class Benefits():
             self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
             self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
-        self.tyonantajan_sairausvakuutusmaksu=0.0154
+        self.tyonantajan_sairausvakuutusmaksu=0.0153
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0154 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
@@ -1029,6 +1057,7 @@ class Benefits():
         Päivitetty 21.9.2022
         '''
         self.kunnallisvero_pros=max(0,0.0761+self.additional_kunnallisvero) # Viitamäen raportista
+        self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0150 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
@@ -1054,105 +1083,104 @@ class Benefits():
         self.elakemaksu_alaraja=62.88
         self.tulonhankkimisvahennys=750/self.kk_jakaja
         
-    def laske_ylevero2018(self,palkkatulot: float,elaketulot: float):
+    def laske_ylevero2018(self,puhdas_ansiotulo: float):
         yleveropros=0.025
         min_ylevero=0/self.kk_jakaja
         max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14750/self.kk_jakaja
     
-        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+        ylevero=min(max_ylevero,yleveropros*max(0,puhdas_ansiotulo-ylevero_alaraja))
     
         if ylevero<min_ylevero:
             ylevero=0
             
         return ylevero    
 
-    def laske_ylevero2019(self,palkkatulot: float,elaketulot: float):
+    def laske_ylevero2019(self,puhdas_ansiotulo: float):
         yleveropros=0.025
         min_ylevero=0/self.kk_jakaja
         max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14750/self.kk_jakaja
     
-        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+        ylevero=min(max_ylevero,yleveropros*max(0,puhdas_ansiotulo-ylevero_alaraja))
     
         if ylevero<min_ylevero:
             ylevero=0
             
         return ylevero    
 
-    def laske_ylevero2020(self,palkkatulot: float,elaketulot: float):
+    def laske_ylevero2020(self,puhdas_ansiotulo: float):
         yleveropros=0.025
         min_ylevero=0/self.kk_jakaja
         max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14000/self.kk_jakaja
     
-        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+        ylevero=min(max_ylevero,yleveropros*max(0,puhdas_ansiotulo-ylevero_alaraja))
     
         if ylevero<min_ylevero:
             ylevero=0
             
         return ylevero    
 
-    def laske_ylevero2021(self,palkkatulot: float,elaketulot: float):
+    def laske_ylevero2021(self,puhdas_ansiotulo: float):
         yleveropros=0.025
         min_ylevero=0/self.kk_jakaja
         max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14000/self.kk_jakaja
     
-        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+        ylevero=min(max_ylevero,yleveropros*max(0,puhdas_ansiotulo-ylevero_alaraja))
     
         if ylevero<min_ylevero:
             ylevero=0
             
         return ylevero    
 
-    def laske_ylevero2022(self,palkkatulot: float,elaketulot: float):
+    def laske_ylevero2022(self,puhdas_ansiotulo: float):
         yleveropros=0.025
         min_ylevero=0/self.kk_jakaja
         max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14000/self.kk_jakaja
     
-        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+        ylevero=min(max_ylevero,yleveropros*max(0,puhdas_ansiotulo-ylevero_alaraja))
     
         if ylevero<min_ylevero:
             ylevero=0
             
         return ylevero
 
-    def laske_ylevero2023(self,palkkatulot: float,elaketulot: float):
+    def laske_ylevero2023(self,puhdas_ansiotulo: float):
         yleveropros=0.025
         min_ylevero=0/self.kk_jakaja
         max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14000/self.kk_jakaja
     
-        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+        ylevero=min(max_ylevero,yleveropros*max(0,puhdas_ansiotulo-ylevero_alaraja))
     
         if ylevero<min_ylevero:
             ylevero=0
             
         return ylevero    
         
-    def laske_ylevero2024(self,palkkatulot: float,elaketulot: float):
+    def laske_ylevero2024(self,puhdas_ansiotulo: float):
         yleveropros=0.025
         min_ylevero=0/self.kk_jakaja
         max_ylevero=163/self.kk_jakaja
         ylevero_alaraja=14000/self.kk_jakaja
     
-        ylevero=min(max_ylevero,yleveropros*max(0,elaketulot+palkkatulot-ylevero_alaraja))
+        ylevero=min(max_ylevero,yleveropros*max(0,puhdas_ansiotulo-ylevero_alaraja))
     
         if ylevero<min_ylevero:
             ylevero=0
             
         return ylevero    
         
-    def laske_perusvahennys(self,tulot: float):
+    def laske_perusvahennys(self,tulot: float,puhdas_ansiotulo: float):
         perusvahennys_pros,max_perusvahennys=self.perusvahennys()
-        #peruste=max(0,tulot_kunnallis-ansiotulovahennys)
         peruste=max(0,tulot)
         if peruste<max_perusvahennys:
             perusvahennys=peruste
         else:
-            perusvahennys=max(0,max_perusvahennys-perusvahennys_pros*max(0,peruste-max_perusvahennys))
+            perusvahennys=max(0,max_perusvahennys-perusvahennys_pros*max(0,puhdas_ansiotulo-max_perusvahennys))
 
         return perusvahennys
 
@@ -1195,7 +1223,7 @@ class Benefits():
         lapsivahennys=0 # poistui 2018
     
         peritytverot=0
-        self.kk_jakaja=12
+        #self.kk_jakaja=12
         
         self.veroparam()
         if self.vaihtuva_tyelmaksu:
@@ -1239,31 +1267,32 @@ class Benefits():
             tyotvakmaksu=0
         
         if palkkatulot>self.paivarahamaksu_raja and p['ika']<68:
-            sairausvakuutusmaksu=palkkatulot*self.paivarahamaksu_pros
+            paivarahamaksu = palkkatulot*self.paivarahamaksu_pros
         else:
-            sairausvakuutusmaksu=0
+            paivarahamaksu=0
+            #print('sv',palkkatulot,palkkatulot*self.kk_jakaja,sairausvakuutusmaksu)
 
-        peritytverot += sairausvakuutusmaksu+ptel+tyotvakmaksu
-        palkkatulot = palkkatulot-sairausvakuutusmaksu-ptel-tyotvakmaksu 
+        peritytverot += paivarahamaksu+ptel+tyotvakmaksu
     
         # tulonhankkimisvähennys pienentää ansiotuloa
     
-        palkkatulot_puhdas=max(0,palkkatulot-self.tulonhankkimisvahennys) # puhdas ansiotulo
+        #palkkatulot_puhdas=max(0,palkkatulot-self.tulonhankkimisvahennys) # puhdas palkkatulo
+        #palkkatulot_puhdas_ilman_maksuja = palkkatulot_puhdas-paivarahamaksu-ptel-tyotvakmaksu 
+        palkkatulot_puhdas=max(0,palkkatulot-self.tulonhankkimisvahennys) # puhdas palkkatulo
         
         # eläketulovähennys
-        puhdas_ansiotulo=palkkatulot_puhdas+muuttulot+elaketulot
+        puhdas_ansiotulo = palkkatulot_puhdas+muuttulot+elaketulot
         
         elaketulovahennys_valtio,elaketulovahennys_kunnallis=self.elaketulovahennys(elaketulot,puhdas_ansiotulo)
         elaketulot_valtio=max(0,elaketulot-elaketulovahennys_valtio)
         elaketulot_kunnallis=max(0,elaketulot-elaketulovahennys_kunnallis)
-        elaketulot_puhdas=elaketulot
-        
-        tulot_valtio=palkkatulot_puhdas+muuttulot+elaketulot_valtio
-        tulot_kunnallis=palkkatulot_puhdas+muuttulot+elaketulot_kunnallis
+
+        tulot_valtio = puhdas_ansiotulo + elaketulot_valtio - elaketulot -paivarahamaksu-ptel-tyotvakmaksu 
+        tulot_kunnallis = puhdas_ansiotulo + elaketulot_kunnallis - elaketulot -paivarahamaksu-ptel-tyotvakmaksu 
     
         # ylevero
     
-        ylevero=self.laske_ylevero(palkkatulot_puhdas,elaketulot_puhdas)    
+        ylevero = self.laske_ylevero(puhdas_ansiotulo)
         peritytverot += ylevero
 
         # työtulovähennys vähennetään valtionveroista
@@ -1273,17 +1302,16 @@ class Benefits():
         # perusvähennys
         if self.year>=2023:
             ansiotulovahennys_valtio=self.laske_ansiotulovahennys(puhdas_ansiotulo,palkkatulot_puhdas)
-            peruste1=max(0,puhdas_ansiotulo-ansiotulovahennys_valtio)
-            perusvahennys_valtio=self.laske_perusvahennys(peruste1)
+            peruste=max(0,tulot_valtio-ansiotulovahennys_valtio)
+            perusvahennys_valtio=self.laske_perusvahennys(peruste,peruste)
         else:
             perusvahennys_valtio=0
             ansiotulovahennys_valtio=0
                     
         # valtioverotus
         # varsinainen verotus
-        valtionveroperuste = tulot_valtio
-        if self.year>=2023:
-            valtionveroperuste = max(0,valtionveroperuste-perusvahennys_valtio-ansiotulovahennys_valtio)
+        valtionveroperuste = max(0,tulot_valtio - perusvahennys_valtio - ansiotulovahennys_valtio)
+
         valtionvero = self.laske_valtionvero(valtionveroperuste,p)
         valtionvero += self.raippavero(elaketulot_valtio)
         
@@ -1300,43 +1328,57 @@ class Benefits():
         peritytverot += valtionvero
 
         # kunnallisverotus
-        ansiotulovahennys=self.laske_ansiotulovahennys(puhdas_ansiotulo,palkkatulot_puhdas)
-
-        # perusvähennys
-        peruste=max(0,tulot_kunnallis-ansiotulovahennys)
-        perusvahennys=self.laske_perusvahennys(peruste)
-            
-        # Yhteensä
-        kunnallisveroperuste=max(0,peruste-perusvahennys)
+        if self.year>=2023:
+            ansiotulovahennys = ansiotulovahennys_valtio
+            perusvahennys = perusvahennys_valtio
+            kunnallisveroperuste = valtionveroperuste # max(0,tulot_kunnallis - perusvahennys - ansiotulovahennys)
+        else:
+            ansiotulovahennys=self.laske_ansiotulovahennys(puhdas_ansiotulo,palkkatulot_puhdas)
+            # perusvähennys
+            #peruste=max(0,tulot_kunnallis-ansiotulovahennys)
+            peruste=max(0,tulot_kunnallis-ansiotulovahennys)
+            perusvahennys=self.laske_perusvahennys(peruste,peruste)
         
-        # korotettu maksuperuste puuttuu? =max(0,palkkatulot-peritty_sairaanhoitomaksu)*korotus
-        peritty_sairaanhoitomaksu=max(0,palkkatulot_puhdas-perusvahennys)*self.sairaanhoitomaksu+(muuttulot+elaketulot_kunnallis)*self.sairaanhoitomaksu_etuus
+            # Yhteensä
+            kunnallisveroperuste=max(0,peruste-perusvahennys)
+        
+        #peritty_sairaanhoitomaksu=max(0,palkkatulot_puhdas-perusvahennys)*self.sairaanhoitomaksu+(muuttulot+elaketulot_kunnallis)*self.sairaanhoitomaksu_etuus
+        kunnallis_verotettava_palkkatulo=max(0,kunnallisveroperuste-elaketulot_kunnallis-muuttulot)
+        peritty_sairaanhoitomaksu=max(0,kunnallis_verotettava_palkkatulo)*self.sairaanhoitomaksu+max(0,kunnallisveroperuste-kunnallis_verotettava_palkkatulo)*self.sairaanhoitomaksu_etuus
         
         if tyotulovahennys_kunnallisveroon>0:
             kunnallisvero_0=kunnallisveroperuste*self.kunnallisvero_pros
-            if peritty_sairaanhoitomaksu+kunnallisvero_0>0:
-                kvhen=tyotulovahennys_kunnallisveroon*kunnallisvero_0/(peritty_sairaanhoitomaksu+kunnallisvero_0)
-                svhen=tyotulovahennys_kunnallisveroon*peritty_sairaanhoitomaksu/(peritty_sairaanhoitomaksu+kunnallisvero_0)
+            kirkollisvero_0=kunnallisveroperuste*self.kirkollisvero_pros
+            a=peritty_sairaanhoitomaksu+kunnallisvero_0+kirkollisvero_0
+            if a > 0:
+                osuus_0 = tyotulovahennys_kunnallisveroon/a
+                kvhen = kunnallisvero_0 * osuus_0
+                kihen = kirkollisvero_0 * osuus_0
+                svhen = peritty_sairaanhoitomaksu * osuus_0
             else:
                 kvhen=0
+                kihen=0
                 svhen=0
 
             kunnallisvero=max(0,kunnallisveroperuste*self.kunnallisvero_pros-kvhen)
+            kirkollisvero=max(0,kunnallisveroperuste*self.kirkollisvero_pros-kihen)
             peritty_sairaanhoitomaksu=max(0,peritty_sairaanhoitomaksu-svhen)
         else:
             kunnallisvero=kunnallisveroperuste*self.kunnallisvero_pros
+            kirkollisvero=kunnallisveroperuste*self.kirkollisvero_pros
             
-        sairausvakuutusmaksu += peritty_sairaanhoitomaksu
+        sairausvakuutusmaksu = paivarahamaksu + peritty_sairaanhoitomaksu
         
         peritytverot += peritty_sairaanhoitomaksu + kunnallisvero
-        
-        #palkkatulot=palkkatulot-peritty_sairaanhoitomaksu 
-        # sairausvakuutusmaksu=sairausvakuutusmaksu+kunnallisveroperuste*sairaanhoitomaksu
+        if self.include_kirkollisvero:
+            peritytverot += kirkollisvero
+            #print('kirkollisvero',kirkollisvero)
+
         # yhteensä
         netto=tulot-peritytverot
         
-        d1=peritytverot
-        d2=valtionvero+kunnallisvero+ptel+tyotvakmaksu+ylevero+sairausvakuutusmaksu
+        #d1=peritytverot
+        #d2=valtionvero+kunnallisvero+ptel+tyotvakmaksu+ylevero+sairausvakuutusmaksu
         
 #         if np.abs(d2-d1)>1e-6:
 #             print('verotus',d2-d1)
@@ -1344,6 +1386,93 @@ class Benefits():
         return netto,peritytverot,valtionvero,kunnallisvero,kunnallisveroperuste,\
                valtionveroperuste,ansiotulovahennys,perusvahennys,tyotulovahennys,\
                tyotulovahennys_kunnallisveroon,ptel,sairausvakuutusmaksu,tyotvakmaksu,koko_tyoelakemaksu,ylevero
+
+        
+    def raippavero2018(self,elaketulo: float):
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+    
+    def raippavero2019(self,elaketulo: float):
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+    
+    def raippavero2020(self,elaketulo: float):
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+    
+    def raippavero2021(self,elaketulo: float):
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+    
+    def raippavero2022(self,elaketulo: float):
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+    
+    def raippavero2023(self,elaketulo: float):
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+
+    def raippavero2024(self,elaketulo: float):
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
+        vero=max(elaketulo-alaraja,0)*pros
+        return vero
+        
+    def valtionvero_asteikko_2018(self):
+        rajat=np.array([17200,25700,42400,74200])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+    
+    def valtionvero_asteikko_2019(self):
+        rajat=np.array([17600,26400,43500,76100])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+
+    def valtionvero_asteikko_2020(self):
+        rajat=np.array([18100,27200,44800,78500])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+
+    def valtionvero_asteikko_2021(self):
+        rajat=np.array([18600,27900,45900,80500])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+        
+    def valtionvero_asteikko_2022(self):
+        rajat=np.array([19200,28700,47300,82900])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+        
+    def valtionvero_asteikko_2023(self):
+        rajat=np.array([0,19900,29700,49000,85800])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros
+        
+    def valtionvero_asteikko_2024(self):
+        rajat=np.array([0,19900,29700,49000,85800])/self.kk_jakaja*1.03
+        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros               
+
+### Hoitolisä
 
     def hoitolisa2018(self,perheentulot: float,perhekoko: int):
         '''
@@ -1598,90 +1727,6 @@ class Benefits():
         
         return arvo
         
-    def raippavero2018(self,elaketulo: float):
-        alaraja=47_000*self.kk_jakaja
-        pros=0.0585
-        vero=max(elaketulo-alaraja,0)*pros
-        return vero
-    
-    def raippavero2019(self,elaketulo: float):
-        alaraja=47_000*self.kk_jakaja
-        pros=0.0585
-        vero=max(elaketulo-alaraja,0)*pros
-        return vero
-    
-    def raippavero2020(self,elaketulo: float):
-        alaraja=47_000*self.kk_jakaja
-        pros=0.0585
-        vero=max(elaketulo-alaraja,0)*pros
-        return vero
-    
-    def raippavero2021(self,elaketulo: float):
-        alaraja=47_000*self.kk_jakaja
-        pros=0.0585
-        vero=max(elaketulo-alaraja,0)*pros
-        return vero
-    
-    def raippavero2022(self,elaketulo: float):
-        alaraja=47_000*self.kk_jakaja
-        pros=0.0585
-        vero=max(elaketulo-alaraja,0)*pros
-        return vero
-    
-    def raippavero2023(self,elaketulo: float):
-        alaraja=47_000*self.kk_jakaja
-        pros=0.0585
-        vero=max(elaketulo-alaraja,0)*pros
-        return vero
-
-    def raippavero2024(self,elaketulo: float):
-        alaraja=47_000*self.kk_jakaja
-        pros=0.0585
-        vero=max(elaketulo-alaraja,0)*pros
-        return vero
-        
-    def valtionvero_asteikko_2018(self):
-        rajat=np.array([17200,25700,42400,74200])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
-        return rajat,pros
-    
-    def valtionvero_asteikko_2019(self):
-        rajat=np.array([17600,26400,43500,76100])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
-        return rajat,pros
-
-    def valtionvero_asteikko_2020(self):
-        rajat=np.array([18100,27200,44800,78500])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
-        return rajat,pros
-
-    def valtionvero_asteikko_2021(self):
-        rajat=np.array([18600,27900,45900,80500])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
-        return rajat,pros
-        
-    def valtionvero_asteikko_2022(self):
-        rajat=np.array([19200,28700,47300,82900])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.06,0.1725,0.2125,0.3125+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.3125+self.additional_income_tax_high+self.additional_income_tax))
-        return rajat,pros
-        
-    def valtionvero_asteikko_2023(self):
-        rajat=np.array([0,19900,29700,49000,85800])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
-        return rajat,pros
-        
-    def valtionvero_asteikko_2024(self):
-        rajat=np.array([0,19900,29700,49000,85800])/self.kk_jakaja*1.03
-        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
-        return rajat,pros
-        
     def laske_elatustuki(self,lapsia: int,aikuisia: int):
         if self.year==2018:
             elatustuki=156.39*lapsia
@@ -1725,8 +1770,7 @@ class Benefits():
         '''
         Sote-alueiden vuoksi kunnallisveroa siirrettiin valtionveroon. Rakennemuutos
         '''
-        #rajat,pros=self.valtionvero_asteikko()
-        rajat,pros=self.valtionvero_asteikko_2023()
+        rajat,pros=self.valtionvero_asteikko()
 
         vero=0
 
@@ -3495,23 +3539,23 @@ class Benefits():
         prosentti=0.85 # vastaa 85 %
         perusomavastuu=56.78 # e/kk, 2019
         if p['aikuisia']<2:
-            tuloraja=9_534/12
+            tuloraja=10_280/12
         else:
-            tuloraja=15_565/12
+            tuloraja=16_783/12
             #if puolisolla_oikeus:
-            #    tuloraja=15_565/12
+            #    tuloraja=16_783/12
             #else:
-            #    tuloraja=13_676/12 # oletetaan että puolisolla ei oikeutta asumistukeen
+            #    tuloraja=14_746/12 # oletetaan että puolisolla ei oikeutta asumistukeen
             
         lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
         
         if p['aikuisia']>1:
-            if tuki<6.92:
+            if tuki<7.46:
                 tuki=0
         else:
-            if tuki<3.46:
+            if tuki<3.73:
                 tuki=0
         
         if self.use_extra_ppr:
@@ -4865,3 +4909,4 @@ class Benefits():
 
     def compare_q(self,q1,q2):
         compare_q_print(q1,q2)
+
