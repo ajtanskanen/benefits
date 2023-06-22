@@ -9,7 +9,7 @@ extensions = [
 
 setup(
     name='fin_benefits',
-    version='1.3.0',
+    version='1.9.0',
     packages=find_packages(),
     install_requires=['numpy'],
     
