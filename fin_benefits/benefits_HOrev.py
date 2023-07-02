@@ -3,10 +3,11 @@ import gym
 from gym import spaces, logger, utils, error
 from gym.utils import seeding
 import numpy as np
+from .benefits_HO import BenefitsHO
 from .benefits import Benefits
 import random
 
-class BenefitsHO(Benefits):
+class BenefitsHOrev(Benefits):
     """
     Description:
         Changes to unemployment benefits in the EK model
@@ -24,6 +25,8 @@ class BenefitsHO(Benefits):
         self.year=2023
         self.set_year(self.year)
         self.muuta_ansiopv_ylaraja=False
+        #self.sovitteluprosentti=0.5
+        self.sovitteluprosentti=0.6
         
     def set_year(self,vuosi):
         super().set_year(vuosi)
@@ -38,9 +41,9 @@ class BenefitsHO(Benefits):
         # 2 kk -> 80%
         # 34 vko -> 75%
         if self.porrastus:
-            if kesto>34/52*12*21.5:
+            if kesto>34/52*12*25:
                 kerroin=0.75
-            elif kesto>2*21.5:
+            elif kesto>2*25:
                 kerroin=0.80
             else:
                 kerroin=1.00
@@ -49,8 +52,13 @@ class BenefitsHO(Benefits):
             
         p2=p.copy()
 
-        p2['tyottomyysturva_suojaosa_taso']=0
-        p2['ansiopvrahan_suojaosa']=0
+        if True: # False = suojaosat säilyvät
+            p2['tyottomyysturva_suojaosa_taso']=300
+            p2['ansiopvrahan_suojaosa']=0
+        else:
+            p2['tyottomyysturva_suojaosa_taso']=0
+            p2['ansiopvrahan_suojaosa']=0
+
         p2['ansiopvraha_lapsikorotus']=0
 
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
@@ -75,8 +83,8 @@ class BenefitsHO(Benefits):
         # 137    130    123    118
 
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[563, 563, 447, 394],[808, 808, 652, 574],[1_019, 1_019, 828, 734],[1_188, 1_188, 981, 875]])
-        max_lisa=np.array([148, 148, 134, 129])
+        max_menot=np.array([[582, 563, 447, 394],[843, 808, 652, 574],[1_072, 1_019, 828, 734],[1_253, 1_188, 981, 875]])
+        max_lisa=np.array([156, 148, 134, 129])
         # kuntaryhma=3
 
         max_menot[:,0]=max_menot[:,1]
@@ -86,8 +94,12 @@ class BenefitsHO(Benefits):
 
         prosentti=0.7 # vastaa 80 %
         suojaosa=0 #p['asumistuki_suojaosa']*p['aikuisia']
-        lapsiparam=246
-        perusomavastuu=max(0,0.50*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*p['aikuisia']+lapsiparam*p['lapsia'])))
+        lapsiparam=246#*1.5
+        if p['aikuisia']<2 and p['lapsia']>0 and True:
+            perusomavastuu=max(0,0.50*(0.8*max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*p['aikuisia']+lapsiparam*p['lapsia'])))
+        else:
+            perusomavastuu=max(0,0.50*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*p['aikuisia']+lapsiparam*p['lapsia'])))
+
         if perusomavastuu<10:
             perusomavastuu=0
         #if p['aikuisia']==1 and p['tyoton']==1 and p['saa_ansiopaivarahaa']==0 and palkkatulot<1 and p['lapsia']==0:
@@ -110,20 +122,51 @@ class BenefitsHO(Benefits):
         return rajat,pros
 
     def lapsilisa2023(self,yksinhuoltajakorotus: bool=False) -> float:
-        lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69]) + 2.0
+        lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
             # yksinhuoltajakorotus 53,30 e/lapsi
-            lapsilisat += 68.3 + 10.0
+            lapsilisat += 68.3 + 10
             
         return lapsilisat
 
-    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara: float,tyotaikaisettulot: float,vakpalkka: float,vakiintunutpalkka: float,peruspvraha: float) -> float:
-        if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
-            return max(0,vakpalkka-tyotaikaisettulot) 
-           
-        return ansiopaivarahamaara 
+    def ansiopaivaraha_sovittelu(self,tuki2: float,tyotaikaisettulot: float,suojaosa: float):
+        vahentavat_tulot=max(0,tyotaikaisettulot-suojaosa)
+        ansiopaivarahamaara=max(0,tuki2-self.sovitteluprosentti*vahentavat_tulot)
 
-    def tyotulovahennys2023(self,ika: float,lapsia: int):
+        return ansiopaivarahamaara
+
+    def soviteltu_peruspaivaraha(self,lapsia: int,tyotaikaisettulot: float,ansiopvrahan_suojaosa: int,p: dict) -> float:
+        suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa,p)
+
+        pvraha=self.peruspaivaraha(lapsia)
+        vahentavattulo=max(0,tyotaikaisettulot-suojaosa)
+        tuki=max(0,pvraha-self.sovitteluprosentti*vahentavattulo)
+    
+        return tuki        
+
+    # yläraja 90% ansionalenemasta
+    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara: float,tyotaikaisettulot: float,vakpalkka: float,vakiintunutpalkka: float,peruspvraha: float) -> float:
+        return ansiopaivarahamaara
+
+        # nykytila
+        #if vakpalkka < ansiopaivarahamaara+tyotaikaisettulot:
+        #    return max(0,vakpalkka-tyotaikaisettulot)
+
+        #if vakiintunutpalkka < ansiopaivarahamaara+tyotaikaisettulot:
+        #    return max(0,vakiintunutpalkka-tyotaikaisettulot)
+        #else:
+        #    return ansiopaivarahamaara
+
+        #if self.muuta_ansiopv_ylaraja:
+        #    perus=self.peruspaivaraha(0) 
+        #    ansiopv = max(peruspvraha,min(ansiopaivarahamaara,0.8*(vakiintunutpalkka-tyotaikaisettulot)))
+        #    #if ansiopv<ansiopaivarahamaara:
+        #    #    print('ansiopaivarahamaara',ansiopaivarahamaara,'peruspvraha',peruspvraha,'tyotaikaisettulot',tyotaikaisettulot,':',ansiopv)
+        #    return ansiopv
+        #else:
+        #    return super().ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,peruspvraha)
+
+    def tyotulovahennys2023(self,ika: float,lapsia: int) -> float:
         if ika>=60:
             if ika>=62:
                 max_tyotulovahennys=2430/self.kk_jakaja
@@ -133,6 +176,7 @@ class BenefitsHO(Benefits):
                 max_tyotulovahennys=2230/self.kk_jakaja
         else:
             max_tyotulovahennys=2030/self.kk_jakaja
+
         max_tyotulovahennys += 50*lapsia/self.kk_jakaja
 
         ttulorajat=np.array([0,22000,70000])/self.kk_jakaja 

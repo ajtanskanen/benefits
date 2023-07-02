@@ -298,7 +298,7 @@ class Marginals():
     def plot_julkinen_vaikutus(self,netto,palkka,nettopalkka,asumistuki,toimeentulotuki,ansiopvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
             ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=True,
             csfont=None,min_salary=None,max_salary=None,legend=True,source=None,header=None,head_text='',figname=None,show=True,
-            extraheader=None):
+            extraheader=None,counter=False,countertext=''):
     
         if ax is None:
             figi,axs = plt.subplots()

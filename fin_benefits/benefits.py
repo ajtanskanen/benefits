@@ -499,11 +499,12 @@ class Benefits():
             pvraha=21.5*(37.21+lisa)*1.03
         tuki=max(0,pvraha)    
     
-        return tuki        
+        return tuki
+
     def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara: float,tyotaikaisettulot: float,vakpalkka: float,vakiintunutpalkka: float,peruspvraha: float) -> float:
         if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
             return max(0,vakpalkka-tyotaikaisettulot) 
-            
+           
         return ansiopaivarahamaara   
         
     def laske_sotumaksu(self,vuosi: int):
@@ -528,10 +529,14 @@ class Benefits():
             
         return sotumaksu
         
-    def ansiopaivaraha(self,tyoton: int,vakiintunutpalkka,lapsia: int,tyotaikaisettulot: float,saa_ansiopaivarahaa: int,kesto: float,p: dict,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
+    def ansiopaivaraha(self,tyoton: int,vakiintunutpalkka,lapsia: int,tyotaikaisettulot: float,saa_ansiopaivarahaa: int,
+                       kesto: float,p: dict,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
     
+        #if 'tyottomyysturva_suojaosa_taso' in p:
+        #    print('tyottomyysturva_suojaosa_taso',p['tyottomyysturva_suojaosa_taso'])
+
         if tyoton>0 and p[alku+'elakkeella']<1:
             if lapsikorotus<1:
                 lapsia=0    
@@ -583,6 +588,7 @@ class Benefits():
         
                 vahentavat_tulot=max(0,tyotaikaisettulot-suojaosa)
                 ansiopaivarahamaara=max(0,tuki2-0.5*vahentavat_tulot)
+                ansiopaivarahamaara = self.ansiopaivaraha_sovittelu(tuki2,tyotaikaisettulot,suojaosa)
                 soviteltuperus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
                 ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,soviteltuperus)  
 
@@ -595,7 +601,7 @@ class Benefits():
                     tuki=omavastuukerroin*perus
                 else: # tm-tuki
                     ansiopaivarahamaara=0
-                    perus=self.soviteltu_tmtuki(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
+                    perus=self.soviteltu_tmtuki(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p) 
                     tuki=omavastuukerroin*perus
         else:
             perus=0    
@@ -603,6 +609,12 @@ class Benefits():
             ansiopaivarahamaara=0   
 
         return tuki,ansiopaivarahamaara,perus
+
+    def ansiopaivaraha_sovittelu(self,tuki2: float,tyotaikaisettulot: float,suojaosa: float):
+        vahentavat_tulot=max(0,tyotaikaisettulot-suojaosa)
+        ansiopaivarahamaara=max(0,tuki2-0.5*vahentavat_tulot)
+
+        return ansiopaivarahamaara
 
     def soviteltu_peruspaivaraha(self,lapsia: int,tyotaikaisettulot: float,ansiopvrahan_suojaosa: int,p: dict) -> float:
         suojaosa=self.tyottomyysturva_suojaosa(ansiopvrahan_suojaosa,p)
@@ -715,10 +727,15 @@ class Benefits():
 
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
-    def elaketulovahennys2024(self,elaketulot: float,tulot: float):
-        max_elaketulovahennys_kunnallis=10_320/self.kk_jakaja*1.03
-        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,max_elaketulovahennys_kunnallis-0.51*max(0,tulot-max_elaketulovahennys_kunnallis))))
+    def elaketulovahennys2024(self,elaketulot: float,puhdas_ansiotulo: float):
+        raja1_elaketulovahennys_kunnallis=10_320/self.kk_jakaja
+        raja2_elaketulovahennys_kunnallis=22_500/self.kk_jakaja
+        elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,raja1_elaketulovahennys_kunnallis
+            -0.51*max(0,min(puhdas_ansiotulo,raja2_elaketulovahennys_kunnallis)-raja1_elaketulovahennys_kunnallis)
+            -0.15*max(0,puhdas_ansiotulo-raja2_elaketulovahennys_kunnallis)))
+        )
         elaketulovahennys_valtio=elaketulovahennys_kunnallis
+
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
     def tyotulovahennys2018(self):
@@ -751,35 +768,30 @@ class Benefits():
         ttulopros=np.array([0.13,0.0196,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
-    def tyotulovahennys2023(self,ika: float):
+    def tyotulovahennys2023(self,ika: float,lapsia: int):
         if ika>=60:
             if ika>=62:
-                max_tyotulovahennys=2230/self.kk_jakaja
-            elif ika>=65:
                 max_tyotulovahennys=2430/self.kk_jakaja
-            else:
+            elif ika>=65:
                 max_tyotulovahennys=2630/self.kk_jakaja
+            else:
+                max_tyotulovahennys=2230/self.kk_jakaja
         else:
             max_tyotulovahennys=2030/self.kk_jakaja
         ttulorajat=np.array([0,22000,70000])/self.kk_jakaja 
         ttulopros=np.array([0.13,0.0203,0.0121])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
-    def tyotulovahennys2024(self,ika: float):
-        if ika>=60:
-            if ika>=62:
-                max_tyotulovahennys=2230/self.kk_jakaja
-            elif ika>=65:
-                max_tyotulovahennys=2430/self.kk_jakaja
-            else:
-                max_tyotulovahennys=2630/self.kk_jakaja
+    def tyotulovahennys2024(self,ika: float,lapsia: int):
+        if ika>=65:
+            max_tyotulovahennys=3230/self.kk_jakaja
         else:
-            max_tyotulovahennys=2030/self.kk_jakaja*1.032
+            max_tyotulovahennys=2030/self.kk_jakaja
         ttulorajat=np.array([0,22000,77000])/self.kk_jakaja*1.032 # 127000??
         ttulopros=np.array([0.13,0.0203,0.121])
         return max_tyotulovahennys,ttulorajat,ttulopros
         
-    def laske_tyotulovahennys2018_2022(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float):
+    def laske_tyotulovahennys2018_2022(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float, lapsia: int):
         '''
         Vuosille 2018-2022
         '''
@@ -804,11 +816,11 @@ class Benefits():
                 
         return tyotulovahennys
         
-    def laske_tyotulovahennys2023_2024(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float):
+    def laske_tyotulovahennys2023_2024(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float,lapsia: float):
         '''
         Vuosille 2023-
         '''
-        max_tyotulovahennys,ttulorajat,ttulopros=self.tyotulovahennys(ika)
+        max_tyotulovahennys,ttulorajat,ttulopros=self.tyotulovahennys(ika,lapsia)
     
         tyotulovahennys=min(max_tyotulovahennys,max(0,ttulopros[0]*max(0,palkkatulot_puhdas-ttulorajat[0])))
         tyotulovahennys=max(0,tyotulovahennys-ttulopros[1]*max(0,min(ttulorajat[2],puhdas_ansiotulo)-ttulorajat[1])-ttulopros[2]*max(0,puhdas_ansiotulo-ttulorajat[2]))    
@@ -1288,7 +1300,7 @@ class Benefits():
 
         # työtulovähennys vähennetään valtionveroista
 
-        tyotulovahennys=self.laske_tyotulovahennys(puhdas_ansiotulo,palkkatulot_puhdas,p['ika'])
+        tyotulovahennys=self.laske_tyotulovahennys(puhdas_ansiotulo,palkkatulot_puhdas,p['ika'],lapsia)
 
         # perusvähennys
         if self.year>=2023:
@@ -1448,7 +1460,7 @@ class Benefits():
         return rajat,pros
         
     def valtionvero_asteikko_2024(self):
-        rajat=np.array([0,19900,29700,49000,85800])/self.kk_jakaja*1.03
+        rajat=np.array([0,19_900*1.03,29_700*1.03,49_000*1.03,150_000])/self.kk_jakaja
         pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros               
@@ -1991,9 +2003,9 @@ class Benefits():
             q['isyyspaivaraha'],q['aitiyspaivaraha'],q['kotihoidontuki'],q['sairauspaivaraha']=(0,0,0,0)
             q['opintotuki']=0
             if p['aitiysvapaalla']>0:
-                q['aitiyspaivaraha']=self.aitiysraha(p['vakiintunutpalkka'],p['aitiysvapaa_kesto'])
+                q['aitiyspaivaraha']=self.aitiysraha(0,p['vakiintunutpalkka'],p['aitiysvapaa_kesto'])
             elif p['isyysvapaalla']>0:
-                q['isyyspaivaraha']=self.isyysraha(p['vakiintunutpalkka'])
+                q['isyyspaivaraha']=self.isyysraha(0,p['vakiintunutpalkka'])
             elif p['kotihoidontuella']>0:
                 q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
             else:
@@ -2007,11 +2019,11 @@ class Benefits():
             q['ansiopvraha'],q['puhdasansiopvraha'],q['peruspvraha']=(0,0,0)
             q['isyyspaivaraha'],q['aitiyspaivaraha'],q['kotihoidontuki'],q['sairauspaivaraha']=(0,0,0,0)
             if p['aitiysvapaalla']>0:
-                q['aitiyspaivaraha']=self.aitiysraha(p['vakiintunutpalkka'],p['aitiysvapaa_kesto'])
+                q['aitiyspaivaraha']=self.aitiysraha(0,p['vakiintunutpalkka'],p['aitiysvapaa_kesto'])
             elif p['isyysvapaalla']>0:
-                q['isyyspaivaraha']=self.isyysraha(p['vakiintunutpalkka'])
+                q['isyyspaivaraha']=self.isyysraha(0,p['vakiintunutpalkka'])
             elif p['sairauspaivarahalla']>0:
-                q['sairauspaivaraha']=self.sairauspaivaraha(p['vakiintunutpalkka'])
+                q['sairauspaivaraha']=self.sairauspaivaraha(0,p['vakiintunutpalkka'])
             elif p['kotihoidontuella']>0:
                 q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
             elif p['tyoton']>0:
@@ -2040,9 +2052,9 @@ class Benefits():
                 q['puoliso_isyyspaivaraha'],q['puoliso_aitiyspaivaraha'],q['puoliso_kotihoidontuki'],q['puoliso_sairauspaivaraha']=(0,0,0,0)
                 q['puoliso_opintotuki']=0
                 if p['puoliso_aitiysvapaalla']>0:
-                    q['puoliso_aitiyspaivaraha']=self.aitiysraha(p['puoliso_vakiintunutpalkka'],p['puoliso_aitiysvapaa_kesto'])
+                    q['puoliso_aitiyspaivaraha']=self.aitiysraha(0,p['puoliso_vakiintunutpalkka'],p['puoliso_aitiysvapaa_kesto'])
                 elif p['puoliso_isyysvapaalla']>0:
-                    q['puoliso_isyyspaivaraha']=self.isyysraha(p['puoliso_vakiintunutpalkka'])
+                    q['puoliso_isyyspaivaraha']=self.isyysraha(0,p['puoliso_vakiintunutpalkka'])
                 elif p['puoliso_kotihoidontuella']>0:
                     q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
                 else:
@@ -2056,11 +2068,11 @@ class Benefits():
                 q['puoliso_ansiopvraha'],q['puoliso_puhdasansiopvraha'],q['puoliso_peruspvraha']=(0,0,0)
                 q['puoliso_isyyspaivaraha'],q['puoliso_aitiyspaivaraha'],q['puoliso_kotihoidontuki'],q['puoliso_sairauspaivaraha']=(0,0,0,0)
                 if p['puoliso_aitiysvapaalla']>0:
-                    q['puoliso_aitiyspaivaraha']=self.aitiysraha(p['puoliso_vakiintunutpalkka'],p['puoliso_aitiysvapaa_kesto'])
+                    q['puoliso_aitiyspaivaraha']=self.aitiysraha(0,p['puoliso_vakiintunutpalkka'],p['puoliso_aitiysvapaa_kesto'])
                 elif p['puoliso_isyysvapaalla']>0:
-                    q['puoliso_isyyspaivaraha']=self.isyysraha(p['puoliso_vakiintunutpalkka'])
+                    q['puoliso_isyyspaivaraha']=self.isyysraha(0,p['puoliso_vakiintunutpalkka'])
                 elif p['puoliso_sairauspaivarahalla']>0:
-                    q['puoliso_sairauspaivaraha']=self.sairauspaivaraha(p['puoliso_vakiintunutpalkka'])
+                    q['puoliso_sairauspaivaraha']=self.sairauspaivaraha(0,p['puoliso_vakiintunutpalkka'])
                 elif p['puoliso_kotihoidontuella']>0:
                     q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
                 elif p['puoliso_tyoton']>0:
@@ -2213,7 +2225,8 @@ class Benefits():
 
         return kateen,q
         
-    def setup_puoliso_q(self,p: dict,q: dict,puoliso: str='puoliso_',alku: str='puoliso_',include_takuuelake: bool=True,include_kansanelake: bool=True):
+    def setup_puoliso_q(self,p: dict,q: dict,puoliso: str='puoliso_',alku: str='puoliso_',
+                        include_takuuelake: bool=True,include_kansanelake: bool=True) -> dict:
         q[puoliso+'multiplier']=1
         q[puoliso+'perustulo']=0
         q[puoliso+'puhdas_tyoelake']=0
@@ -2259,9 +2272,9 @@ class Benefits():
                 q[puoliso+'isyyspaivaraha'],q[puoliso+'aitiyspaivaraha'],q[puoliso+'kotihoidontuki'],q[puoliso+'sairauspaivaraha']=(0,0,0,0)
                 q[puoliso+'opintotuki']=0
                 if p[alku+'aitiysvapaalla']>0:
-                    q[puoliso+'aitiyspaivaraha']=self.aitiysraha(p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
+                    q[puoliso+'aitiyspaivaraha']=self.aitiysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
                 elif p[alku+'isyysvapaalla']>0:
-                    q[puoliso+'isyyspaivaraha']=self.isyysraha(p[alku+'vakiintunutpalkka'])
+                    q[puoliso+'isyyspaivaraha']=self.isyysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'])
                 elif p[alku+'kotihoidontuella']>0:
                     q[puoliso+'kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
                 else:
@@ -2275,11 +2288,11 @@ class Benefits():
                 q[puoliso+'ansiopvraha'],q[puoliso+'puhdasansiopvraha'],q[puoliso+'peruspvraha']=(0,0,0)
                 q[puoliso+'isyyspaivaraha'],q[puoliso+'aitiyspaivaraha'],q[puoliso+'kotihoidontuki'],q[puoliso+'sairauspaivaraha']=(0,0,0,0)
                 if p[alku+'aitiysvapaalla']>0:
-                    q[puoliso+'aitiyspaivaraha']=self.aitiysraha(p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
+                    q[puoliso+'aitiyspaivaraha']=self.aitiysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
                 elif p[alku+'isyysvapaalla']>0:
-                    q[puoliso+'isyyspaivaraha']=self.isyysraha(p[alku+'vakiintunutpalkka'])
+                    q[puoliso+'isyyspaivaraha']=self.isyysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'])
                 elif p[alku+'sairauspaivarahalla']>0:
-                    q[puoliso+'sairauspaivaraha']=self.sairauspaivaraha(p[alku+'vakiintunutpalkka'])
+                    q[puoliso+'sairauspaivaraha']=self.sairauspaivaraha(p[alku+'t'],p[alku+'vakiintunutpalkka'])
                 elif p[alku+'kotihoidontuella']>0:
                     q[puoliso+'kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
                 elif p[alku+'tyoton']>0:
@@ -2355,9 +2368,9 @@ class Benefits():
             q[omat+'isyyspaivaraha'],q[omat+'aitiyspaivaraha'],q[omat+'kotihoidontuki'],q[omat+'sairauspaivaraha']=(0,0,0,0)
             q[omat+'opintotuki']=0
             if p[alku+'aitiysvapaalla']>0:
-                q[omat+'aitiyspaivaraha']=self.aitiysraha(p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
+                q[omat+'aitiyspaivaraha']=self.aitiysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
             elif p[alku+'isyysvapaalla']>0:
-                q[omat+'isyyspaivaraha']=self.isyysraha(p[alku+'vakiintunutpalkka'])
+                q[omat+'isyyspaivaraha']=self.isyysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'])
             elif p[alku+'kotihoidontuella']>0:
                 q[omat+'kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
             else:
@@ -2371,11 +2384,11 @@ class Benefits():
             q[omat+'ansiopvraha'],q[omat+'puhdasansiopvraha'],q[omat+'peruspvraha']=(0,0,0)
             q[omat+'isyyspaivaraha'],q[omat+'aitiyspaivaraha'],q[omat+'kotihoidontuki'],q[omat+'sairauspaivaraha']=(0,0,0,0)
             if p[alku+'aitiysvapaalla']>0:
-                q[omat+'aitiyspaivaraha']=self.aitiysraha(p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
+                q[omat+'aitiyspaivaraha']=self.aitiysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'],p[alku+'aitiysvapaa_kesto'])
             elif p[alku+'isyysvapaalla']>0:
-                q[omat+'isyyspaivaraha']=self.isyysraha(p[alku+'vakiintunutpalkka'])
+                q[omat+'isyyspaivaraha']=self.isyysraha(p[alku+'t'],p[alku+'vakiintunutpalkka'])
             elif p[alku+'sairauspaivarahalla']>0:
-                q[omat+'sairauspaivaraha']=self.sairauspaivaraha(p[alku+'vakiintunutpalkka'])
+                q[omat+'sairauspaivaraha']=self.sairauspaivaraha(p[alku+'t'],p[alku+'vakiintunutpalkka'])
             elif p[alku+'kotihoidontuella']>0:
                 q[omat+'kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
             elif p['tyoton']>0:
@@ -3078,7 +3091,7 @@ class Benefits():
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
         
-        if tuki<15:
+        if tuki<30:
             tuki=0
     
         return tuki
@@ -3117,7 +3130,7 @@ class Benefits():
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
     
-        if tuki<15:
+        if tuki<30:
             tuki=0
     
         return tuki
@@ -3156,7 +3169,7 @@ class Benefits():
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
     
-        if tuki<15:
+        if tuki<30:
             tuki=0
     
         return tuki
@@ -3195,7 +3208,7 @@ class Benefits():
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
     
-        if tuki<15:
+        if tuki<30:
             tuki=0
     
         return tuki
@@ -3234,7 +3247,7 @@ class Benefits():
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
             
-        if tuki<15:
+        if tuki<30:
             tuki=0
     
         return tuki
@@ -3273,7 +3286,7 @@ class Benefits():
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
             
-        if tuki<15:
+        if tuki<30:
             tuki=0
     
         return tuki    
@@ -3293,8 +3306,8 @@ class Benefits():
         # 
         # 137    130    123    118
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[582, 563, 447, 394],[843, 808, 652, 574],[1_072, 1_019, 828, 734],[1_253, 1_188, 981, 875]])*1.03
-        max_lisa=np.array([156, 148, 134, 129])*1.03
+        max_menot=np.array([[605, 585, 465, 410],[877, 840, 678, 597],[1_115, 1_060, 861, 673],[1_303, 1_235, 1_020, 910]])
+        max_lisa=np.array([162, 154, 139, 134])
         # kuntaryhma=3
 
         max_meno=max_menot[min(3,p['aikuisia']+p['lapsia']-1),p['kuntaryhma']]+max(0,p['aikuisia']+p['lapsia']-4)*max_lisa[p['kuntaryhma']]
@@ -3312,7 +3325,7 @@ class Benefits():
         if self.use_extra_ppr:
             tuki=tuki*self.extra_ppr_factor
             
-        if tuki<15:
+        if tuki<30:
             tuki=0
     
         return tuki            
@@ -4479,7 +4492,7 @@ class Benefits():
     
         return kokoelake
 
-    def isyysraha_perus(self,vakiintunutpalkka: float):
+    def isyysraha_perus(self,palkka: float,vakiintunutpalkka: float):
         if self.year==2018:
             minimi=27.86*25
             taite1=37_861/12  
@@ -4518,9 +4531,9 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunutpalkka)+0.4*max(min(taite2,vakiintunutpalkka)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def aitiysraha2018(self,vakiintunutpalkka: float,kesto: float):
+    def aitiysraha2018(self,palkka: float,vakiintunutpalkka: float,kesto: float):
         if kesto<56/260:
             minimi=27.86*25
             taite1=37_861/12  
@@ -4534,9 +4547,9 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
                 
-    def aitiysraha2019(self,vakiintunutpalkka: float,kesto: float):
+    def aitiysraha2019(self,palkka: float,vakiintunutpalkka: float,kesto: float):
         if kesto<56/260:
             minimi=27.86*25
             taite1=37_861/12  
@@ -4550,9 +4563,9 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def aitiysraha2020(self,vakiintunutpalkka: float,kesto: float):
+    def aitiysraha2020(self,palkka: float,vakiintunutpalkka: float,kesto: float):
         if kesto<56/260:
             minimi=28.94*25
             taite1=37_861/12  
@@ -4566,9 +4579,9 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def aitiysraha2021(self,vakiintunutpalkka: float,kesto: float):
+    def aitiysraha2021(self,palkka: float,vakiintunutpalkka: float,kesto: float):
         if kesto<56/260:
             minimi=29.05*25
             taite1=39_144/12  
@@ -4582,9 +4595,9 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def aitiysraha2022(self,vakiintunutpalkka: float,kesto: float):
+    def aitiysraha2022(self,palkka: float,vakiintunutpalkka: float,kesto: float):
         if kesto<56/260:
             minimi=29.67*25
             taite1=39_144/12  
@@ -4598,9 +4611,9 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def aitiysraha2023(self,vakiintunutpalkka: float,kesto: float):
+    def aitiysraha2023(self,palkka: float,vakiintunutpalkka: float,kesto: float):
         if kesto<56/260:
             minimi=31.99*25
             taite1=40_106/12  
@@ -4614,9 +4627,9 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def aitiysraha2024(self,vakiintunutpalkka: float,kesto: float):
+    def aitiysraha2024(self,palkka: float,vakiintunutpalkka: float,kesto: float):
         if kesto<56/260:
             minimi=31.99*25
             taite1=40_106/12  
@@ -4630,17 +4643,18 @@ class Benefits():
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.4*max(vakiintunutpalkka-taite2,0))
 
-        return raha        
-    def sairauspaivaraha2018(self,vakiintunutpalkka: float):
+        return max(raha,palkka)
+
+    def sairauspaivaraha2018(self,palkka: float,vakiintunutpalkka: float):
         minimi=24.64*25
         taite1=30_394/12
         taite2=58_252/12
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.2*max(vakiintunut-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def sairauspaivaraha2019(self,vakiintunutpalkka: float):
+    def sairauspaivaraha2019(self,palkka: float,vakiintunutpalkka: float):
         minimi=27.86*25
         taite1=30_394/12
         taite2=57_183/12
@@ -4648,52 +4662,52 @@ class Benefits():
 
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.4*max(min(taite2,vakiintunut)-taite1,0)+0.2*max(vakiintunut-taite2,0))
 
-        return raha
+        return max(0,raha-palkka)
 
-    def sairauspaivaraha2020(self,vakiintunutpalkka: float):
+    def sairauspaivaraha2020(self,palkka: float,vakiintunutpalkka: float):
         minimi=28.94*25
         taite1=31_595/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def sairauspaivaraha2021(self,vakiintunutpalkka: float):
+    def sairauspaivaraha2021(self,palkka: float,vakiintunutpalkka: float):
         minimi=29.05*25
         taite1=32_011/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
-        return raha
+        return max(0,raha-palkka)
         
-    def sairauspaivaraha2022(self,vakiintunutpalkka: float):
+    def sairauspaivaraha2022(self,palkka: float,vakiintunutpalkka: float):
         minimi=30.71*25
         taite1=32_011/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
-        return raha
+        return max(0,raha-palkka)
 
-    def sairauspaivaraha2023(self,vakiintunutpalkka: float):
+    def sairauspaivaraha2023(self,palkka: float,vakiintunutpalkka: float):
         minimi=31.99*25
         taite1=32_797/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
-        return raha
+        return max(0,raha-palkka)
 
-    def sairauspaivaraha2024(self,vakiintunutpalkka: float):
+    def sairauspaivaraha2024(self,palkka: float,vakiintunutpalkka: float):
         minimi=31.99*25
         taite1=32_797/12  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
-        return raha
+        return max(0,raha-palkka)
         
     # valitaan oikeat funktiot vuoden mukaan
     def set_year(self,vuosi: int):
