@@ -8,7 +8,7 @@
 """
 
 import numpy as np
-from .parameters import perheparametrit, print_examples, tee_selite
+from .parameters import perheparametrit, print_examples, tee_selite,get_n_perheet
 from .labels import Labels
 from .ben_utils import get_palette_EK,get_style_EK, compare_q_print, print_q
 import matplotlib.pyplot as plt
@@ -897,7 +897,7 @@ class Marginals():
     def laske_ja_plottaa_hila(self,min_salary=0,max_salary=8000,type='eff',dt=100,maxn=None,dire=None,palette_EK=True,grayscale=False,
             incl_perustulo=False,incl_alv=False,source='Lähde: EK'):
         if maxn is None:
-            maxn=36
+            maxn=_n_perheet()
     
         fig,axs = plt.subplots(int(maxn/5),5,sharex=True,sharey=True)
         for k in range(1,maxn):

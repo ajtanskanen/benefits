@@ -9,7 +9,7 @@ extensions = [
 
 setup(
     name='fin_benefits',
-    version='1.9.0',
+    version='1.10.0',
     packages=find_packages(),
     install_requires=['numpy'],
     
@@ -17,6 +17,6 @@ setup(
     author="Antti Tanskanen",
     author_email="antti.tanskanen@ek.fi",
     description="Finnish earning-related social security as a Python module. The module enables analysis of "+
-                "incentive such as participation rax rate and effective marginal tax.",
+                "incentives such as participation rax rate and effective marginal tax.",
     keywords="social-security earnings-related"
 )
