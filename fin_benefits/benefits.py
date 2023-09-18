@@ -2536,7 +2536,7 @@ class Benefits():
         return q
         
     def laske_tulot_v3(self,p: dict,tt_alennus=0,include_takuuelake: bool=True,omat: str='omat_',omatalku: str='',puoliso: str='puoliso_',puolisoalku: str='puoliso_',
-        include_alv: bool=True,split_costs: bool=True,include_kansanelake: bool=True):
+        include_alv: bool=True,split_costs: bool=True,set_equal: bool=False,include_kansanelake: bool=True):
         '''
         v4:ää varten tehty tulonlaskenta
         - eroteltu paremmin omat ja puolison tulot ja etuudet 
@@ -2557,7 +2557,7 @@ class Benefits():
         _,q[omat+'verot'],q[omat+'valtionvero'],q[omat+'kunnallisvero'],q[omat+'kunnallisveroperuste'],q[omat+'valtionveroperuste'],\
             q[omat+'ansiotulovahennys'],q[omat+'perusvahennys'],q[omat+'tyotulovahennys'],q[omat+'tyotulovahennys_kunnallisveroon'],\
             q[omat+'ptel'],q[omat+'sairausvakuutusmaksu'],q[omat+'tyotvakmaksu'],q[omat+'tyel_kokomaksu'],q[omat+'ylevero']=\
-            self.verotus(q[omat+'palkkatulot'],q[omat+'ansiopvraha']+q[omat+'aitiyspaivaraha']+q[omat+'isyyspaivaraha']\
+            self.verotus(q[omat+'palkkatulot'],q[omat+'tyotpvraha']+q[omat+'aitiyspaivaraha']+q[omat+'isyyspaivaraha']\
                 +q[omat+'kotihoidontuki']+q[omat+'sairauspaivaraha']+q[omat+'opintotuki'],
                 q[omat+'kokoelake'],lapsia,p,alku=omatalku)
         _,q[omat+'verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,lapsia,p,alku=omatalku)
@@ -2571,7 +2571,7 @@ class Benefits():
             q[puoliso+'ansiotulovahennys'],q[puoliso+'perusvahennys'],q[puoliso+'tyotulovahennys'],q[puoliso+'tyotulovahennys_kunnallisveroon'],\
             q[puoliso+'ptel'],q[puoliso+'sairausvakuutusmaksu'],q[puoliso+'tyotvakmaksu'],q[puoliso+'tyel_kokomaksu'],q[puoliso+'ylevero']=\
                 self.verotus(q[puoliso+'palkkatulot'],
-                    q[puoliso+'ansiopvraha']+q[puoliso+'aitiyspaivaraha']+q[puoliso+'isyyspaivaraha']+q[puoliso+'kotihoidontuki']+q[puoliso+'sairauspaivaraha']+q[puoliso+'opintotuki'],
+                    q[puoliso+'tyotpvraha']+q[puoliso+'aitiyspaivaraha']+q[puoliso+'isyyspaivaraha']+q[puoliso+'kotihoidontuki']+q[puoliso+'sairauspaivaraha']+q[puoliso+'opintotuki'],
                     q[puoliso+'kokoelake'],0,p,alku=puoliso) # onko oikein että lapsia 0 tässä????
             _,q[puoliso+'verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(q[puoliso+'palkkatulot'],0,0,0,p,alku=puoliso)
             if q[puoliso+'kokoelake']>0:
@@ -2601,7 +2601,7 @@ class Benefits():
         q=self.summaa_q(p,q,omat=omat,puoliso=puoliso)
         
         if q['kotihoidontuki']>0:
-            hoitol = self.hoitolisa(aikuisia+lapsia,q['palkkatulot']+q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['sairauspaivaraha']+q['opintotuki'])
+            hoitol = self.hoitolisa(aikuisia+lapsia,q['palkkatulot']+q['tyotpvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['sairauspaivaraha']+q['opintotuki'])
             q['kotihoidontuki'] += hoitol
             if q[omat+'kotihoidontuki']>0:
                 q[omat+'kotihoidontuki'] += hoitol
@@ -2622,7 +2622,7 @@ class Benefits():
         elif p[omatalku+'elakkeella']>0 or p[puolisoalku+'elakkeella']>0: # eläkkeensaajan asumistuki vain, jos toinen eläkkeellä
             q['asumistuki']=self.elakkeensaajan_asumistuki(q['palkkatulot'],q['kokoelake'],p['asumismenot_asumistuki'],aikuisia,p['kuntaryhma'],p,puolisolla_oikeus=True)
         else: # muuten yleinen asumistuki
-            q['asumistuki']=self.asumistuki(q[omat+'palkkatulot'],q[puoliso+'palkkatulot'],q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
+            q['asumistuki']=self.asumistuki(q[omat+'palkkatulot'],q[puoliso+'palkkatulot'],q['tyotpvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
                                             +q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
                                             p['asumismenot_asumistuki'],aikuisia,lapsia,p['kuntaryhma'],p)
             
@@ -2644,13 +2644,13 @@ class Benefits():
                 q['pvhoito_ilman_etuuksia']=0
             else:
                 # kuukausi lomalla, jolloin ei päivähoitoa
-                q['pvhoito']=11/12*self.paivahoitomenot(p['lapsia_paivahoidossa'],q['palkkatulot']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['sairauspaivaraha'],aikuisia,lapsia,p)
+                q['pvhoito']=11/12*self.paivahoitomenot(p['lapsia_paivahoidossa'],q['palkkatulot']+q['kokoelake']+q['elatustuki']+q['tyotpvraha']+q['sairauspaivaraha'],aikuisia,lapsia,p)
                 #if (p['lapsia_kotihoidontuella']>0):
                 #    alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['lapsia_alle_3v'])
                 #    q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
                 q['pvhoito_ilman_etuuksia']=11/12*self.paivahoitomenot(p['lapsia_paivahoidossa'],p[puolisoalku+'t']+p[omatalku+'t']+q['elatustuki'],aikuisia,lapsia,p)
                 #if p['lapsia_paivahoidossa']>0:
-                #    print('pv',q['pvhoito'],'lapsia',p['lapsia_paivahoidossa'],'t',q['palkkatulot'],'etuus',q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['sairauspaivaraha'])
+                #    print('pv',q['pvhoito'],'lapsia',p['lapsia_paivahoidossa'],'t',q['palkkatulot'],'etuus',q['kokoelake']+q['elatustuki']+q['tyotpvraha']+q['sairauspaivaraha'])
                 
             if aikuisia==1:
                 yksinhuoltajakorotus=1
@@ -2678,19 +2678,19 @@ class Benefits():
 
         # sisältää sekä omat että puolison tulot ja menot
         kateen=q['opintotuki']+q['kokoelake']+q['palkkatulot']+q['aitiyspaivaraha']+q['isyyspaivaraha']\
-            +q['kotihoidontuki']+q['asumistuki']+q['toimeentulotuki']+q['ansiopvraha']+q['elatustuki']\
+            +q['kotihoidontuki']+q['asumistuki']+q['toimeentulotuki']+q['tyotpvraha']+q['elatustuki']\
             -q['verot']-q['pvhoito']+q['lapsilisa']+q['sairauspaivaraha']
 
         brutto_omat=q[omat+'opintotuki']+q[omat+'kokoelake']+q[omat+'palkkatulot']+q[omat+'aitiyspaivaraha']\
             +q[omat+'isyyspaivaraha']+q[omat+'kotihoidontuki']+\
-            +q[omat+'ansiopvraha']+q[omat+'elatustuki']+q[omat+'sairauspaivaraha']
+            +q[omat+'tyotpvraha']+q[omat+'elatustuki']+q[omat+'sairauspaivaraha']
         kateen_omat=brutto_omat-q[omat+'verot']
         etuusnetto_omat=brutto_omat-q[omat+'palkkatulot']-(q[omat+'verot']-q[omat+'verot_ilman_etuuksia'])
                 
         if aikuisia>1:
             brutto_puoliso=q[puoliso+'opintotuki']+q[puoliso+'kokoelake']+q[puoliso+'palkkatulot']+q[puoliso+'aitiyspaivaraha']\
                 +q[puoliso+'isyyspaivaraha']+q[puoliso+'kotihoidontuki']\
-                +q[puoliso+'ansiopvraha']+q[puoliso+'elatustuki']+q[puoliso+'sairauspaivaraha']
+                +q[puoliso+'tyotpvraha']+q[puoliso+'elatustuki']+q[puoliso+'sairauspaivaraha']
             kateen_puoliso=brutto_puoliso-q[puoliso+'verot']
             etuusnetto_puoliso=brutto_puoliso-q[puoliso+'palkkatulot']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])
         else:
@@ -2699,7 +2699,7 @@ class Benefits():
             etuusnetto_puoliso=0
 
         q['kateen']=kateen # tulot yhteensä perheessä
-        q['etuustulo_netto']=q['ansiopvraha']+q['opintotuki']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
+        q['etuustulo_netto']=q['tyotpvraha']+q['opintotuki']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
             +q['toimeentulotuki']+q['kokoelake']+q['elatustuki']+q['lapsilisa']+q['sairauspaivaraha']\
             -(q['pvhoito']-q['pvhoito_ilman_etuuksia'])-(q['verot']-q['verot_ilman_etuuksia'])
         #q['etuustulo_nettonetto']=q['etuustulo_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
@@ -2722,33 +2722,43 @@ class Benefits():
                 if kateen_puoliso+kateen_omat<1e-6:
                     suhde=0.5
                 else: # jaetaan bruttotulojen suhteessa, mutta tasoitetaan eroja
-                    if kateen_omat>kateen_puoliso:
-                        if (q['asumistuki']+q['lapsilisa']+q['toimeentulotuki']-q['alv']-q['pvhoito'])>0: 
-                            suhde=kateen_puoliso/(kateen_puoliso+kateen_omat)
-                        else:
-                            suhde=kateen_omat/(kateen_puoliso+kateen_omat)
+                    suhde = kateen_omat/(kateen_puoliso+kateen_omat)
+                    summa = q['asumistuki']+q['lapsilisa']+q['toimeentulotuki']-q['alv']-q['pvhoito']
+                    if summa >= 0: 
+                        suhde = 0.5
+                    elif (summa < 0) and (summa + kateen_puoliso+kateen_omat > 0):
+                        suhde = kateen_omat/(kateen_puoliso+kateen_omat)
                     else:
-                        if (q['asumistuki']+q['lapsilisa']+q['toimeentulotuki']-q['alv']-q['pvhoito'])>0:
-                            suhde=kateen_puoliso/(kateen_puoliso+kateen_omat)
-                        else:
-                            suhde=kateen_omat/(kateen_puoliso+kateen_omat)
+                        print("ONGELMA: q['asumistuki']+q['lapsilisa']+q['toimeentulotuki']-q['alv']-q['pvhoito'] > kateen_puoliso+kateen_omat",summa, kateen_puoliso+kateen_omat)
+                        suhde = 0.5
+
+                    #if kateen_omat>kateen_puoliso:
+                    #    if (q['asumistuki']+q['lapsilisa']+q['toimeentulotuki']-q['alv']-q['pvhoito'])>0: 
+                    #        suhde = kateen_puoliso/(kateen_puoliso+kateen_omat)
+                    #    else:
+                    #        suhde = kateen_omat/(kateen_puoliso+kateen_omat)
+                    #else:
+                    #    if (q['asumistuki']+q['lapsilisa']+q['toimeentulotuki']-q['alv']-q['pvhoito'])>0:
+                    #        suhde = kateen_puoliso/(kateen_puoliso+kateen_omat)
+                    #    else:
+                    #        suhde = kateen_omat/(kateen_puoliso+kateen_omat)
                 
-                etuusnetto_omat+=(q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*suhde
-                kateen_omat+=(q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*suhde
-                brutto_omat+=(q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*suhde
+                etuusnetto_omat += (q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*suhde
+                kateen_omat += (q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*suhde
+                brutto_omat += (q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*suhde
                 if kateen_omat>0:
                     r2=etuusnetto_omat/kateen_omat
                 else:
                     r2=1
                 
-                q[omat+'toimeentulotuki']=q['toimeentulotuki']*suhde
-                q[omat+'asumistuki']=q['asumistuki']*suhde
-                q[omat+'lapsilisa']=q['lapsilisa']*suhde
+                q[omat+'toimeentulotuki'] = q['toimeentulotuki']*suhde
+                q[omat+'asumistuki'] = q['asumistuki']*suhde
+                q[omat+'lapsilisa'] = q['lapsilisa']*suhde
 
                 if etuusnetto_omat>0:
                     r_t_e=q[omat+'toimeentulotuki']/etuusnetto_omat
                     r_a_e=q[omat+'asumistuki']/etuusnetto_omat
-                    r_tt_e=q[omat+'ansiopvraha_nettonetto']/etuusnetto_omat
+                    r_tt_e=q[omat+'tyotpvraha_nettonetto']/etuusnetto_omat
                     r_tt_l=q[omat+'lapsilisa']/etuusnetto_omat
                     r_tt_ko=q[omat+'kokoelake_netto']/etuusnetto_omat
                     r_tt_op=q[omat+'opintotuki_netto']/etuusnetto_omat
@@ -2764,20 +2774,20 @@ class Benefits():
                     r_ko=0
                     r_e=0
             
-                etuusnetto_omat+=(-r2*(q['alv']+q['pvhoito']))*suhde
-                kateen_omat+=(-q['alv']-q['pvhoito'])*suhde
-                q[omat+'palkkatulot_nettonetto']+=-(1-r2)*q['alv']*suhde
-                omat_alv=q['alv']*suhde*r2
-                q[omat+'toimeentulotuki_nettonetto']=q[omat+'toimeentulotuki']-r_t_e*omat_alv
-                q[omat+'asumistuki_nettonetto']=q[omat+'asumistuki']-r_a_e*omat_alv
-                q[omat+'ansiopvraha_nettonetto']+=-r_tt_e*omat_alv
-                q[omat+'opintotuki_nettonetto']=q[omat+'opintotuki_netto']-r_tt_op*omat_alv
-                q[omat+'kokoelake_nettonetto']=q[omat+'kokoelake_netto']-r_tt_ko*omat_alv
-                q[omat+'kotihoidontuki_nettonetto']=q[omat+'kotihoidontuki_netto']-r_ko*omat_alv
-                q[omat+'elatustuki_nettonetto']=q[omat+'elatustuki']-r_e*omat_alv
-                q[omat+'lapsilisa_nettonetto']=q[omat+'lapsilisa']-r_tt_l*omat_alv
-                q[omat+'pvhoito']=q['pvhoito']*suhde
-                q[omat+'alv']=q['alv']*suhde
+                etuusnetto_omat += (-r2*(q['alv']+q['pvhoito']))*suhde
+                kateen_omat += (-q['alv']-q['pvhoito'])*suhde
+                q[omat+'palkkatulot_nettonetto'] += -(1-r2)*q['alv']*suhde
+                omat_alv = q['alv']*suhde*r2
+                q[omat+'toimeentulotuki_nettonetto'] = q[omat+'toimeentulotuki']-r_t_e*omat_alv
+                q[omat+'asumistuki_nettonetto'] = q[omat+'asumistuki']-r_a_e*omat_alv
+                q[omat+'tyotpvraha_nettonetto'] += -r_tt_e*omat_alv
+                q[omat+'opintotuki_nettonetto'] = q[omat+'opintotuki_netto']-r_tt_op*omat_alv
+                q[omat+'kokoelake_nettonetto'] = q[omat+'kokoelake_netto']-r_tt_ko*omat_alv
+                q[omat+'kotihoidontuki_nettonetto'] = q[omat+'kotihoidontuki_netto']-r_ko*omat_alv
+                q[omat+'elatustuki_nettonetto'] = q[omat+'elatustuki']-r_e*omat_alv
+                q[omat+'lapsilisa_nettonetto'] = q[omat+'lapsilisa']-r_tt_l*omat_alv
+                q[omat+'pvhoito'] = q['pvhoito']*suhde
+                q[omat+'alv'] = q['alv']*suhde
             
                 etuusnetto_puoliso+=(q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*(1-suhde)
                 kateen_puoliso+=(q['asumistuki']+q['lapsilisa']+q['toimeentulotuki'])*(1-suhde)
@@ -2787,18 +2797,18 @@ class Benefits():
                 else:
                     r2=1
                 
-                q[puoliso+'toimeentulotuki']=q['toimeentulotuki']*(1-suhde)
-                q[puoliso+'asumistuki']=q['asumistuki']*(1-suhde)
-                q[puoliso+'lapsilisa']=q['lapsilisa']*(1-suhde)
+                q[puoliso+'toimeentulotuki'] = q['toimeentulotuki']*(1-suhde)
+                q[puoliso+'asumistuki'] = q['asumistuki']*(1-suhde)
+                q[puoliso+'lapsilisa'] = q['lapsilisa']*(1-suhde)
                 if etuusnetto_puoliso>0:
-                    r_t_e=q[puoliso+'toimeentulotuki']/etuusnetto_puoliso
-                    r_a_e=q[puoliso+'asumistuki']/etuusnetto_puoliso
-                    r_tt_e=q[puoliso+'ansiopvraha_nettonetto']/etuusnetto_puoliso
-                    r_tt_l=q[puoliso+'lapsilisa']/etuusnetto_puoliso
-                    r_tt_ko=q[puoliso+'kokoelake_netto']/etuusnetto_puoliso
-                    r_tt_op=q[puoliso+'opintotuki_netto']/etuusnetto_puoliso
-                    r_ko=q[puoliso+'kotihoidontuki_netto']/etuusnetto_puoliso
-                    r_e=q[puoliso+'elatustuki']/etuusnetto_puoliso
+                    r_t_e = q[puoliso+'toimeentulotuki']/etuusnetto_puoliso
+                    r_a_e = q[puoliso+'asumistuki']/etuusnetto_puoliso
+                    r_tt_e = q[puoliso+'tyotpvraha_nettonetto']/etuusnetto_puoliso
+                    r_tt_l = q[puoliso+'lapsilisa']/etuusnetto_puoliso
+                    r_tt_ko = q[puoliso+'kokoelake_netto']/etuusnetto_puoliso
+                    r_tt_op = q[puoliso+'opintotuki_netto']/etuusnetto_puoliso
+                    r_ko = q[puoliso+'kotihoidontuki_netto']/etuusnetto_puoliso
+                    r_e = q[puoliso+'elatustuki']/etuusnetto_puoliso
                 else:
                     r_t_e=0
                     r_a_e=0
@@ -2810,13 +2820,13 @@ class Benefits():
                     r_e=0
 
                 #etuusnetto_puoliso+=(q['asumistuki']+q['lapsilisa']+q['toimeentulotuki']-r2*(q['alv']+q['pvhoito']))*(1-suhde)
-                etuusnetto_puoliso+=(-r2*(q['alv']+q['pvhoito']))*(1-suhde)
-                kateen_puoliso+=(-q['alv']-q['pvhoito'])*(1-suhde)
-                puoliso_alv=q['alv']*(1-suhde)*r2
+                etuusnetto_puoliso += (-r2*(q['alv']+q['pvhoito']))*(1-suhde)
+                kateen_puoliso += (-q['alv']-q['pvhoito'])*(1-suhde)
+                puoliso_alv = q['alv']*(1-suhde)*r2
                 q[puoliso+'palkkatulot_nettonetto']+=-(1-r2)*q['alv']*(1-suhde)
                 q[puoliso+'toimeentulotuki_nettonetto']=q[puoliso+'toimeentulotuki']-r_t_e*puoliso_alv
                 q[puoliso+'asumistuki_nettonetto']=q[puoliso+'asumistuki']-r_a_e*puoliso_alv
-                q[puoliso+'ansiopvraha_nettonetto']+=-r_tt_e*puoliso_alv
+                q[puoliso+'tyotpvraha_nettonetto']+=-r_tt_e*puoliso_alv
                 q[puoliso+'kokoelake_nettonetto']=q[puoliso+'kokoelake_netto']-r_tt_ko*puoliso_alv
                 q[puoliso+'opintotuki_nettonetto']=q[puoliso+'opintotuki_netto']-r_tt_op*puoliso_alv
                 q[puoliso+'kotihoidontuki_nettonetto']=q[puoliso+'kotihoidontuki_netto']-r_ko*puoliso_alv
@@ -2824,6 +2834,11 @@ class Benefits():
                 q[puoliso+'lapsilisa_nettonetto']=q[puoliso+'lapsilisa']-r_tt_l*puoliso_alv
                 q[puoliso+'pvhoito']=q['pvhoito']*(1-suhde)
                 q[puoliso+'alv']=q['alv']*(1-suhde)
+
+                if set_equal:
+                    puolet=0.5*(kateen_omat+kateen_puoliso)
+                    kateen_omat=puolet
+                    kateen_puoliso=puolet
             
                 #if kateen_puoliso<1e-6:
                 #    print(kateen_omat,kateen_puoliso)
@@ -2848,7 +2863,7 @@ class Benefits():
                 if etuusnetto_omat>0:
                     r_t_e=q['toimeentulotuki']/etuusnetto_omat
                     r_a_e=q['asumistuki']/etuusnetto_omat
-                    r_tt_e=q['ansiopvraha_nettonetto']/etuusnetto_omat
+                    r_tt_e=q['tyotpvraha_nettonetto']/etuusnetto_omat
                     r_tt_l=q['lapsilisa']/etuusnetto_omat
                     r_tt_el=q['elatustuki']/etuusnetto_omat
                     r_tt_op=q['opintotuki']/etuusnetto_omat
@@ -2870,7 +2885,7 @@ class Benefits():
                 q[omat+'palkkatulot_nettonetto']+=-(1-r2)*q['alv']
                 q[omat+'toimeentulotuki_nettonetto']=q[omat+'toimeentulotuki']-r_t_e*q['alv']*r2
                 q[omat+'asumistuki_nettonetto']=q[omat+'asumistuki']-r_a_e*q['alv']*r2
-                q[omat+'ansiopvraha_nettonetto']+=-r_tt_e*q['alv']*r2
+                q[omat+'tyotpvraha_nettonetto']+=-r_tt_e*q['alv']*r2
                 q[omat+'opintotuki_nettonetto']=q[omat+'opintotuki_netto']-r_tt_op*q['alv']*r2
                 q[omat+'kokoelake_nettonetto']=q[omat+'kokoelake_netto']-r_tt_ko*q['alv']*r2
                 q[omat+'elatustuki_nettonetto']=q[omat+'elatustuki']-r_e*q['alv']*r2
@@ -2898,7 +2913,7 @@ class Benefits():
             q['kokoelake_nettonetto']=q[puoliso+'kokoelake_nettonetto']+q[omat+'kokoelake_nettonetto']
             q['opintotuki_nettonetto']=q[puoliso+'opintotuki_nettonetto']+q[omat+'opintotuki_nettonetto']
             q['lapsilisa_nettonetto']=q[puoliso+'lapsilisa_nettonetto']+q[omat+'lapsilisa_nettonetto']
-            q['ansiopvraha_nettonetto']=q[puoliso+'ansiopvraha_nettonetto']+q[omat+'ansiopvraha_nettonetto']
+            q['tyotpvraha_nettonetto']=q[puoliso+'tyotpvraha_nettonetto']+q[omat+'tyotpvraha_nettonetto']
             q['kotihoidontuki_nettonetto']=q[puoliso+'kotihoidontuki_nettonetto']+q[omat+'kotihoidontuki_nettonetto']
             q['elatustuki_nettonetto']=q[puoliso+'elatustuki_nettonetto']+q[omat+'elatustuki_nettonetto']
             #q['etuustulo_netto_v2']=q[puoliso+'etuustulo_netto']+q[omat+'etuustulo_netto']
@@ -2909,7 +2924,7 @@ class Benefits():
             if aikuisia>1:
                 brutto_puoliso=q[puoliso+'opintotuki']+q[puoliso+'kokoelake']+q[puoliso+'palkkatulot']+q[puoliso+'aitiyspaivaraha']\
                     +q[puoliso+'isyyspaivaraha']+q[puoliso+'kotihoidontuki']\
-                    +q[puoliso+'ansiopvraha']+q[puoliso+'elatustuki']+q[puoliso+'sairauspaivaraha']
+                    +q[puoliso+'tyotpvraha']+q[puoliso+'elatustuki']+q[puoliso+'sairauspaivaraha']
                 kateen_puoliso=brutto_puoliso-q[puoliso+'verot']
                 etuusnetto_puoliso=brutto_puoliso-q[puoliso+'palkkatulot']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])
             
@@ -2963,15 +2978,15 @@ class Benefits():
         
         assert(np.abs(q[omat+'netto']+q[puoliso+'netto']-q['netto'])<1e-10)
         
-        q[omat+'etuustulo_brutto']=q[omat+'ansiopvraha']+q[omat+'opintotuki']+q[omat+'sairauspaivaraha']+q[omat+'aitiyspaivaraha']\
+        q[omat+'etuustulo_brutto']=q[omat+'tyotpvraha']+q[omat+'opintotuki']+q[omat+'sairauspaivaraha']+q[omat+'aitiyspaivaraha']\
             +q[omat+'isyyspaivaraha']+q[omat+'kotihoidontuki']+q[omat+'asumistuki']\
             +q[omat+'toimeentulotuki']+q[omat+'kokoelake']+q[omat+'elatustuki']+q[omat+'lapsilisa'] # + sairauspaivaraha
-        q[puoliso+'etuustulo_brutto']=q[puoliso+'ansiopvraha']+q[puoliso+'opintotuki']+q[puoliso+'sairauspaivaraha']+q[puoliso+'aitiyspaivaraha']\
+        q[puoliso+'etuustulo_brutto']=q[puoliso+'tyotpvraha']+q[puoliso+'opintotuki']+q[puoliso+'sairauspaivaraha']+q[puoliso+'aitiyspaivaraha']\
             +q[puoliso+'isyyspaivaraha']+q[puoliso+'kotihoidontuki']+q[puoliso+'asumistuki']\
             +q[puoliso+'toimeentulotuki']+q[puoliso+'kokoelake']+q[puoliso+'elatustuki']+q[puoliso+'lapsilisa']
         q['etuustulo_brutto']=q[omat+'etuustulo_brutto']+q[puoliso+'etuustulo_brutto'] # + sairauspaivaraha
         
-        q['brutto']=q['etuustulo_brutto']+p['t']
+        q['brutto']=brutto_omat+brutto_puoliso # q['etuustulo_brutto']+p['t'] #+p[puoliso+'t']
         kateen=q['netto']
         
         # check that omat, puoliso split is ok
@@ -2986,7 +3001,7 @@ class Benefits():
                     q['toimeentulotuki']=0
                 else:
                     q['toimeentulotuki']=self.toimeentulotuki(p[omatalku+'t'],q[omat+'verot_ilman_etuuksia'],0,0,\
-                        q['elatustuki']+q['opintotuki_netto']+q['ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
+                        q['elatustuki']+q['opintotuki_netto']+q['tyotpvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
                         +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto'],\
                         0,p['asumismenot_toimeentulo'],q['pvhoito'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p)
             else:
@@ -2994,18 +3009,18 @@ class Benefits():
                     q['toimeentulotuki']=0
                 else:
                     q['toimeentulotuki']=self.toimeentulotuki(p[omatalku+'t'],q[omat+'verot_ilman_etuuksia'],p[puolisoalku+'t'],q[puoliso+'verot_ilman_etuuksia'],\
-                        q['elatustuki']+q['opintotuki_netto']+q['ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
+                        q['elatustuki']+q['opintotuki_netto']+q['tyotpvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
                         +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto'],\
                         0,p['asumismenot_toimeentulo'],q['pvhoito'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p)
         else:
             q['toimeentulotuki']=0
                             
     def update_netto(self,p: dict,q: dict,omat: str,puoliso: str,omatalku: str,puolisoalku: str):
-        q['kokoelake_netto'],q['isyyspaivaraha_netto'],q['ansiopvraha_netto'],q['aitiyspaivaraha_netto'],q['sairauspaivaraha_netto'],\
-            q[puoliso+'ansiopvraha_netto'],q['opintotuki_netto']=(0,0,0,0,0,0,0)
-        q[omat+'kokoelake_netto'],q[omat+'isyyspaivaraha_netto'],q[omat+'ansiopvraha_netto'],q[omat+'aitiyspaivaraha_netto'],q[omat+'sairauspaivaraha_netto'],\
+        q['kokoelake_netto'],q['isyyspaivaraha_netto'],q['tyotpvraha_netto'],q['aitiyspaivaraha_netto'],q['sairauspaivaraha_netto'],\
+            q[puoliso+'tyotpvraha_netto'],q['opintotuki_netto']=(0,0,0,0,0,0,0)
+        q[omat+'kokoelake_netto'],q[omat+'isyyspaivaraha_netto'],q[omat+'tyotpvraha_netto'],q[omat+'aitiyspaivaraha_netto'],q[omat+'sairauspaivaraha_netto'],\
             q[omat+'opintotuki_netto'],q[omat+'kotihoidontuki_netto']=(0,0,0,0,0,0,0)
-        q[puoliso+'kokoelake_netto'],q[puoliso+'isyyspaivaraha_netto'],q[puoliso+'ansiopvraha_netto'],q[puoliso+'aitiyspaivaraha_netto'],q[puoliso+'sairauspaivaraha_netto'],\
+        q[puoliso+'kokoelake_netto'],q[puoliso+'isyyspaivaraha_netto'],q[puoliso+'tyotpvraha_netto'],q[puoliso+'aitiyspaivaraha_netto'],q[puoliso+'sairauspaivaraha_netto'],\
             q[puoliso+'opintotuki_netto'],q[puoliso+'kotihoidontuki_netto']=(0,0,0,0,0,0,0)
             
         if p[omatalku+'elakkeella']>0:
@@ -3022,11 +3037,11 @@ class Benefits():
             q[omat+'sairauspaivaraha_netto']=q[omat+'sairauspaivaraha']-(q[omat+'verot']-q[omat+'verot_ilman_etuuksia']) 
         else:
             if q[omat+'kotihoidontuki']>0:
-                r=q[omat+'ansiopvraha']/(q[omat+'ansiopvraha']+q[omat+'kotihoidontuki'])
-                q[omat+'ansiopvraha_netto']=q[omat+'ansiopvraha']-(q[omat+'verot']-q[omat+'verot_ilman_etuuksia'])*r
+                r=q[omat+'tyotpvraha']/(q[omat+'tyotpvraha']+q[omat+'kotihoidontuki'])
+                q[omat+'tyotpvraha_netto']=q[omat+'tyotpvraha']-(q[omat+'verot']-q[omat+'verot_ilman_etuuksia'])*r
                 q[omat+'kotihoidontuki_netto']=q[omat+'kotihoidontuki']-(q[omat+'verot']-q[omat+'verot_ilman_etuuksia'])*(1-r)
             else:
-                q[omat+'ansiopvraha_netto']=q[omat+'ansiopvraha']-(q[omat+'verot']-q[omat+'verot_ilman_etuuksia'])
+                q[omat+'tyotpvraha_netto']=q[omat+'tyotpvraha']-(q[omat+'verot']-q[omat+'verot_ilman_etuuksia'])
 
         if p[puolisoalku+'elakkeella']>0:
             q[puoliso+'kokoelake_netto']=q[puoliso+'kokoelake']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])
@@ -3042,17 +3057,17 @@ class Benefits():
             q[puoliso+'sairauspaivaraha_netto']=q[puoliso+'sairauspaivaraha']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia']) 
         else:
             if q[puoliso+'kotihoidontuki']>0:
-                r=q[puoliso+'ansiopvraha']/(q[puoliso+'ansiopvraha']+q[puoliso+'kotihoidontuki'])
-                q[puoliso+'ansiopvraha_netto']=q[puoliso+'ansiopvraha']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])*r
+                r=q[puoliso+'tyotpvraha']/(q[puoliso+'tyotpvraha']+q[puoliso+'kotihoidontuki'])
+                q[puoliso+'tyotpvraha_netto']=q[puoliso+'tyotpvraha']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])*r
                 q[puoliso+'kotihoidontuki_netto']=q[puoliso+'kotihoidontuki']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])*(1-r)
             else:
-                q[puoliso+'ansiopvraha_netto']=q[puoliso+'ansiopvraha']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])
+                q[puoliso+'tyotpvraha_netto']=q[puoliso+'tyotpvraha']-(q[puoliso+'verot']-q[puoliso+'verot_ilman_etuuksia'])
 
         q[puoliso+'palkkatulot_netto']=q[puoliso+'palkkatulot']-q[puoliso+'verot_ilman_etuuksia']
         q[omat+'palkkatulot_netto']=q[omat+'palkkatulot']-q[omat+'verot_ilman_etuuksia']
 
         q['palkkatulot_netto']=q[omat+'palkkatulot_netto']+q[puoliso+'palkkatulot_netto']
-        q['ansiopvraha_netto']=q[omat+'ansiopvraha_netto']+q[puoliso+'ansiopvraha_netto']
+        q['tyotpvraha_netto']=q[omat+'tyotpvraha_netto']+q[puoliso+'tyotpvraha_netto']
         q['kokoelake_netto']=q[omat+'kokoelake_netto']+q[puoliso+'kokoelake_netto']
         q['aitiyspaivaraha_netto']=q[omat+'aitiyspaivaraha_netto']+q[puoliso+'aitiyspaivaraha_netto']
         q['isyyspaivaraha_netto']=q[omat+'isyyspaivaraha_netto']+q[puoliso+'isyyspaivaraha_netto']
@@ -3085,30 +3100,30 @@ class Benefits():
             q[puoliso+'palkkatulot_nettonetto']=0
             q['palkkatulot_nettonetto']=0
 
-        if q['ansiopvraha_netto']>0:
+        if q['tyotpvraha_netto']>0:
             if p['aikuisia']>1:
                 if p[omatalku+'alive']>0 and p[puolisoalku+'alive']>0:
-                    suhde=max(0,q[omat+'ansiopvraha_netto']/q['ansiopvraha_netto'])
-                    q[omat+'ansiopvraha_nettonetto']=q[omat+'ansiopvraha_netto']-suhde*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
-                    q[puoliso+'ansiopvraha_nettonetto']=q[puoliso+'ansiopvraha_netto']-(1-suhde)*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
+                    suhde=max(0,q[omat+'tyotpvraha_netto']/q['tyotpvraha_netto'])
+                    q[omat+'tyotpvraha_nettonetto']=q[omat+'tyotpvraha_netto']-suhde*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
+                    q[puoliso+'tyotpvraha_nettonetto']=q[puoliso+'tyotpvraha_netto']-(1-suhde)*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
                 elif p[omatalku+'alive']>0:
-                    q[omat+'ansiopvraha_nettonetto']=q[omat+'ansiopvraha_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
-                    q[puoliso+'ansiopvraha_nettonetto']=0
+                    q[omat+'tyotpvraha_nettonetto']=q[omat+'tyotpvraha_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
+                    q[puoliso+'tyotpvraha_nettonetto']=0
                 elif p[puolisoalku+'alive']>0:
-                    q[puoliso+'ansiopvraha_nettonetto']=q[puoliso+'ansiopvraha_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
-                    q[omat+'ansiopvraha_nettonetto']=0
+                    q[puoliso+'tyotpvraha_nettonetto']=q[puoliso+'tyotpvraha_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
+                    q[omat+'tyotpvraha_nettonetto']=0
                 else:
-                    q[omat+'ansiopvraha_nettonetto']=0
-                    q[puoliso+'ansiopvraha_nettonetto']=0
+                    q[omat+'tyotpvraha_nettonetto']=0
+                    q[puoliso+'tyotpvraha_nettonetto']=0
             else:
-                q[omat+'ansiopvraha_nettonetto']=q[omat+'ansiopvraha_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
-                q[puoliso+'ansiopvraha_nettonetto']=0
+                q[omat+'tyotpvraha_nettonetto']=q[omat+'tyotpvraha_netto']-(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
+                q[puoliso+'tyotpvraha_nettonetto']=0
                 
-            q['ansiopvraha_nettonetto']=q[puoliso+'ansiopvraha_nettonetto']+q[omat+'ansiopvraha_nettonetto']
+            q['tyotpvraha_nettonetto']=q[puoliso+'tyotpvraha_nettonetto']+q[omat+'tyotpvraha_nettonetto']
         else:
-            q[omat+'ansiopvraha_nettonetto']=0
-            q[puoliso+'ansiopvraha_nettonetto']=0
-            q['ansiopvraha_nettonetto']=0           
+            q[omat+'tyotpvraha_nettonetto']=0
+            q[puoliso+'tyotpvraha_nettonetto']=0
+            q['tyotpvraha_nettonetto']=0           
         
     def add_q(self,benefitq1: dict,benefitq2: dict):
         q= { k: benefitq1.get(k, 0) + benefitq2.get(k, 0) for k in set(benefitq1).union(set(benefitq2)) }
@@ -3126,7 +3141,7 @@ class Benefits():
                 print('palkkatulot2',d,puoliso)
         else:
             s=[omat]
-            for ss in set(['etuustulo_brutto','palkkatulot','netto','opintotuki','kokoelake','palkkatulot','aitiyspaivaraha','isyyspaivaraha','kotihoidontuki','ansiopvraha','verot','pvhoito']):
+            for ss in set(['etuustulo_brutto','palkkatulot','netto','opintotuki','kokoelake','palkkatulot','aitiyspaivaraha','isyyspaivaraha','kotihoidontuki','tyotpvraha','verot','pvhoito']):
                 d=q[ss]-q[omat+ss]
                 if np.abs(d)>1e-6:
                     print('1',ss,omat,d)

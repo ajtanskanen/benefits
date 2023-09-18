@@ -25,8 +25,8 @@ class BenefitsHOrev(Benefits):
         self.year=2023
         self.set_year(self.year)
         self.muuta_ansiopv_ylaraja=False
-        #self.sovitteluprosentti=0.5
-        self.sovitteluprosentti=0.6
+        self.sovitteluprosentti=0.5
+        #self.sovitteluprosentti=0.6
         
     def set_year(self,vuosi):
         super().set_year(vuosi)
@@ -52,7 +52,7 @@ class BenefitsHOrev(Benefits):
             
         p2=p.copy()
 
-        if True: # False = suojaosat säilyvät
+        if False: # False = suojaosat säilyvät
             p2['tyottomyysturva_suojaosa_taso']=300
             p2['ansiopvrahan_suojaosa']=0
         else:
@@ -83,8 +83,8 @@ class BenefitsHOrev(Benefits):
         # 137    130    123    118
 
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[582, 563, 447, 394],[843, 808, 652, 574],[1_072, 1_019, 828, 734],[1_253, 1_188, 981, 875]])
-        max_lisa=np.array([156, 148, 134, 129])
+        max_menot=np.array([[563, 563, 447, 394],[808, 808, 652, 574],[1_019, 1_019, 828, 734],[1_188, 1_188, 981, 875]])
+        max_lisa=np.array([148, 148, 134, 129])
         # kuntaryhma=3
 
         max_menot[:,0]=max_menot[:,1]
@@ -93,12 +93,12 @@ class BenefitsHOrev(Benefits):
         max_meno=max_menot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_lisa[kuntaryhma]
 
         prosentti=0.7 # vastaa 80 %
-        suojaosa=0 #p['asumistuki_suojaosa']*p['aikuisia']
+        suojaosa=p['asumistuki_suojaosa']*min(p['aikuisia'],p['lapsia'])
         lapsiparam=246#*1.5
-        if aikuisia<2 and lapsia>0 and True:
-            perusomavastuu=max(0,0.50*(0.8*max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*aikuisia+lapsiparam*lapsia)))
+        if lapsia>0:
+            perusomavastuu=max(0,0.55*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*aikuisia+lapsiparam*lapsia)))
         else:
-            perusomavastuu=max(0,0.50*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*aikuisia+lapsiparam*lapsia)))
+            perusomavastuu=max(0,0.55*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*aikuisia+lapsiparam*lapsia)))
 
         if perusomavastuu<10:
             perusomavastuu=0
@@ -116,8 +116,8 @@ class BenefitsHOrev(Benefits):
         return tuki    
 
     def valtionvero_asteikko_2023(self):
-        rajat=np.array([0,19_900,29700,49_000,150_000])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        rajat=np.array([0,19_900,29_700,49_000,150_000])/self.kk_jakaja
+        pros=(1-405/20000)*np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
 
@@ -145,8 +145,8 @@ class BenefitsHOrev(Benefits):
         return tuki        
 
     # yläraja 90% ansionalenemasta
-    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara: float,tyotaikaisettulot: float,vakpalkka: float,vakiintunutpalkka: float,peruspvraha: float) -> float:
-        return ansiopaivarahamaara
+    #def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara: float,tyotaikaisettulot: float,vakpalkka: float,vakiintunutpalkka: float,peruspvraha: float) -> float:
+    #    return ansiopaivarahamaara
 
         # nykytila
         #if vakpalkka < ansiopaivarahamaara+tyotaikaisettulot:

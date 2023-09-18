@@ -23,7 +23,8 @@ class BenefitsHO(Benefits):
         self.porrastus=True
         self.year=2023
         self.set_year(self.year)
-        self.muuta_ansiopv_ylaraja=False
+
+        print('Hallitusohjelma 2023')
         
     def set_year(self,vuosi):
         super().set_year(vuosi)
@@ -32,6 +33,8 @@ class BenefitsHO(Benefits):
     def setup_HO(self):
         self.asumistuki=self.asumistuki2023
         self.tyotulovahennys=self.tyotulovahennys2023
+        self.valtionvero_asteikko=self.valtionvero_asteikko_2023
+        self.lapsilisa=self.lapsilisa2023
 
     def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         # porrastetaan ansio-osa keston mukaan
@@ -104,8 +107,8 @@ class BenefitsHO(Benefits):
         return tuki    
 
     def valtionvero_asteikko_2023(self):
-        rajat=np.array([0,19_900,29700,49_000,150_000])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        rajat=np.array([0,19_900,29_700,49_000,150_000])/self.kk_jakaja
+        pros=(1-405/20000)*np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
 
