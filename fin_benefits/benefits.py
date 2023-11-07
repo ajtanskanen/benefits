@@ -797,9 +797,9 @@ class Benefits():
 
     def tyotulovahennys2024(self,ika: float,lapsia: int):
         if ika>=65:
-            max_tyotulovahennys=3230/self.kk_jakaja
+            max_tyotulovahennys=3340/self.kk_jakaja
         else:
-            max_tyotulovahennys=2030/self.kk_jakaja
+            max_tyotulovahennys=2140/self.kk_jakaja
         ttulorajat=np.array([0,22000,77000])/self.kk_jakaja*1.032 # 127000??
         ttulopros=np.array([0.13,0.0203,0.121])
         return max_tyotulovahennys,ttulorajat,ttulopros
@@ -1082,7 +1082,7 @@ class Benefits():
         '''
         self.kunnallisvero_pros=max(0,0.0761+self.additional_kunnallisvero) # Viitamäen raportista
         self.kirkollisvero_pros=0.0139
-        self.tyottomyysvakuutusmaksu=0.0150 #
+        self.tyottomyysvakuutusmaksu=0.0079 #
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1098,10 +1098,10 @@ class Benefits():
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
-        self.sairaanhoitomaksu=0.0060
+        self.sairaanhoitomaksu=0.0055
         self.sairaanhoitomaksu_etuus=0.0157 # muut
         
-        self.paivarahamaksu_pros=0.0136 # palkka
+        self.paivarahamaksu_pros=0.0101 # palkka
         self.paivarahamaksu_raja=15_562/self.kk_jakaja    
         
         self.elakemaksu_alaraja=62.88
@@ -1240,7 +1240,7 @@ class Benefits():
     
     def perusvahennys2024(self):
         perusvahennys_pros=0.18
-        max_perusvahennys=3870/self.kk_jakaja*1.03
+        max_perusvahennys=3980/self.kk_jakaja
         return perusvahennys_pros,max_perusvahennys
     
     def verotus(self,palkkatulot: float,muuttulot: float,elaketulot: float,lapsia: int,p: dict,alku: str=''):
@@ -1473,8 +1473,8 @@ class Benefits():
         return rajat,pros
         
     def valtionvero_asteikko_2024(self):
-        rajat=np.array([0,19_900*1.03,29_700*1.03,49_000*1.03,150_000])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        rajat=np.array([0,20_500,30_500,50_400,88_200,150_000])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.42,0.44+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros               
 
@@ -1814,7 +1814,7 @@ class Benefits():
         
         return vero
 
-    def laske_valtionvero2023_2024(self,tulot: float,p: dict) -> float:
+    def laske_valtionvero2023(self,tulot: float,p: dict) -> float:
         '''
         Sote-alueiden vuoksi kunnallisveroa siirrettiin valtionveroon. Rakennemuutos
         '''
@@ -1829,6 +1829,22 @@ class Benefits():
             vero=vero+(tulot-rajat[4])*pros[4]
         
         return vero
+
+    def laske_valtionvero2024(self,tulot: float,p: dict) -> float:
+        '''
+        Sote-alueiden vuoksi kunnallisveroa siirrettiin valtionveroon. Rakennemuutos
+        '''
+        rajat,pros=self.valtionvero_asteikko()
+
+        vero=0
+
+        for k in range(0,5):
+            vero=vero+max(0,min(rajat[k+1],tulot)-rajat[k])*pros[k]
+
+        if tulot>rajat[5]:
+            vero=vero+(tulot-rajat[5])*pros[5]
+        
+        return vero        
 
     def tyottomyysturva_suojaosa(self,suojaosamalli: int,p: dict=None):
         if suojaosamalli==2:
@@ -4900,7 +4916,7 @@ class Benefits():
             self.peruspaivaraha=self.peruspaivaraha2023
             self.valtionvero_asteikko=self.valtionvero_asteikko_2023
             self.raippavero=self.raippavero2023
-            self.laske_valtionvero=self.laske_valtionvero2023_2024
+            self.laske_valtionvero=self.laske_valtionvero2023
             self.laske_ylevero=self.laske_ylevero2023
             self.elaketulovahennys=self.elaketulovahennys2023
             self.tyotulovahennys=self.tyotulovahennys2023
@@ -4924,7 +4940,7 @@ class Benefits():
             self.peruspaivaraha=self.peruspaivaraha2024
             self.valtionvero_asteikko=self.valtionvero_asteikko_2024
             self.raippavero=self.raippavero2024
-            self.laske_valtionvero=self.laske_valtionvero2023_2024
+            self.laske_valtionvero=self.laske_valtionvero2024
             self.laske_ylevero=self.laske_ylevero2024
             self.elaketulovahennys=self.elaketulovahennys2024
             self.tyotulovahennys=self.tyotulovahennys2024
