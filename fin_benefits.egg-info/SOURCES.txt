@@ -1,6 +1,19 @@
+.DS_Store
+.gitattributes
+.gitignore
 LICENCE
 README.md
+Untitled.ipynb
+kannusteet HO.ipynb
 setup.py
+vertaa_veronmaksajat.ipynb
+vertailu 2022 2023.ipynb
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
+.ipynb_checkpoints/Untitled1-checkpoint.ipynb
+.ipynb_checkpoints/Untitled2-checkpoint.ipynb
+.ipynb_checkpoints/kannusteet-checkpoint.ipynb
+.ipynb_checkpoints/unemploymentRL-checkpoint.ipynb
+fin_benefits/.DS_Store
 fin_benefits/__init__.py
 fin_benefits/basic_account.py
 fin_benefits/basic_income.py
@@ -8,6 +21,8 @@ fin_benefits/basic_income_v1.py
 fin_benefits/ben_test.py
 fin_benefits/ben_utils.py
 fin_benefits/benefits.py
+fin_benefits/benefits_HO.py
+fin_benefits/benefits_HOrev.py
 fin_benefits/benefits_UC.py
 fin_benefits/benefits_unemp_EK.py
 fin_benefits/benefits_unemp_EK2020.py

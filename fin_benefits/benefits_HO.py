@@ -24,8 +24,8 @@ class BenefitsHO(Benefits):
         self.year=2023
         self.set_year(self.year)
 
-        print('Hallitusohjelma 2023')
-        
+        print('Hallitusohjelma 2023 BENEFITS')
+
     def set_year(self,vuosi):
         super().set_year(vuosi)
         self.setup_HO()
@@ -35,6 +35,14 @@ class BenefitsHO(Benefits):
         self.tyotulovahennys=self.tyotulovahennys2023
         self.valtionvero_asteikko=self.valtionvero_asteikko_2023
         self.lapsilisa=self.lapsilisa2023
+        self.veroparam=self.veroparam2023
+
+    def veroparam2023(self):
+            '''
+            Päivitetty 6.5.2023
+            '''
+            super().veroparam2023()
+            self.tyottomyysvakuutusmaksu=0.0150 - 0.002 # vastaa VM:n arviota rakenteellisesta maksun muutoksesta 
 
     def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         # porrastetaan ansio-osa keston mukaan
@@ -80,8 +88,8 @@ class BenefitsHO(Benefits):
         # enimmaismenot kuntaryhmittain kun hloita 1-4
         max_menot=np.array([[563, 563, 447, 394],[808, 808, 652, 574],[1_019, 1_019, 828, 734],[1_188, 1_188, 981, 875]])
         max_lisa=np.array([148, 148, 134, 129])
-        # kuntaryhma=3
 
+        # kuntaryhma=3
         max_menot[:,0]=max_menot[:,1]
         max_lisa[0]=max_lisa[1]
 
@@ -89,7 +97,7 @@ class BenefitsHO(Benefits):
 
         prosentti=0.7 # vastaa 80 %
         suojaosa=0 #p['asumistuki_suojaosa']*p['aikuisia']
-        lapsiparam=246
+        lapsiparam=246 # FIXME 270?
         perusomavastuu=max(0,0.50*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*aikuisia+lapsiparam*lapsia)))
         if perusomavastuu<10:
             perusomavastuu=0
@@ -108,7 +116,7 @@ class BenefitsHO(Benefits):
 
     def valtionvero_asteikko_2023(self):
         rajat=np.array([0,19_900,29_700,49_000,150_000])/self.kk_jakaja
-        pros=(1-405/20000)*np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=(1-100/20000)*np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
 
@@ -120,24 +128,18 @@ class BenefitsHO(Benefits):
             
         return lapsilisat
 
-    def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara: float,tyotaikaisettulot: float,vakpalkka: float,vakiintunutpalkka: float,peruspvraha: float) -> float:
-        if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
-            return max(0,vakpalkka-tyotaikaisettulot) 
-           
-        return ansiopaivarahamaara 
+    #def ansiopaivaraha_ylaraja(self,ansiopaivarahamaara: float,tyotaikaisettulot: float,vakpalkka: float,vakiintunutpalkka: float,peruspvraha: float) -> float:
+    #    if vakpalkka<ansiopaivarahamaara+tyotaikaisettulot:
+    #        return max(0,vakpalkka-tyotaikaisettulot) 
+    #       
+    #    return ansiopaivarahamaara 
 
     def tyotulovahennys2023(self,ika: float,lapsia: int):
-        if ika>=60:
-            if ika>=62:
-                max_tyotulovahennys=2430/self.kk_jakaja
-            elif ika>=65:
-                max_tyotulovahennys=2630/self.kk_jakaja
-            else:
-                max_tyotulovahennys=2230/self.kk_jakaja
+        if ika>=65:
+            max_tyotulovahennys=3230/self.kk_jakaja
         else:
             max_tyotulovahennys=2030/self.kk_jakaja
-        max_tyotulovahennys += 50*lapsia/self.kk_jakaja
-
-        ttulorajat=np.array([0,22000,70000])/self.kk_jakaja 
-        ttulopros=np.array([0.13,0.0203,0.0121])
+        ttulorajat=np.array([0,22000,77000])/self.kk_jakaja # 127000??
+        ttulopros=np.array([0.13,0.0203,0.121])
         return max_tyotulovahennys,ttulorajat,ttulopros
+  
