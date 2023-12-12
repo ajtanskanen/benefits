@@ -2301,7 +2301,10 @@ class Benefits():
     #     return kateen,q
         
     def setup_puoliso_q(self,p: dict,q: dict,puoliso: str='puoliso_',alku: str='puoliso_',
-                        include_takuuelake: bool=True,include_kansanelake: bool=True) -> dict:
+                        include_takuuelake: bool=True,add_kansanelake: bool=True) -> dict:
+        '''
+        add_kansanelake tarkoittaa, että kansaneläke lasketaan maksussa olevan eläkkeen lisäksi
+        '''
         q[puoliso+'multiplier']=1
         q[puoliso+'perustulo']=0
         q[puoliso+'puhdas_tyoelake']=0
@@ -2333,8 +2336,10 @@ class Benefits():
                 q[puoliso+'elake_tuleva']=0
                 #p[alku+'saa_ansiopaivarahaa']=0
                 # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
-                q[puoliso+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[puoliso+'elake_maksussa'],include_takuuelake=include_takuuelake,yksin=0,
-                                            disability=p[puoliso+'disabled'],lapsia=p['lapsikorotus_lapsia'],include_kansanelake=include_kansanelake)
+                #q[puoliso+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[puoliso+'elake_maksussa'],include_takuuelake=include_takuuelake,yksin=0,
+                #                            disability=p[puoliso+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
+                q[puoliso+'kokoelake']=self.laske_kokonaiselake_v2(p['ika'],q[puoliso+'tyoelake'],q[puoliso+'kansanelake'],include_takuuelake=include_takuuelake,yksin=0,
+                                            disability=p[puoliso+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[puoliso+'takuuelake']=q[puoliso+'kokoelake']-q[puoliso+'elake_maksussa']
                 q[puoliso+'ansiopvraha'],q[puoliso+'tyotpvraha'],q[puoliso+'peruspvraha']=(0,0,0)
                 q[puoliso+'opintotuki']=0
@@ -2391,7 +2396,7 @@ class Benefits():
                 
         return q
         
-    def setup_omat_q(self,p: dict,omat: str='omat_',alku: str='',include_takuuelake: bool=True,include_kansanelake: bool=True):
+    def setup_omat_q(self,p: dict,omat: str='omat_',alku: str='',include_takuuelake: bool=True,add_kansanelake: bool=True):
         q={} # tulokset tänne
         q[omat+'multiplier']=1
         q[omat+'perustulo']=0
@@ -2425,14 +2430,18 @@ class Benefits():
             #p['omat_saa_ansiopaivarahaa']=0
             # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
             if (p['aikuisia']>1):
-                q[omat+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[omat+'elake_maksussa'],yksin=0,include_takuuelake=include_takuuelake,
-                                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],include_kansanelake=include_kansanelake)
+                #q[omat+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[omat+'elake_maksussa'],yksin=0,include_takuuelake=include_takuuelake,
+                #                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
+                q[omat+'kokoelake']=self.laske_kokonaiselake_v2(p['ika'],q[omat+'tyoelake'],q[omat+'kansanelake'],yksin=0,include_takuuelake=include_takuuelake,
+                                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[omat+'takuuelake']=q[omat+'kokoelake']-q[omat+'elake_maksussa']
                 q[omat+'puhdas_tyoelake']=self.laske_puhdas_tyoelake_v2(p['ika'],q[omat+'tyoelake'],q[omat+'kansanelake'],
                                             disability=p[alku+'disabled'],yksin=0,lapsia=p['lapsia'])
             else:
-                q[omat+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[omat+'elake_maksussa'],yksin=1,include_takuuelake=include_takuuelake,
-                                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],include_kansanelake=include_kansanelake)
+                #[omat+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[omat+'elake_maksussa'],yksin=1,include_takuuelake=include_takuuelake,
+                #                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
+                q[omat+'kokoelake']=self.laske_kokonaiselake_v2(p['ika'],q[omat+'tyoelake'],q[omat+'kansanelake'],yksin=1,include_takuuelake=include_takuuelake,
+                                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[omat+'takuuelake']=q[omat+'kokoelake']-q[omat+'elake_maksussa']
                 q[omat+'puhdas_tyoelake']=self.laske_puhdas_tyoelake_v2(p['ika'],q[omat+'tyoelake'],q[omat+'kansanelake'],
                                             disability=p[alku+'disabled'],yksin=1,lapsia=p['lapsia'])
@@ -2440,7 +2449,7 @@ class Benefits():
             q[omat+'ansiopvraha'],q[omat+'tyotpvraha'],q[omat+'peruspvraha']=(0,0,0)
             q[omat+'opintotuki']=0
         elif p[alku+'opiskelija']>0:
-            q[omat+'elake_maksussa']=p[alku+'tyoelake']
+            q[omat+'elake_maksussa']=p[alku+'elake_maksussa']
             q[omat+'kokoelake']=p[alku+'tyoelake']
             q[omat+'tyoelake']=p[alku+'tyoelake']
             q[omat+'elake_tuleva']=0
@@ -2552,7 +2561,7 @@ class Benefits():
         return q
         
     def laske_tulot_v3(self,p: dict,tt_alennus=0,include_takuuelake: bool=True,omat: str='omat_',omatalku: str='',puoliso: str='puoliso_',puolisoalku: str='puoliso_',
-        include_alv: bool=True,split_costs: bool=True,set_equal: bool=False,include_kansanelake: bool=True):
+        include_alv: bool=True,split_costs: bool=True,set_equal: bool=False,add_kansanelake: bool=True):
         '''
         v4:ää varten tehty tulonlaskenta
         - eroteltu paremmin omat ja puolison tulot ja etuudet 
@@ -2566,8 +2575,8 @@ class Benefits():
         aikuisia=p['aikuisia']
         lapsia=p['lapsia']
 
-        q=self.setup_omat_q(p,omat=omat,alku=omatalku,include_takuuelake=include_takuuelake,include_kansanelake=include_kansanelake)
-        q=self.setup_puoliso_q(p,q,puoliso=puoliso,alku=puolisoalku,include_takuuelake=include_takuuelake,include_kansanelake=include_kansanelake)
+        q=self.setup_omat_q(p,omat=omat,alku=omatalku,include_takuuelake=include_takuuelake,add_kansanelake=add_kansanelake)
+        q=self.setup_puoliso_q(p,q,puoliso=puoliso,alku=puolisoalku,include_takuuelake=include_takuuelake,add_kansanelake=add_kansanelake)
         
         # q['verot] sisältää kaikki veronluonteiset maksut
         _,q[omat+'verot'],q[omat+'valtionvero'],q[omat+'kunnallisvero'],q[omat+'kunnallisveroperuste'],q[omat+'valtionveroperuste'],\
@@ -4400,7 +4409,7 @@ class Benefits():
             else:
                 maara=0
                 
-        if maara<6.92:
+        if maara<7.46:
             maara=0
             
         return maara
@@ -4413,20 +4422,21 @@ class Benefits():
             maara=732.67
         else:
             maara=654.13
+
         if lapsia>0:
             maara += 24.48*lapsia
             
         if disability:
-            maara = max(0,maara-np.maximum(0,(tyoelake-59.45))/2)
+            maara = max(0,maara-np.maximum(0,(tyoelake-61.95))/2)
         else:
             if ika>=65:
-                maara = max(0,maara*(1.0+0.072*(ika-65))-np.maximum(0,(tyoelake-59.45))/2)
+                maara = max(0,maara*(1.0+0.072*(ika-65))-np.maximum(0,(tyoelake-61.95))/2)
             elif ika>=62: # varhennus
-                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-59.45))/2)
+                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-61.95))/2)
             else:
                 maara=0
                 
-        if maara<6.92:
+        if maara<7.46:
             maara=0
             
         return maara        
@@ -4519,7 +4529,7 @@ class Benefits():
         else:
             elake=0
         
-        if elake<6.92:
+        if elake<7.46:
             elake=0
 
         return elake        
@@ -4535,7 +4545,7 @@ class Benefits():
         else:
             elake=0
         
-        if elake<6.92:
+        if elake<7.46:
             elake=0
 
         return elake                
@@ -4573,36 +4583,45 @@ class Benefits():
         else:
             return max(0,tyoelake-vahennys1)
     
-    def laske_kokonaiselake(self,ika: int,muuelake: float,yksin: int=1,include_takuuelake: bool=True,include_kansanelake: bool=False,disability: bool=False,lapsia: int=0) -> float:
+    def laske_kokonaiselake(self,ika: int,muuelake: float,yksin: int=1,include_takuuelake: bool=True,add_kansanelake: bool=False,disability: bool=False,lapsia: int=0) -> float:
         '''
         by default, kansaneläke is not included, since this function is called annually
         kansaneläke sisältyy muuelake-muuttujaan
         '''
-        if include_kansanelake:
-            kansanelake=self.laske_kansanelake(ika,muuelake,yksin,disability=disability,lapsia=lapsia)
-            muuelake=muuelake+kansanelake
+        if add_kansanelake:
+            kansanelake = self.laske_kansanelake(ika,muuelake,yksin,disability=disability,lapsia=lapsia)
+            muuelake = muuelake+kansanelake
             
         if include_takuuelake:
-            takuuelake=self.laske_takuuelake(ika,muuelake,disability=disability,lapsia=lapsia)
-            kokoelake=takuuelake+muuelake
+            takuuelake = self.laske_takuuelake(ika,muuelake,disability=disability,lapsia=lapsia)
+            #if takuuelake>0:
+            #    print('ika',ika,'muuelake',muuelake,'takuuelake',takuuelake)
+            kokoelake = takuuelake+muuelake
         else:
-            kokoelake=muuelake
+            kokoelake = muuelake
     
         return kokoelake
         
-    def laske_kokonaiselake_v2(self,ika: int,muuelake: float,kansanelake,yksin: int=1,include_takuuelake: bool=True,include_kansanelake: bool=False,disability: bool=False,lapsia: int=0):
+    def laske_kokonaiselake_v2(self,ika: int,omaelake: float,kansanelake: float,yksin: int=1,include_takuuelake: bool=True,add_kansanelake: bool=False,disability: bool=False,lapsia: int=0) -> float:
         '''
         by default, kansaneläke is not included, since this function is called annually
         kansaneläke lasketaan erikseen
         '''
-        if include_kansanelake:
-            muuelake=muuelake+kansanelake
+        if add_kansanelake:
+            kansanelake = self.laske_kansanelake(ika,omaelake,yksin,disability=disability,lapsia=lapsia)
+            muuelake = omaelake + kansanelake
+        else:
+            muuelake = omaelake + kansanelake
             
         if include_takuuelake:
             takuuelake=self.laske_takuuelake(ika,muuelake,disability=disability,lapsia=lapsia)
-            kokoelake=takuuelake+muuelake
+            kokoelake = takuuelake+muuelake
+            #if takuuelake>0:
+            #    print('ika',ika,'tyoelake',omaelake,'kansanelake',kansanelake,'takuuelake',takuuelake)
+            if takuuelake>0 and kansanelake<1e-4:
+                print('ika',ika,'tyoelake',omaelake,'kansanelake',kansanelake,'takuuelake',takuuelake)
         else:
-            kokoelake=muuelake
+            kokoelake = muuelake
     
         return kokoelake
 
