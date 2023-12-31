@@ -8,6 +8,7 @@ class Labels():
     def get_labels(self,language='English'):
         labels={}
         if language=='English':
+            labels['ero määrissä']='Difference in numbers'
             labels['osuus tilassa x']='Proportion in state {} [%]'
             labels['age']='Age [y]'
             labels['ratio']='Proportion [%]'
@@ -60,7 +61,12 @@ class Labels():
             labels['lapsia']='Children'
             labels['spouses']='Spouses'
             labels['työvoima %']='Workforce %'
+            labels['Menetetty palkkasumma']='Lost wages [euros]'
+            labels['Menetetty palkkasumma %']='Lost wages [%]'
         else:
+            labels['Menetetty palkkasumma']='Menetetty palkkasumma [euroa]'
+            labels['Menetetty palkkasumma %']='Menetetty palkkasumma [%]'
+            labels['ero määrissä']='Ero määrissä'
             labels['osuus tilassa x']='Osuus tilassa {} [%]'
             labels['age']='Ikä [v]'
             labels['ratio']='Osuus tilassa [%]'

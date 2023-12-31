@@ -4618,8 +4618,8 @@ class Benefits():
             kokoelake = takuuelake+muuelake
             #if takuuelake>0:
             #    print('ika',ika,'tyoelake',omaelake,'kansanelake',kansanelake,'takuuelake',takuuelake)
-            if takuuelake>0 and kansanelake<1e-4:
-                print('ika',ika,'tyoelake',omaelake,'kansanelake',kansanelake,'takuuelake',takuuelake)
+            #if takuuelake>0 and kansanelake<1e-4:
+            #    print('ika',ika,'tyoelake',omaelake,'kansanelake',kansanelake,'takuuelake',takuuelake)
         else:
             kokoelake = muuelake
     
