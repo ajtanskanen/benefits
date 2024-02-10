@@ -54,9 +54,12 @@ class BenefitsHO(Benefits):
             elif kesto>2*21.5:
                 kerroin=0.80
             else:
-                kerroin=1.00
+                kerroin=1.00 # =1-2/3/21.5
         else:
-            kerroin=1.00
+            if kesto<3*21.5:
+                kerroin=1.00 # =1-2/3/21.5
+            else:
+                kerroin=1.00 # =1-2/3/21.5
             
         p2=p.copy()
 
