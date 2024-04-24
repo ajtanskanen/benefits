@@ -38,11 +38,11 @@ class BenefitsHO(Benefits):
         self.veroparam=self.veroparam2023
 
     def veroparam2023(self):
-            '''
-            Päivitetty 6.5.2023
-            '''
-            super().veroparam2023()
-            self.tyottomyysvakuutusmaksu=0.0150 - 0.002 # vastaa VM:n arviota rakenteellisesta maksun muutoksesta 
+        '''
+        Päivitetty 6.5.2023
+        '''
+        super().veroparam2023()
+        self.tyottomyysvakuutusmaksu=0.0150 - 0.002 # vastaa VM:n arviota rakenteellisesta maksun muutoksesta 
 
     def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         # porrastetaan ansio-osa keston mukaan
