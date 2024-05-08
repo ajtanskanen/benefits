@@ -1,6 +1,6 @@
 import numpy as np
 
-def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False):
+def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toimeentulotukea=False):
 
     lapsia_kotihoidontuella=0    
     alle3v=0
@@ -15,16 +15,13 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False):
     p['perustulo']=0
     elakkeella=0
     elake=0
-    p['asumismenot_toimeentulo']=500
-    p['asumismenot_asumistuki']=500
     p['lapsia']=0
     p['lapsia_paivahoidossa']=0
     p['aikuisia']=1
     p['veromalli']=0
-    p['kuntaryhma']=kuntaryhmä-1 # indeksointi alkaa nollasta
     p['lapsia_kotihoidontuella']=0
     p['alle3v']=0
-    p['ansiopvrahan_suojaosa']=1
+    p['ansiopvrahan_suojaosa']=0
     p['ansiopvraha_lapsikorotus']=1
     p['puoliso_tulot']=0
     p['puoliso_tyoton']=0  
@@ -32,54 +29,29 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False):
     p['puoliso_saa_ansiopaivarahaa']=0
     p['puoliso_tyottomyyden_kesto']=100
     p['tyottomyyden_kesto']=10
+    p['kuntaryhma']=kuntaryhmä-1 # indeksointi alkaa nollasta
+    p['suojaosamalli']=0
     p['saa_elatustukea']=0
+    p['omat_alive']=1
+
+    if ei_toimeentulotukea:
+        p['ei_toimeentulotukea']=1
     
     kotihoidontuella=0
     
     lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake, \
-        puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake = \
-        _perheet(perhetyyppi)
+        puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
+            asumismenot_toimeentulo,asumismenot_asumistuki,saa_elatustukea = \
+        _perheet(perhetyyppi,kuntaryhmä=kuntaryhmä,vuosi=vuosi)
         
-    if lapsia>0 and aikuisia==1:
+    if lapsia>0 and aikuisia==1 or saa_elatustukea>0:
         p['saa_elatustukea']=1
-        
+
     # perhekoko          1   2   3   4    5
     # luvut peräisin Viitamäeltä
     #vuokra_toimeentulo=np.array([440,660,850,980,1150]) # helsinki 675 800 919 1008 +115/hlo
     #vuokra_asumistuki =np.array([411,600,761,901,1024])
-    
-    # päivitetty luvut
-    if vuosi==2018:
-        max_menot=np.array([[508, 492, 390, 344],[735, 706, 570, 501],[937, 890, 723, 641],[1095, 1038, 856, 764]])
-        max_lisa=np.array([137, 130, 123, 118])
-    elif vuosi==2019:
-        max_menot=np.array([[516, 499, 396, 349],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
-        max_lisa=np.array([139, 132, 119, 114])
-    elif vuosi==2020:
-        max_menot=np.array([[520, 503, 399, 352],[752, 722, 583, 513],[958, 910, 740, 656],[1120, 1062, 876, 781]])
-        max_lisa=np.array([140, 133, 120, 115])
-    elif vuosi==2021:
-        max_menot=np.array([[521, 504, 400, 353],[754, 723, 584, 514],[960, 912, 741, 657],[1122, 1064, 878, 783]])
-        max_lisa=np.array([140, 133, 120, 115])
-    elif vuosi==2022:
-        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
-        max_lisa=np.array([144, 137, 124, 119])
-    elif vuosi==2023:
-        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
-        max_lisa=np.array([144, 137, 124, 119])
-    else:
-        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
-        max_lisa=np.array([144, 137, 124, 119])    
-    
-    ind=lapsia+aikuisia-1
-    if ind<4:
-        asumismenot_toimeentulo=max_menot[p['kuntaryhma'],ind] #vuokra_toimeentulo[ind]
-        asumismenot_asumistuki=max_menot[p['kuntaryhma'],ind]-ind*30 #vuokra_asumistuki[ind]
-    else:
-        print(ind,p['kuntaryhma'])  
-        asumismenot_toimeentulo=max_menot[p['kuntaryhma'],3]+max_lisa[p['kuntaryhma']]*(ind-4)
-        asumismenot_asumistuki=max_menot[p['kuntaryhma'],3]+max_lisa[p['kuntaryhma']]*(ind-4)-ind*30
-    
+        
     asumismenot_yhdistetty=asumismenot_toimeentulo
     #vuokra_yhdistetty=vuokra_toimeentulo    
 
@@ -142,13 +114,55 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False):
     return p,selite
 
 def get_n_perheet():
-    return 72
+    return 73
 
-def _perheet(perhetyyppi: int):
+def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int):
+# päivitetty luvut
+    if vuosi==2018:
+        max_menot=np.array([[508, 492, 390, 344],[735, 706, 570, 501],[937, 890, 723, 641],[1095, 1038, 856, 764]])
+        max_lisa=np.array([137, 130, 123, 118])
+    elif vuosi==2019:
+        max_menot=np.array([[516, 499, 396, 349],[735, 706, 600, 527],[937, 890, 761, 675],[1095, 1038, 901, 804]])
+        max_lisa=np.array([139, 132, 119, 114])
+    elif vuosi==2020:
+        max_menot=np.array([[520, 503, 399, 352],[752, 722, 583, 513],[958, 910, 740, 656],[1120, 1062, 876, 781]])
+        max_lisa=np.array([140, 133, 120, 115])
+    elif vuosi==2021:
+        max_menot=np.array([[521, 504, 400, 353],[754, 723, 584, 514],[960, 912, 741, 657],[1122, 1064, 878, 783]])
+        max_lisa=np.array([140, 133, 120, 115])
+    elif vuosi==2022:
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
+        max_lisa=np.array([144, 137, 124, 119])
+    elif vuosi==2023:
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
+        max_lisa=np.array([144, 137, 124, 119])
+    elif vuosi==2024:
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
+        max_lisa=np.array([144, 137, 124, 119])
+    elif vuosi==2025:
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
+        max_lisa=np.array([144, 137, 124, 119])
+    else:
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
+        max_lisa=np.array([144, 137, 124, 119])    
+    
+    ind=lapsia+aikuisia-1
+    if ind<4:
+        asumismenot_toimeentulo=max_menot[kuntaryhmä-1,ind] #vuokra_toimeentulo[ind]
+        asumismenot_asumistuki=max_menot[kuntaryhmä-1,ind]-ind*30 #vuokra_asumistuki[ind]
+    else:
+        asumismenot_toimeentulo=max_menot[kuntaryhmä-1,3]+max_lisa[kuntaryhmä-1]*(ind-4)
+        asumismenot_asumistuki=max_menot[kuntaryhmä-1,3]+max_lisa[kuntaryhmä-1]*(ind-4)-ind*30    
+
+    return asumismenot_toimeentulo,asumismenot_asumistuki
+
+def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
     puoliso_elakkeella,puoliso_elake=0,0
     elakkeella,elake=0,0
     lapsia,paivahoidossa=0,0
     alle3v,lapsia_kotihoidontuella=0,0
+    asumismenot_toimeentulo,asumismenot_asumistuki=None,None
+    elatustuki=0
 
     if perhetyyppi==1: # 1+0, töissä
         aikuisia=1    
@@ -1026,14 +1040,17 @@ def _perheet(perhetyyppi: int):
         puoliso_saa_ansiopaivarahaa=0                
         puoliso_elakkeella=1
         puoliso_elake=1700  
-    elif perhetyyppi==69: # 2+0, työtön itse, puoliso eläkkeellä
+    elif perhetyyppi==71: # Kelan esimerkki 1; työttömyysetuutta ja yleistä asumistukea saava yksinasuva, asuinmenoina vuokra 650 euroa kuukaudessa ja vesimaksu 20 euroa kuukaudessa, asuinpaikkana Helsinki.
         lapsia=0    
         paivahoidossa=0
         lapsia_kotihoidontuella=0    
+        kuntaryhmä=0
+        asumismenot_toimeentulo = 670
+        asumismenot_asumistuki = 650
         alle3v=0
-        aikuisia=2
-        vakiintunutpalkka=1500    
-        tyoton=0    
+        aikuisia=1
+        vakiintunutpalkka=0
+        tyoton=1
         saa_ansiopaivarahaa=0
         elakkeella=0
         elake=0
@@ -1041,8 +1058,28 @@ def _perheet(perhetyyppi: int):
         puoliso_vakiintunutpalkka=0    
         puoliso_tyoton=0
         puoliso_saa_ansiopaivarahaa=0                
-        puoliso_elakkeella=1
-        puoliso_elake=1500                 
+        puoliso_elakkeella=0
+        puoliso_elake=0                     
+    elif perhetyyppi==72: # Kelan esimerkki 2: Yhden päiväkoti-ikäisen lapsen yksinhuoltaja, asuinmenoina vuokra 850 euroa kuukaudessa ja vesimaksu 40 euroa kuukaudessa, asuinpaikkana Helsinki, tuloina lisäksi lapsilisä ja elatustuki.
+        lapsia=1    
+        paivahoidossa=1 # sic! 0 jos lapsi ei päivähoidossa, vaikka olisi työskentelyä (näin Kela vaikuttaa olettaneen)
+        elatustuki=1
+        lapsia_kotihoidontuella=0    
+        alle3v=0
+        aikuisia=1
+        vakiintunutpalkka=1500    
+        asumismenot_toimeentulo = 890
+        asumismenot_asumistuki = 850
+        tyoton=1
+        saa_ansiopaivarahaa=0
+        elakkeella=0
+        elake=0
+        puoliso_tulot=0  
+        puoliso_vakiintunutpalkka=0    
+        puoliso_tyoton=0
+        puoliso_saa_ansiopaivarahaa=0                
+        puoliso_elakkeella=0
+        puoliso_elake=0                               
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
@@ -1055,8 +1092,12 @@ def _perheet(perhetyyppi: int):
         puoliso_tyoton=0    
         puoliso_saa_ansiopaivarahaa=0   
 
+    if asumismenot_toimeentulo is None:
+        asumismenot_toimeentulo,asumismenot_asumistuki = _max_asumismenot(lapsia,aikuisia,kuntaryhmä,vuosi)
+
     return lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake,\
-           puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake
+           puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
+           asumismenot_toimeentulo,asumismenot_asumistuki,elatustuki
     
 def make_filename(p):
     if p['elakkeella']>0:

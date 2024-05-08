@@ -1495,6 +1495,8 @@ class Marginals():
             palkka[ind]=t
             netto[ind]=n1
 
+            #print(t,q1['tyotpvraha_nettonetto'],q2['tyotpvraha_nettonetto'],marg['tyotpvraha'],q1['kateen'],q2['kateen'],1-(q2['kateen']-q1['kateen'])/dt)
+
             effmarg[ind]=marg['marginaaliveroprosentti']
             margyht[ind]=marg['marginaali']
             margalv[ind]=marg['alv']
