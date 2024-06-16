@@ -358,12 +358,16 @@ class Benefits():
         palkkavero=omapalkkavero+puolison_palkkavero    
         palkkatulot=bruttopalkka-palkkavero    
         
-        if False: # lain mukainen tiukka tulkinta
+        if True: # lain mukainen tiukka tulkinta
             omaetuoikeutettuosa=min(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
             puolison_etuoikeutettuosa=min(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
         else: # Kelan tulkinta: aina 150e
-            omaetuoikeutettuosa=min_etuoikeutettuosa
-            puolison_etuoikeutettuosa=min_etuoikeutettuosa
+            if False:
+                omaetuoikeutettuosa=min_etuoikeutettuosa
+                puolison_etuoikeutettuosa=min_etuoikeutettuosa
+            else: # kokeilu
+                omaetuoikeutettuosa=min(min_etuoikeutettuosa,0.35*omabruttopalkka)
+                puolison_etuoikeutettuosa=min(min_etuoikeutettuosa,0.35*omabruttopalkka)
             
         etuoikeutettuosa=omaetuoikeutettuosa+puolison_etuoikeutettuosa    
 
@@ -3813,7 +3817,10 @@ class Benefits():
         max_meno=max_menot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_lisa[kuntaryhma]
 
         prosentti=0.7 # vastaa 80 %
-        suojaosa=0
+        if True:
+            suojaosa=0
+        else:
+            suojaosa=250 #min(250,palkkatulot1*0.5)+min(250,palkkatulot2*0.5)
         perusomavastuu=max(0,0.50*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*aikuisia+246*lapsia)))
         if perusomavastuu<10:
             perusomavastuu=0

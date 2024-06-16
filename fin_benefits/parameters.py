@@ -113,6 +113,119 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
     
     return p,selite
 
+def bruttoparametrit(perhetyyppi=1,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toimeentulotukea=False):
+
+    lapsia_kotihoidontuella=0    
+    alle3v=0
+    opiskelija=0
+    
+    p={}
+    p['tyoton']=1
+    p['ika']=30
+    p['saa_ansiopaivarahaa']=0
+    p['t']=0
+    p['vakiintunutpalkka']=2500
+    p['perustulo']=0
+    elakkeella=0
+    elake=0
+    p['lapsia']=0
+    p['lapsia_paivahoidossa']=0
+    p['aikuisia']=1
+    p['veromalli']=0
+    p['lapsia_kotihoidontuella']=0
+    p['alle3v']=0
+    p['ansiopvrahan_suojaosa']=0
+    p['ansiopvraha_lapsikorotus']=1
+    p['puoliso_tulot']=0
+    p['puoliso_tyoton']=0  
+    p['puoliso_vakiintunutpalkka']=0  
+    p['puoliso_saa_ansiopaivarahaa']=0
+    p['puoliso_tyottomyyden_kesto']=100
+    p['tyottomyyden_kesto']=10
+    p['kuntaryhma']=kuntaryhmä-1 # indeksointi alkaa nollasta
+    p['suojaosamalli']=0
+    p['saa_elatustukea']=0
+    p['omat_alive']=1
+
+    if ei_toimeentulotukea:
+        p['ei_toimeentulotukea']=1
+    
+    kotihoidontuella=0
+    
+    lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake, \
+        puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
+            asumismenot_toimeentulo,asumismenot_asumistuki,saa_elatustukea = \
+        _bruttoesimerkit(perhetyyppi,kuntaryhmä=kuntaryhmä,vuosi=vuosi)
+        
+    if lapsia>0 and aikuisia==1 or saa_elatustukea>0:
+        p['saa_elatustukea']=1
+
+    # perhekoko          1   2   3   4    5
+    # luvut peräisin Viitamäeltä
+    #vuokra_toimeentulo=np.array([440,660,850,980,1150]) # helsinki 675 800 919 1008 +115/hlo
+    #vuokra_asumistuki =np.array([411,600,761,901,1024])
+        
+    asumismenot_yhdistetty=asumismenot_toimeentulo
+    #vuokra_yhdistetty=vuokra_toimeentulo    
+
+    if (aikuisia<2):
+        puoliso_tulot=0    
+        puoliso_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+
+    if (puoliso_tyoton>0):
+        puoliso_tulot=0    
+
+    if (paivahoidossa>lapsia):
+        paivahoidossa=lapsia   
+        
+    p['lapsia']=lapsia
+    p['elakkeella']=elakkeella
+    p['tyoelake']=elake
+    p['elake_maksussa']=elake
+    p['opiskelija']=opiskelija
+    p['aitiysvapaalla']=0
+    p['isyysvapaalla']=0
+    p['kotihoidontuella']=kotihoidontuella
+    p['lapsia_paivahoidossa']=paivahoidossa
+    p['aikuisia']=aikuisia
+    p['vakiintunutpalkka']=vakiintunutpalkka
+    p['tyoton']=tyoton
+    p['saa_ansiopaivarahaa']=saa_ansiopaivarahaa
+
+    p['asumismenot_toimeentulo']=asumismenot_toimeentulo
+    p['asumismenot_asumistuki']=asumismenot_asumistuki
+    p['asumismenot_yhdistetty']=asumismenot_yhdistetty
+    p['lapsia_kotihoidontuella']=lapsia_kotihoidontuella
+    p['lapsia_alle_3v']=alle3v
+    p['lapsia_alle_kouluikaisia']=lapsia
+
+    p['puoliso_tulot']=puoliso_tulot
+    p['puoliso_t']=puoliso_tulot
+    p['puoliso_vakiintunutpalkka']=puoliso_vakiintunutpalkka
+    p['puoliso_tyoton']=puoliso_tyoton
+    p['puoliso_saa_ansiopaivarahaa']=puoliso_saa_ansiopaivarahaa
+    p['puoliso_elakkeella']=puoliso_elakkeella
+    p['puoliso_opiskelija']=0
+    p['puoliso_elake_maksussa']=puoliso_elake
+    p['puoliso_tyoelake']=puoliso_elake
+    p['puoliso_aitiysvapaalla']=0
+    p['puoliso_isyysvapaalla']=0
+    p['puoliso_sairauspaivarahalla']=0
+    p['puoliso_kotihoidontuella']=0
+    
+    #return lapsia,paivahoidossa,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa, \
+    #puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa, \
+    #asumismenot_asumistuki,asumismenot_toimeentulo,alle3v,asumismenot_yhdistetty 
+    
+    selite=tee_selite(p)
+    
+    if tulosta:
+        print(selite)
+    
+    return p,selite    
+
 def get_n_perheet():
     return 73
 
@@ -1080,6 +1193,60 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
         puoliso_saa_ansiopaivarahaa=0                
         puoliso_elakkeella=0
         puoliso_elake=0                               
+    else: # 1+0
+        lapsia=0    
+        paivahoidossa=0    
+        aikuisia=1    
+        vakiintunutpalkka=1500    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puoliso_tulot=0    
+        puoliso_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0   
+
+    if asumismenot_toimeentulo is None:
+        asumismenot_toimeentulo,asumismenot_asumistuki = _max_asumismenot(lapsia,aikuisia,kuntaryhmä,vuosi)
+
+    return lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake,\
+           puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
+           asumismenot_toimeentulo,asumismenot_asumistuki,elatustuki
+    
+def _bruttoesimerkit(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2024,bruttotulo=None):
+    puoliso_elakkeella,puoliso_elake=0,0
+    elakkeella,elake=0,0
+    lapsia,paivahoidossa=0,0
+    alle3v,lapsia_kotihoidontuella=0,0
+    asumismenot_toimeentulo,asumismenot_asumistuki=None,None
+    elatustuki=0
+
+    if perhetyyppi==1: # 1+0, töissä
+        aikuisia=1    
+        vakiintunutpalkka=2500    
+        tyoton=0    
+        saa_ansiopaivarahaa=0    
+        puoliso_tulot=1250    
+        puoliso_vakiintunutpalkka=2500    
+        puoliso_tyoton=1    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==2: # 1+0, työtön ansiopäivärahalla 
+        aikuisia=1    
+        vakiintunutpalkka=2500    
+        tyoton=1    
+        saa_ansiopaivarahaa=1    
+        puoliso_tulot=0    
+        puoliso_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
+    elif perhetyyppi==3: # 1+0, työtön työmarkkinatuella
+        aikuisia=1    
+        vakiintunutpalkka=2500    
+        tyoton=1    
+        saa_ansiopaivarahaa=0    
+        puoliso_tulot=0    
+        puoliso_vakiintunutpalkka=0    
+        puoliso_tyoton=0    
+        puoliso_saa_ansiopaivarahaa=0    
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    

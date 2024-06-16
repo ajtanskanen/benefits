@@ -517,7 +517,7 @@ class Marginals():
                 dt=100,plottaa=True,header=True,source='Lähde: EK',head_text=None,
                 incl_alv=False,include_tuet=False):
 
-        tulos=pd.DataFrame(columns={'kokonaistulo, e/v','palkka, e/kk','vero [%]','marginaali','netto','brutto','tva'})
+        tulos=pd.DataFrame(columns=('kokonaistulo, e/v','palkka, e/kk','vero [%]','marginaali','netto','brutto','tva'))
 
         if p is None:
             p,selite=self.get_default_parameter()
@@ -558,7 +558,6 @@ class Marginals():
         pd.options.display.max_rows = 1000
         pd.set_option("display.precision", 2)
         display(tulos)
-
 
     def laske_ja_plottaa_marginaalit(self,p=None,p0=None,min_salary=0,max_salary=8000,
                 basenetto=None,baseeff=None,basetva=None,basebrutto=None,plot_julkinen=True,dt=100,plottaa=True,
