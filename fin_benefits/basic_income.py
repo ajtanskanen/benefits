@@ -29,7 +29,7 @@ class BasicIncomeBenefits(Benefits):
     """
     
     def __init__(self,**kwargs):
-        self.year=2018
+        self.year=2023
         self.additional_income_tax=0.0
         self.additional_tyel_premium=0.0
         self.additional_kunnallisvero=0.0
@@ -46,6 +46,9 @@ class BasicIncomeBenefits(Benefits):
         
         self.osittainen_perustulo=True
         self.perustulo_korvaa_toimeentulotuen=False
+        self.include_kirkollisvero=False
+        self.include_joustavahoitoraha=False
+        self.kk_jakaja=12        
         
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -140,6 +143,11 @@ class BasicIncomeBenefits(Benefits):
 
     def veroparam2018_perustulo_sotu(self):
         super().veroparam2018()
+
+    # uusin versio ajoista v8
+    def veroparam2023_perustulo(self):
+        super().veroparam2018()
+        self.kunnallisvero_pros=0.0    
 
     def setup_basic_income(self):
         self.nyky_soviteltu_peruspaivaraha=super().soviteltu_peruspaivaraha
@@ -522,21 +530,89 @@ class BasicIncomeBenefits(Benefits):
 
     def tyotulovahennys2020(self):
         max_tyotulovahennys=1770/self.kk_jakaja
-        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
+        ttulorajat=np.array([2500,33000,129_800])/self.kk_jakaja 
         ttulopros=np.array([0.125,0.0184,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def tyotulovahennys2021(self):
         max_tyotulovahennys=1840/self.kk_jakaja
-        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
+        ttulorajat=np.array([2500,33000,130_400])/self.kk_jakaja 
         ttulopros=np.array([0.127,0.0189,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
     def tyotulovahennys2022(self):
-        max_tyotulovahennys=1840/self.kk_jakaja
-        ttulorajat=np.array([2500,33000,127000])/self.kk_jakaja # 127000??
-        ttulopros=np.array([0.127,0.0189,0])
+        max_tyotulovahennys=1930/self.kk_jakaja
+        ttulorajat=np.array([2500,33000,132_200])/self.kk_jakaja 
+        ttulopros=np.array([0.13,0.0196,0])
         return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2023(self,ika: float,lapsia: int):
+        if ika>=60:
+            if ika>=62:
+                max_tyotulovahennys=2430/self.kk_jakaja
+            elif ika>=65:
+                max_tyotulovahennys=2630/self.kk_jakaja
+            else:
+                max_tyotulovahennys=2230/self.kk_jakaja
+        else:
+            max_tyotulovahennys=2030/self.kk_jakaja
+        ttulorajat=np.array([0,22000,70000])/self.kk_jakaja 
+        ttulopros=np.array([0.13,0.0203,0.0121])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def tyotulovahennys2024(self,ika: float,lapsia: int):
+        if ika>=65:
+            max_tyotulovahennys=3340/self.kk_jakaja
+        else:
+            max_tyotulovahennys=2140/self.kk_jakaja
+        ttulorajat=np.array([0,22000,77000])/self.kk_jakaja*1.032 # 127000??
+        ttulopros=np.array([0.13,0.0203,0.121])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+        
+    def tyotulovahennys2025(self,ika: float,lapsia: int):
+        if ika>=65:
+            max_tyotulovahennys=3340/self.kk_jakaja
+        else:
+            max_tyotulovahennys=2140/self.kk_jakaja
+        ttulorajat=np.array([0,22000,77000])/self.kk_jakaja*1.032 # 127000??
+        ttulopros=np.array([0.13,0.0203,0.121])
+        return max_tyotulovahennys,ttulorajat,ttulopros
+
+    def laske_tyotulovahennys2018_2022(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float, lapsia: int):
+        '''
+        Vuosille 2018-2022
+        '''
+        max_tyotulovahennys,ttulorajat,ttulopros=self.tyotulovahennys()
+    
+        if palkkatulot_puhdas>ttulorajat[1]:
+            if palkkatulot_puhdas>ttulorajat[2]:
+                tyotulovahennys=0
+            else:
+                tyotulovahennys=min(max_tyotulovahennys,max(0,ttulopros[0]*max(0,palkkatulot_puhdas-ttulorajat[0])))
+        else:
+            if palkkatulot_puhdas>ttulorajat[0]:
+                tyotulovahennys=min(max_tyotulovahennys,max(0,ttulopros[0]*max(0,palkkatulot_puhdas-ttulorajat[0])))
+            else:
+                tyotulovahennys=0
+
+        if puhdas_ansiotulo>ttulorajat[1]: # puhdas_ansiotulo vai puhdas_palkkatulo ??
+            if puhdas_ansiotulo>ttulorajat[2]:
+                tyotulovahennys=0
+            else:
+                tyotulovahennys=max(0,tyotulovahennys-ttulopros[1]*max(0,puhdas_ansiotulo-ttulorajat[1]))    
+                
+        return tyotulovahennys
+        
+    def laske_tyotulovahennys2023_2025(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float,lapsia: float):
+        '''
+        Vuosille 2023-
+        '''
+        max_tyotulovahennys,ttulorajat,ttulopros=self.tyotulovahennys(ika,lapsia)
+    
+        tyotulovahennys=min(max_tyotulovahennys,max(0,ttulopros[0]*max(0,palkkatulot_puhdas-ttulorajat[0])))
+        tyotulovahennys=max(0,tyotulovahennys-ttulopros[1]*max(0,min(ttulorajat[2],puhdas_ansiotulo)-ttulorajat[1])-ttulopros[2]*max(0,puhdas_ansiotulo-ttulorajat[2]))    
+                
+        return tyotulovahennys        
 
     def tyotulovahennys_perustulo_sotu(self):
         max_tyotulovahennys=0
@@ -568,12 +644,6 @@ class BasicIncomeBenefits(Benefits):
         ansvah=np.array([0.51,0.28,0.045])
         return rajat,maxvahennys,ansvah
         
-    def ansiotulovahennys2020(self):
-        rajat=np.array([2500,7230,14000])/self.kk_jakaja
-        maxvahennys=3570/self.kk_jakaja
-        ansvah=np.array([0.51,0.28,0.045])
-        return rajat,maxvahennys,ansvah
-        
     def ansiotulovahennys2021(self):
         rajat=np.array([2500,7230,14000])/self.kk_jakaja
         maxvahennys=3570/self.kk_jakaja
@@ -581,6 +651,24 @@ class BasicIncomeBenefits(Benefits):
         return rajat,maxvahennys,ansvah
         
     def ansiotulovahennys2022(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+
+    def ansiotulovahennys2023(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+
+    def ansiotulovahennys2024(self):
+        rajat=np.array([2500,7230,14000])/self.kk_jakaja
+        maxvahennys=3570/self.kk_jakaja
+        ansvah=np.array([0.51,0.28,0.045])
+        return rajat,maxvahennys,ansvah
+        
+    def ansiotulovahennys2025(self):
         rajat=np.array([2500,7230,14000])/self.kk_jakaja
         maxvahennys=3570/self.kk_jakaja
         ansvah=np.array([0.51,0.28,0.045])

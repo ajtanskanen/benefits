@@ -1550,7 +1550,7 @@ class Benefits():
         paivarahamaksu=self.laske_paivarahamaksu(palkkatulot,p['ika'])
         #print('paivarahamaksu',paivarahamaksu,palkkatulot*12,self.paivarahamaksu_raja*12)
 
-        peritytverot += paivarahamaksu+ptel+tyotvakmaksu
+        peritytverot += paivarahamaksu + ptel + tyotvakmaksu
     
         # tulonhankkimisvähennys pienentää ansiotuloa    
         palkkatulot_puhdas=max(0,palkkatulot-self.tulonhankkimisvahennys) # puhdas palkkatulo
@@ -1642,6 +1642,7 @@ class Benefits():
             
         sairausvakuutusmaksu = paivarahamaksu + peritty_sairaanhoitomaksu
         
+        # perityst verot sis kaikki työntekijän osuudet, ilman työnantajan osuutta
         peritytverot += peritty_sairaanhoitomaksu + kunnallisvero
         if self.include_kirkollisvero:
             peritytverot += kirkollisvero
@@ -3552,7 +3553,11 @@ class Benefits():
         
     def laske_alv(self,kateen: float):
         # kulutusmenoista maksetaan noin 24% alvia (lähde: TK, https://www.stat.fi/tietotrendit/artikkelit/2019/arvonlisavero-haivyttaa-progression-vaikutuksen-pienituloisimmilta/)
-        alv=(0.24+self.additional_vat)/(1.24+self.additional_vat)
+        if self.year<2025:
+            alv=(0.24+self.additional_vat)/(1.24+self.additional_vat)
+        else:
+            alv=(0.255+self.additional_vat)/(1.255+self.additional_vat)
+            
         return alv*kateen
         
     def default_asumistuki_suojaosa(self,p):

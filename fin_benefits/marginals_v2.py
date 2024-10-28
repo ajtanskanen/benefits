@@ -1150,7 +1150,7 @@ class Marginals():
         return netto,eff,tva,osa_tva
 
 
-    def comp_insentives(self,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,dt=100,incl_alv=False):
+    def comp_insentives(self,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,dt=100,incl_alv=False,samapalkka=False):
         '''
         Laskee marginaalit ja nettotulot
         Toimii sekä ALV että ilman ALV
@@ -1179,10 +1179,16 @@ class Marginals():
         k=0
         for t in np.arange(min_salary,max_salary+step_salary,step_salary):
             p3['t']=t # palkka
+            if samapalkka:
+                p3['puoliso_tulot']=t # palkka
             n1,q1=self.ben.laske_tulot_v3(p3,include_alv=incl_alv)
             p3['t']=t+dt # palkka
+            if samapalkka:
+                p3['puoliso_tulot']=t+dt # palkka
             n2,q2=self.ben.laske_tulot_v3(p3,include_alv=incl_alv)
             p3['t']=t+max(t,dt) # palkka
+            if samapalkka:
+                p3['puoliso_tulot']=t+max(t,dt) # palkka
             n3,q3=self.ben.laske_tulot_v3(p3,include_alv=incl_alv)
             netto[k]=n1
             brutto[k]=q1['brutto']
