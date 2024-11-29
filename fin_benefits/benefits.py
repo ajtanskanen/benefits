@@ -259,14 +259,17 @@ class Benefits():
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
-        lapsi1=383.03     # e/kk     alle 10v lapsi
-        lapsi2=355.27     # e/kk
-        lapsi3=327.51     # e/kk
-        yksinhuoltaja=669.99     # e/kk
+        lapsi1=373.94     # e/kk     alle 10v lapsi
+        lapsi2=344.26     # e/kk
+        lapsi3=314,58     # e/kk
+        lapsi1_10_17=415.49     # e/kk     alle 10v lapsi
+        lapsi2_10_17=385.81     # e/kk
+        lapsi3_10_17=356.13     # e/kk
+        yksinhuoltaja=676.65     # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
-        muu=499.55
-        yksinasuva=587.71
-        # Helsinki: 694 869 993 1089 122
+        muu=504.52
+        yksinasuva=593.55
+        # Helsinki: 715 507 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
         # Kihniö: 352 463 568 617 96
@@ -341,7 +344,7 @@ class Benefits():
         
     def toimeentulotuki(self,omabruttopalkka: float,omapalkkavero: float,puolison_bruttopalkka: float,puolison_palkkavero: float,
                              muuttulot: float,verot: float,asumismenot: float,muutmenot: float,aikuisia: int, lapsia: int,kuntaryhma: int,
-                             p: dict,omavastuuprosentti: float=0.0,alennus: int=0):
+                             p: dict,omavastuuprosentti: float=0.0,alennus: int=0,asumistuki: float=None,lapsilisa: float=None,muut_tulot_asumistuki: float=None):
 
         min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_asumislisa=self.toimeentulotuki_param()
         max_asumismeno=max_asumismenot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_asumislisa[kuntaryhma]
@@ -358,11 +361,11 @@ class Benefits():
         palkkavero=omapalkkavero+puolison_palkkavero    
         palkkatulot=bruttopalkka-palkkavero    
         
-        if True: # lain mukainen tiukka tulkinta
+        if False: # lain mukainen tiukka tulkinta
             omaetuoikeutettuosa=min(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
             puolison_etuoikeutettuosa=min(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
         else: # Kelan tulkinta: aina 150e
-            if False:
+            if True:
                 omaetuoikeutettuosa=min_etuoikeutettuosa
                 puolison_etuoikeutettuosa=min_etuoikeutettuosa
             else: # kokeilu
@@ -567,15 +570,6 @@ class Benefits():
         return tuki
 
     def peruspaivaraha2027(self,lapsia: int) -> float:
-        if lapsia==0:
-            lisa=0    
-        elif lapsia==1:
-            lisa=5.84     # e/pv
-        elif lapsia==2:
-            lisa=8.57     # e/pv
-        else:
-            lisa=11.05    # e/pv 
-
         if self.use_extra_ppr:
             pvraha=21.5*37.21*self.extra_ppr_factor
         else:
@@ -1000,10 +994,13 @@ class Benefits():
         return max_tyotulovahennys,ttulorajat,ttulopros
         
     def tyotulovahennys2025(self,ika: float,lapsia: int):
-        if ika>=65:
-            max_tyotulovahennys=3340/self.kk_jakaja
-        else:
-            max_tyotulovahennys=2140/self.kk_jakaja
+        '''
+        tarvitaan tieto yksihuoltajuudesta...
+        '''
+        #if ika>=65:
+        #    max_tyotulovahennys=3340/self.kk_jakaja
+        #else:
+        max_tyotulovahennys=(3_225+50*lapsia)/self.kk_jakaja
         ttulorajat=np.array([0,22000,77000])/self.kk_jakaja*1.032 # 127000??
         ttulopros=np.array([0.13,0.0203,0.121])
         return max_tyotulovahennys,ttulorajat,ttulopros
@@ -1108,7 +1105,7 @@ class Benefits():
         
     def ansiotulovahennys2025(self):
         rajat=np.array([2500,7230,14000])/self.kk_jakaja
-        maxvahennys=3570/self.kk_jakaja
+        maxvahennys=0 #3570/self.kk_jakaja
         ansvah=np.array([0.51,0.28,0.045])
         return rajat,maxvahennys,ansvah
 
@@ -1116,6 +1113,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,max(0,0.1984+self.additional_kunnallisvero)) # Viitamäen raportista 19,84; verotuloilla painotettu k.a. 19,86
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0190 #
+        self.arvonlisavero = 0.24
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1128,7 +1126,7 @@ class Benefits():
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0
@@ -1144,6 +1142,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,0.1988+self.additional_kunnallisvero) # Viitamäen raportista
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0125 #
+        self.arvonlisavero = 0.24
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1156,7 +1155,7 @@ class Benefits():
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0
@@ -1172,6 +1171,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,0.1997+self.additional_kunnallisvero) # Viitamäen raportista
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0125 #
+        self.arvonlisavero = 0.24
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1184,7 +1184,7 @@ class Benefits():
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0068
@@ -1200,6 +1200,7 @@ class Benefits():
         self.kunnallisvero_pros=max(0,0.2002+self.additional_kunnallisvero) # Viitamäen raportista
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0140 #
+        self.arvonlisavero = 0.24
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1212,7 +1213,7 @@ class Benefits():
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0068
@@ -1228,9 +1229,10 @@ class Benefits():
         '''
         Päivitä
         '''
-        self.kunnallisvero_pros=max(0,0.2001+self.additional_kunnallisvero) 
+        self.kunnallisvero_pros=max(0,0.2000+self.additional_kunnallisvero) 
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0150 #
+        self.arvonlisavero = 0.24
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1243,7 +1245,7 @@ class Benefits():
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0151 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0070 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0053
@@ -1259,9 +1261,10 @@ class Benefits():
         '''
         Päivitetty 6.5.2023
         '''
-        self.kunnallisvero_pros=max(0,0.0746+self.additional_kunnallisvero) # +0.0135) 
+        self.kunnallisvero_pros=max(0,0.0743+self.additional_kunnallisvero) # +0.0135) 
         self.kirkollisvero_pros=0.0138
         self.tyottomyysvakuutusmaksu=0.0150 #
+        self.arvonlisavero = 0.24
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1274,7 +1277,7 @@ class Benefits():
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0154 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0057 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0060
@@ -1290,9 +1293,10 @@ class Benefits():
         '''
         Päivitetty 6.5.2024
         '''
-        self.kunnallisvero_pros=max(0,0.0761+self.additional_kunnallisvero) # Viitamäen raportista
+        self.kunnallisvero_pros=max(0,0.0751+self.additional_kunnallisvero)
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0079 #
+        self.arvonlisavero = 0.24
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
@@ -1305,7 +1309,7 @@ class Benefits():
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0082 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
         self.tyonantajan_tytalmaksu=0.0057 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
         self.sairaanhoitomaksu=0.0051
@@ -1319,31 +1323,32 @@ class Benefits():
 
     def veroparam2025(self):
         '''
-        Päivitetty 21.9.2022
+        Päivitetty 27.11.2025
         '''
-        self.kunnallisvero_pros=max(0,0.0761+self.additional_kunnallisvero) # Viitamäen raportista
+        self.kunnallisvero_pros=max(0,0.0751+self.additional_kunnallisvero)
         self.kirkollisvero_pros=0.0139
-        self.tyottomyysvakuutusmaksu=0.0079 #
+        self.tyottomyysvakuutusmaksu=0.0059 #
+        self.arvonlisavero = 0.255
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
             self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
             self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium)
             self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
-        self.tyonantajan_sairausvakuutusmaksu=0.0116
-        self.tyonantajan_tyottomyysvakuutusmaksu=0.0082 # keskimäärin
+        self.tyonantajan_sairausvakuutusmaksu=0.0175
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0061 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
-        self.tyonantajan_tytalmaksu=0.0057 # työtapaturma- ja ammattitautimaksu, keskimäärin
-        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu
+        self.tyonantajan_tytalmaksu=0.0054 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
-        self.sairaanhoitomaksu=0.0055
+        self.sairaanhoitomaksu=0.0105
         self.sairaanhoitomaksu_etuus=0.0157 # muut
         
-        self.paivarahamaksu_pros=0.0101 # palkka
-        self.paivarahamaksu_raja=16_499/self.kk_jakaja    
+        self.paivarahamaksu_pros=0.0071 # palkka
+        self.paivarahamaksu_raja=16_872/self.kk_jakaja    
         
         self.elakemaksu_alaraja=62.88
         self.tulonhankkimisvahennys=750/self.kk_jakaja
@@ -1499,7 +1504,7 @@ class Benefits():
     
     def perusvahennys2025(self):
         perusvahennys_pros=0.18
-        max_perusvahennys=3980/self.kk_jakaja
+        max_perusvahennys=4_115/self.kk_jakaja
         return perusvahennys_pros,max_perusvahennys
     
     def verotus(self,palkkatulot: float,muuttulot: float,elaketulot: float,lapsia: int,p: dict,alku: str=''):
@@ -1745,8 +1750,8 @@ class Benefits():
         return rajat,pros               
 
     def valtionvero_asteikko_2025(self):
-        rajat=np.array([0,20_500,30_500,50_400,88_200,150_000])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.42,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        rajat=np.array([0,21_200,31_500,52_100,88_200,150_000])/self.kk_jakaja
+        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.4175,0.4425+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros               
 
@@ -1844,7 +1849,7 @@ class Benefits():
 
     def hoitolisa2024(self,perheentulot: float,perhekoko: int):
         '''
-        Vuoden 2023 tasossa
+        Vuoden 2024 tasossa
         '''
         perustuki=202.12
         if perhekoko==2:
@@ -1860,7 +1865,7 @@ class Benefits():
 
     def hoitolisa2025(self,perheentulot: float,perhekoko: int):
         '''
-        Vuoden 2023 tasossa
+        Vuoden 2025 tasossa
         '''
         perustuki=202.12
         if perhekoko==2:
@@ -1877,6 +1882,10 @@ class Benefits():
 # joustava hoitoraha
 
     def joustavahoitoraha(self,työaika: float,allekolmev: int):
+        '''
+        osatuki alle 22,5 h/vko
+        päivitetty vuoteen 2025
+        '''
         if allekolmev<1:
             tuki=0
         else:
@@ -2073,6 +2082,9 @@ class Benefits():
         return arvo
 
     def kotihoidontuki2025(self,lapsia: int,allekolmev: int,alle_kouluikaisia: int) -> float:
+        '''
+        vuoden 2025 tasossa
+        '''
         if lapsia<1:
             arvo=0
         else:
@@ -2210,7 +2222,6 @@ class Benefits():
     def lapsilisa2018(self,yksinhuoltajakorotus: bool=False) -> float:
         lapsilisat=np.array([95.75,105.80,135.01,154.64,174.27])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 53.3
 
         return lapsilisat
@@ -2218,7 +2229,6 @@ class Benefits():
     def lapsilisa2019(self,yksinhuoltajakorotus: bool=False) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,153.24,172.69])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 53.3
             
         return lapsilisat
@@ -2226,7 +2236,6 @@ class Benefits():
     def lapsilisa2020(self,yksinhuoltajakorotus: bool=False) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 53.3
             
         return lapsilisat
@@ -2234,7 +2243,6 @@ class Benefits():
     def lapsilisa2021(self,yksinhuoltajakorotus: bool=False) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 63.3
             
         return lapsilisat
@@ -2242,7 +2250,6 @@ class Benefits():
     def lapsilisa2022(self,yksinhuoltajakorotus: bool=False) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 63.3
             
         return lapsilisat
@@ -2250,7 +2257,6 @@ class Benefits():
     def lapsilisa2023(self,yksinhuoltajakorotus: bool=False) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 68.3
             
         return lapsilisat
@@ -2258,20 +2264,21 @@ class Benefits():
     def lapsilisa2024(self,yksinhuoltajakorotus: bool=False) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,173.24,192.69])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 73.3
             
         return lapsilisat
     
     def lapsilisa2025(self,yksinhuoltajakorotus: bool=False) -> float:
+        '''
+        vuoden 2025 tasossa
+        '''
         lapsilisat=np.array([94.88,104.84,133.79,173.24,192.69])
         if yksinhuoltajakorotus:
-            # yksinhuoltajakorotus 53,30 e/lapsi
             lapsilisat += 73.3
             
         return lapsilisat
 
-    def laske_lapsilisa(self,lapsia: int,yksinhuoltajakorotus: float=0) -> float:
+    def laske_lapsilisa(self,lapsia: int,yksinhuoltajakorotus: int=0) -> float: #FIXME!
         lapsilisat=self.lapsilisa(yksinhuoltajakorotus=yksinhuoltajakorotus)
 
         if lapsia==0:
@@ -2367,6 +2374,18 @@ class Benefits():
             tuki=0
             
         return tuki
+
+    def opiskelija_asumislisa(self,palkkatulot,kokoelake,asumismenot_asumistuki,aikuisia,kuntaryhma,p):
+        if self.year>=2025:
+            if kuntaryhma in set([1,2]):
+                tuki = 296
+            elif kuntaryhma==3:
+                tuki = 248
+            elif kuntaryhma==4:
+                tuki = 216
+            return tuki * aikuisia
+        else:
+            return 0
 
     def check_p(self,p: dict):
         if 'toimeentulotuki_vahennys' not in p:
@@ -2705,10 +2724,7 @@ class Benefits():
                 q[puoliso+'tyoelake']=p[alku+'tyoelake']
                 q[puoliso+'kansanelake']=p[alku+'kansanelake']
                 q[puoliso+'elake_tuleva']=0
-                #p[alku+'saa_ansiopaivarahaa']=0
                 # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
-                #q[puoliso+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[puoliso+'elake_maksussa'],include_takuuelake=include_takuuelake,yksin=0,
-                #                            disability=p[puoliso+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[puoliso+'kokoelake']=self.laske_kokonaiselake_v2(p['ika'],q[puoliso+'tyoelake'],q[puoliso+'kansanelake'],include_takuuelake=include_takuuelake,yksin=0,
                                             disability=p[puoliso+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[puoliso+'takuuelake']=q[puoliso+'kokoelake']-q[puoliso+'elake_maksussa']
@@ -2801,16 +2817,12 @@ class Benefits():
             #p['omat_saa_ansiopaivarahaa']=0
             # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
             if (p['aikuisia']>1):
-                #q[omat+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[omat+'elake_maksussa'],yksin=0,include_takuuelake=include_takuuelake,
-                #                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[omat+'kokoelake']=self.laske_kokonaiselake_v2(p['ika'],q[omat+'tyoelake'],q[omat+'kansanelake'],yksin=0,include_takuuelake=include_takuuelake,
                                             disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[omat+'takuuelake']=q[omat+'kokoelake']-q[omat+'elake_maksussa']
                 q[omat+'puhdas_tyoelake']=self.laske_puhdas_tyoelake_v2(p['ika'],q[omat+'tyoelake'],q[omat+'kansanelake'],
                                             disability=p[alku+'disabled'],yksin=0,lapsia=p['lapsia'])
             else:
-                #[omat+'kokoelake']=self.laske_kokonaiselake(p['ika'],q[omat+'elake_maksussa'],yksin=1,include_takuuelake=include_takuuelake,
-                #                            disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[omat+'kokoelake']=self.laske_kokonaiselake_v2(p['ika'],q[omat+'tyoelake'],q[omat+'kansanelake'],yksin=1,include_takuuelake=include_takuuelake,
                                             disability=p[alku+'disabled'],lapsia=p['lapsikorotus_lapsia'],add_kansanelake=add_kansanelake)
                 q[omat+'takuuelake']=q[omat+'kokoelake']-q[omat+'elake_maksussa']
@@ -3017,6 +3029,8 @@ class Benefits():
             q['asumistuki']=self.elakkeensaajan_asumistuki(q['palkkatulot'],q['kokoelake'],p['asumismenot_asumistuki'],aikuisia,p['kuntaryhma'],p,puolisolla_oikeus=False)
         elif p[omatalku+'elakkeella']>0 or p[puolisoalku+'elakkeella']>0: # eläkkeensaajan asumistuki vain, jos toinen eläkkeellä
             q['asumistuki']=self.elakkeensaajan_asumistuki(q['palkkatulot'],q['kokoelake'],p['asumismenot_asumistuki'],aikuisia,p['kuntaryhma'],p,puolisolla_oikeus=True)
+        elif (((p[omatalku+'opiskelija']>0 and aikuisia<2) or (p[omatalku+'opiskelija']>0 and p[puolisoalku+'opiskelija']>0) and aikuisia==2)) and self.year>=2025: # opiskelijat asumislisän piiriin
+            q['asumistuki']=self.opiskelija_asumislisa(q['palkkatulot'],q['kokoelake'],p['asumismenot_asumistuki'],aikuisia,p['kuntaryhma'],p)
         else: # muuten yleinen asumistuki
             q['asumistuki']=self.asumistuki(q[omat+'palkkatulot'],q[puoliso+'palkkatulot'],q['tyotpvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']
                                             +q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
@@ -3045,13 +3059,11 @@ class Benefits():
                 #    alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['lapsia_alle_3v'])
                 #    q['pvhoito']=max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
                 q['pvhoito_ilman_etuuksia']=11/12*self.paivahoitomenot(p['lapsia_paivahoidossa'],p[puolisoalku+'t']+p[omatalku+'t']+q['elatustuki'],aikuisia,lapsia,p)
-                #if p['lapsia_paivahoidossa']>0:
-                #    print('pv',q['pvhoito'],'lapsia',p['lapsia_paivahoidossa'],'t',q['palkkatulot'],'etuus',q['kokoelake']+q['elatustuki']+q['tyotpvraha']+q['sairauspaivaraha'])
                 
             if aikuisia==1:
-                yksinhuoltajakorotus=1
+                yksinhuoltajakorotus = True
             else:
-                yksinhuoltajakorotus=0
+                yksinhuoltajakorotus = False
             q['lapsilisa']=self.laske_lapsilisa(lapsia,yksinhuoltajakorotus=yksinhuoltajakorotus)
         else:
             q['pvhoito']=0
@@ -3391,6 +3403,7 @@ class Benefits():
         return kateen,q
         
     def update_toimeentulotuki(self,p: dict,q: dict,omat: str,puoliso: str,omatalku: str,puolisoalku: str):
+        muut_tulot_asumistuki = q['tyotpvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki']+q['kokoelake']
         if p['ei_toimeentulotukea']<1:
             if p['aikuisia']<2:
                 if p[omatalku+'opiskelija']>0 or p[omatalku+'alive']<1:
@@ -3399,7 +3412,7 @@ class Benefits():
                     q['toimeentulotuki']=self.toimeentulotuki(p[omatalku+'t'],q[omat+'verot_ilman_etuuksia'],0,0,\
                         q['elatustuki']+q['opintotuki_netto']+q['tyotpvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
                         +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto'],\
-                        0,p['asumismenot_toimeentulo'],q['pvhoito'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p)
+                        0,p['asumismenot_toimeentulo'],q['pvhoito'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p,asumistuki=q['asumistuki'],muut_tulot_asumistuki=muut_tulot_asumistuki)
             else:
                 if p[omatalku+'opiskelija']>0 and p[puolisoalku+'opiskelija']>0:
                     q['toimeentulotuki']=0
@@ -3407,7 +3420,7 @@ class Benefits():
                     q['toimeentulotuki']=self.toimeentulotuki(p[omatalku+'t'],q[omat+'verot_ilman_etuuksia'],p[puolisoalku+'t'],q[puoliso+'verot_ilman_etuuksia'],\
                         q['elatustuki']+q['opintotuki_netto']+q['tyotpvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
                         +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto'],\
-                        0,p['asumismenot_toimeentulo'],q['pvhoito'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p)
+                        0,p['asumismenot_toimeentulo'],q['pvhoito'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p,asumistuki=q['asumistuki'],muut_tulot_asumistuki=muut_tulot_asumistuki)
         else:
             q['toimeentulotuki']=0
                             
@@ -3553,10 +3566,7 @@ class Benefits():
         
     def laske_alv(self,kateen: float):
         # kulutusmenoista maksetaan noin 24% alvia (lähde: TK, https://www.stat.fi/tietotrendit/artikkelit/2019/arvonlisavero-haivyttaa-progression-vaikutuksen-pienituloisimmilta/)
-        if self.year<2025:
-            alv=(0.24+self.additional_vat)/(1.24+self.additional_vat)
-        else:
-            alv=(0.255+self.additional_vat)/(1.255+self.additional_vat)
+        alv=(self.arvonlisavero+self.additional_vat)/(1.0+self.arvonlisavero+self.additional_vat)
             
         return alv*kateen
         
@@ -4985,20 +4995,20 @@ class Benefits():
         Päivitä
         '''
         if yksin>0:
-            maara=775.50
+            maara = 783.41
         else:
-            maara=692.54
+            maara = 699.42
 
         if lapsia>0:
-            maara += 24.48*lapsia
+            maara += 26.18*lapsia
             
         if disability:
-            maara = max(0,maara-np.maximum(0,(tyoelake-65.62))/2)
+            maara = max(0,maara-np.maximum(0,(tyoelake-66.29))/2)
         else:
             if ika>=65:
-                maara = max(0,maara*(1.0+0.072*(ika-65))-np.maximum(0,(tyoelake-65.62))/2)
+                maara = max(0,maara*(1.0+0.072*(ika-65))-np.maximum(0,(tyoelake-66.29))/2)
             elif ika>=62: # varhennus
-                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-65.62))/2)
+                maara = max(0,maara*(1.0-0.048*(65-ika))-np.maximum(0,(tyoelake-66.29))/2)
             else:
                 maara=0
                 
@@ -5120,14 +5130,14 @@ class Benefits():
         if ika<63 and not disability:
             return 0
             
-        lapsikorotus=24.48*lapsia
+        lapsikorotus = 26.18*lapsia
         
-        if muuelake<976.54+lapsikorotus:
-            elake=976.54+lapsikorotus-muuelake
+        if muuelake < 986.30+lapsikorotus:
+            elake = 986.30+lapsikorotus-muuelake
         else:
-            elake=0
+            elake = 0
         
-        if elake<7.46:
+        if elake < 7.46:
             elake=0
 
         return elake                        
@@ -5425,7 +5435,7 @@ class Benefits():
 
     def sairauspaivaraha2024(self,palkka: float,vakiintunutpalkka: float):
         minimi=31.99*25
-        taite1=32_797/self.kk_jakaja
+        taite1=35_769/self.kk_jakaja
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
@@ -5434,10 +5444,10 @@ class Benefits():
 
     def sairauspaivaraha2025(self,palkka: float,vakiintunutpalkka: float):
         minimi=31.99*25
-        taite1=32_797/self.kk_jakaja
+        taite1=28_241/self.kk_jakaja
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
-        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
+        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.15*max(vakiintunut-taite1,0))
 
         return max(0,raha-palkka)        
         

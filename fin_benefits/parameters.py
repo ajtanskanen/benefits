@@ -41,7 +41,7 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
     
     lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake, \
         puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
-            asumismenot_toimeentulo,asumismenot_asumistuki,saa_elatustukea = \
+            asumismenot_toimeentulo,asumismenot_asumistuki,saa_elatustukea,ika = \
         _perheet(perhetyyppi,kuntaryhmä=kuntaryhmä,vuosi=vuosi)
         
     if lapsia>0 and aikuisia==1 or saa_elatustukea>0:
@@ -87,6 +87,7 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
     p['lapsia_kotihoidontuella']=lapsia_kotihoidontuella
     p['lapsia_alle_3v']=alle3v
     p['lapsia_alle_kouluikaisia']=lapsia
+    p['ika']=ika
 
     p['puoliso_tulot']=puoliso_tulot
     p['puoliso_t']=puoliso_tulot
@@ -154,7 +155,7 @@ def bruttoparametrit(perhetyyppi=1,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
     
     lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake, \
         puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
-            asumismenot_toimeentulo,asumismenot_asumistuki,saa_elatustukea = \
+            asumismenot_toimeentulo,asumismenot_asumistuki,saa_elatustukea,ika = \
         _bruttoesimerkit(perhetyyppi,kuntaryhmä=kuntaryhmä,vuosi=vuosi)
         
     if lapsia>0 and aikuisia==1 or saa_elatustukea>0:
@@ -214,6 +215,7 @@ def bruttoparametrit(perhetyyppi=1,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
     p['puoliso_isyysvapaalla']=0
     p['puoliso_sairauspaivarahalla']=0
     p['puoliso_kotihoidontuella']=0
+    p['ika']=ika
     
     #return lapsia,paivahoidossa,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa, \
     #puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa, \
@@ -276,6 +278,7 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
     alle3v,lapsia_kotihoidontuella=0,0
     asumismenot_toimeentulo,asumismenot_asumistuki=None,None
     elatustuki=0
+    ika=30
 
     if perhetyyppi==1: # 1+0, töissä
         aikuisia=1    
@@ -654,7 +657,8 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
         puoliso_tulot=0    
         puoliso_vakiintunutpalkka=0    
         puoliso_tyoton=0    
-        puoliso_saa_ansiopaivarahaa=0                
+        puoliso_saa_ansiopaivarahaa=0    
+        ika=70            
     elif perhetyyppi==34: # 1+0, töissä
         lapsia=0    
         paivahoidossa=0
@@ -1102,6 +1106,7 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
         puoliso_saa_ansiopaivarahaa=0                
         puoliso_elakkeella=1
         puoliso_elake=1500
+        ika=70
     elif perhetyyppi==68: # 2+0, eläkkeellä itse, puoliso töissä
         lapsia=0    
         paivahoidossa=0
@@ -1119,6 +1124,7 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
         puoliso_saa_ansiopaivarahaa=0                
         puoliso_elakkeella=0
         puoliso_elake=0       
+        ika=70
     elif perhetyyppi==69: # 2+0, eläkkeellä itse, puoliso työtön
         lapsia=0    
         paivahoidossa=0
@@ -1136,6 +1142,7 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
         puoliso_saa_ansiopaivarahaa=0                
         puoliso_elakkeella=0
         puoliso_elake=0            
+        ika=70
     elif perhetyyppi==70: # 2+0, töissä itse, puoliso eläkkeellä
         lapsia=0    
         paivahoidossa=0
@@ -1153,6 +1160,7 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
         puoliso_saa_ansiopaivarahaa=0                
         puoliso_elakkeella=1
         puoliso_elake=1700  
+        ika=65
     elif perhetyyppi==71: # Kelan esimerkki 1; työttömyysetuutta ja yleistä asumistukea saava yksinasuva, asuinmenoina vuokra 650 euroa kuukaudessa ja vesimaksu 20 euroa kuukaudessa, asuinpaikkana Helsinki.
         lapsia=0    
         paivahoidossa=0
@@ -1210,7 +1218,7 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
 
     return lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake,\
            puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
-           asumismenot_toimeentulo,asumismenot_asumistuki,elatustuki
+           asumismenot_toimeentulo,asumismenot_asumistuki,elatustuki,ika
     
 def _bruttoesimerkit(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2024,bruttotulo=None):
     puoliso_elakkeella,puoliso_elake=0,0
@@ -1219,6 +1227,7 @@ def _bruttoesimerkit(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2024,bruttot
     alle3v,lapsia_kotihoidontuella=0,0
     asumismenot_toimeentulo,asumismenot_asumistuki=None,None
     elatustuki=0
+    ika=30
 
     if perhetyyppi==1: # 1+0, töissä
         aikuisia=1    
@@ -1264,7 +1273,7 @@ def _bruttoesimerkit(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2024,bruttot
 
     return lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake,\
            puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
-           asumismenot_toimeentulo,asumismenot_asumistuki,elatustuki
+           asumismenot_toimeentulo,asumismenot_asumistuki,elatustuki,ika
     
 def make_filename(p):
     if p['elakkeella']>0:

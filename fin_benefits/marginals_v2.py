@@ -924,7 +924,7 @@ class Marginals():
             basenetto2=None,baseeff2=None,basetva2=None,baseosatva2=None,basebrutto2=None,
             basenetto3=None,baseeff3=None,basetva3=None,baseosatva3=None,basebrutto3=None,
             dt=100,otsikko="Vaihtoehto",otsikkobase="Nykytila",otsikkobase2="",otsikkobase3="",selite=True,
-            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=False,plot_brutto=False,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osatva=False,plot_brutto=False,
             figname=None,grayscale=False,source=None,header=None,palette_EK=True):
     
         if grayscale:
@@ -982,13 +982,13 @@ class Marginals():
         if plot_brutto:
             fig, axs = plt.subplots()
             if basebrutto is not None or basebrutto2 is not None:
+                axs.plot(x,brutto,label=otsikko,**linestyle)
                 if basebrutto is not None:
                     axs.plot(x,basebrutto,label=otsikkobase,**linestyle)
                 if basebrutto2 is not None:
                     axs.plot(x,basebrutto2,label=otsikkobase2,**linestyle)
-                if basenetto3 is not None:
-                    axs.plot(x,basenetto3,label=otsikkobase3,**linestyle)
-                axs.plot(x,brutto,label=otsikko,**linestyle)
+                if basebrutto3 is not None:
+                    axs.plot(x,basebrutto3,label=otsikkobase3,**linestyle)
                 if selite:
                     axs.legend(loc='upper right',**legendstyle)
             else:
@@ -1068,7 +1068,7 @@ class Marginals():
                 plt.savefig(figname+'_tva.png', format='png')
             plt.show()
 
-        if plot_osaeff:
+        if plot_osatva:
             fig, axs = plt.subplots()
             if baseosatva is not None or baseosatva2 is not None or baseosatva3 is not None:
                 if baseosatva is not None:
@@ -1101,7 +1101,7 @@ class Marginals():
             basenetto2=None,baseeff2=None,basetva2=None,baseosatva2=None,basebrutto2=None,
             basenetto3=None,baseeff3=None,basetva3=None,baseosatva3=None,basebrutto3=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",otsikkobase2="",otsikkobase3="",selite=True,
-            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,plot_brutto=True,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=True,plot_osatva=True,
             incl_alv=False,figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
     
         netto,eff,tva,osa_tva,brutto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,incl_alv=incl_alv,
@@ -1117,7 +1117,7 @@ class Marginals():
                 step_salary=step_salary,
                 basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,basebrutto=basebrutto,
                 dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
-                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,plot_brutto=plot_brutto,
+                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osatva=plot_osatva,plot_brutto=plot_brutto,
                 figname=figname,grayscale=grayscale,source=source,header=head_text,
                 basenetto2=basenetto2,baseeff2=baseeff2,basetva2=basetva2,baseosatva2=baseosatva2,basebrutto2=basebrutto2,otsikkobase2=otsikkobase2,
                 basenetto3=basenetto3,baseeff3=baseeff3,basetva3=basetva3,baseosatva3=baseosatva3,basebrutto3=basebrutto3,otsikkobase3=otsikkobase3)
@@ -1128,7 +1128,7 @@ class Marginals():
     def plot(self,p=None,p0=None,min_salary=0,max_salary=6000,step_salary=1,
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
-            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osatva=True,
             figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
     
         netto,eff,tva,osa_tva,brutto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,
@@ -1144,7 +1144,7 @@ class Marginals():
                 step_salary=step_salary,
                 basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
                 dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
-                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osaeff=plot_osaeff,
+                plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osatva=plot_osatva,
                 figname=figname,grayscale=grayscale,source=source,header=head_text)
 
         return netto,eff,tva,osa_tva
@@ -1367,7 +1367,7 @@ class Marginals():
     def laske_ja_selita(self,p=None,p0=None,min_salary=0,max_salary=3000,step_salary=1500,
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",selite=True,
-            plot_tva=True,plot_eff=True,plot_netto=True,plot_osaeff=True,incl_alv=False,
+            plot_tva=True,plot_eff=True,plot_netto=True,plot_osatva=True,incl_alv=False,
             figname=None,grayscale=None,source='Lähde: EK',header=True):
     
         head_text=tee_selite(p,short=False)
@@ -1633,3 +1633,17 @@ class Marginals():
         tva=tvat['marginaaliveroprosentti']
 
         return eff,tva
+
+    def compare_netto(self,marg_base,include_alv=False,min_salary=0,max_salary=6000,step_salary=1,dt=100,kuntaryhmä=1,
+                        vuosi=2023,otsikko="Yleistuki",plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=False,plot_osatva=True):
+
+        for pn in range(1,73):
+            p,selite = perheparametrit(perhetyyppi=pn,kuntaryhmä=kuntaryhmä,vuosi=vuosi,tulosta=False)
+            basenetto,baseeff,basetva,baseosatva,basebrutto = \
+                marg_base.comp_insentives(p=p,p0=p,min_salary=min_salary,incl_alv=include_alv,max_salary=max_salary,step_salary=step_salary,dt=dt)
+
+            basenetto_YT,baseeff_YT,basetva_YT,baseosatva_YT,basebrutto_YT = \
+                self.laske_ja_plottaa(p,basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
+                                    basebrutto=basebrutto,incl_alv=include_alv,otsikko=otsikko,otsikkobase="HO",
+                                    min_salary=min_salary,max_salary=max_salary,
+                                    plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_brutto=plot_brutto,plot_osatva=plot_osatva)
