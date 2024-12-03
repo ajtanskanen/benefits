@@ -1635,7 +1635,7 @@ class Marginals():
         return eff,tva
 
     def compare_netto(self,marg_base,include_alv=False,min_salary=0,max_salary=6000,step_salary=1,dt=100,kuntaryhmä=1,
-                        vuosi=2023,otsikko="Yleistuki",plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=False,plot_osatva=True):
+                        vuosi=2023,otsikko="Yleistuki",otsikkobase='baseline',plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=False,plot_osatva=True):
 
         for pn in range(1,73):
             p,selite = perheparametrit(perhetyyppi=pn,kuntaryhmä=kuntaryhmä,vuosi=vuosi,tulosta=False)
@@ -1644,6 +1644,6 @@ class Marginals():
 
             basenetto_YT,baseeff_YT,basetva_YT,baseosatva_YT,basebrutto_YT = \
                 self.laske_ja_plottaa(p,basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,
-                                    basebrutto=basebrutto,incl_alv=include_alv,otsikko=otsikko,otsikkobase="HO",
+                                    basebrutto=basebrutto,incl_alv=include_alv,otsikko=otsikko,otsikkobase=otsikkobase,
                                     min_salary=min_salary,max_salary=max_salary,
                                     plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_brutto=plot_brutto,plot_osatva=plot_osatva)
