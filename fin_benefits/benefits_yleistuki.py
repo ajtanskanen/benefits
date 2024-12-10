@@ -31,7 +31,7 @@ class BenefitsYleistuki(BenefitsHO):
     def __init__(self,**kwargs):
         self.vaihe = 2
         self.setup_YTU()
-        self.yhteensovitus_tyotulo = 1.0        
+        self.yhteensovitus_tyotulo = 0.8        
         super().__init__(**kwargs)
         print('Yleistuki 2023 BENEFITS')
 
