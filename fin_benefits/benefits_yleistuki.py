@@ -21,7 +21,8 @@ from .benefits_HO import BenefitsHO
 class BenefitsYleistuki(BenefitsHO):
     """
     Description:
-        The Finnish Earnings-related Social Security
+        The Finnish Social Security as a Gym Module
+        Universal Credit
 
     Source:
         Antti J. Tanskanen
@@ -29,8 +30,10 @@ class BenefitsYleistuki(BenefitsHO):
     """
     
     def __init__(self,**kwargs):
-        self.vaihe = 4
-        self.yhteensovitus_tyotulo = 0.8 
+        self.vaihe = 2
+        self.setup_YTU()
+        self.yhteensovitus_tyotulo = 0.8 # 1.0        
+        self.asumistuki_korvausaste = 0.7
         super().__init__(**kwargs)
         self.year = 2023
         #self.setup_YTU()
@@ -39,6 +42,9 @@ class BenefitsYleistuki(BenefitsHO):
 
     def set_yhteensovitus_tyotulo(self,prosentti):
         self.yhteensovitus_tyotulo = prosentti
+
+    def set_asumistuki_korvausaste(self,prosentti):
+        self.asumistuki_korvausaste = prosentti
 
     def set_vaihe(self,vaihe):
         self.vaihe = vaihe
@@ -111,16 +117,18 @@ class BenefitsYleistuki(BenefitsHO):
 
         max_meno =max_menot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_lisa[kuntaryhma]
 
-        prosentti =0.7 # vastaa 80 %
-        suojaosa =0 #p['asumistuki_suojaosa']*p['aikuisia']
-        yhteensovitus =1.0
-        yhteensovitus_tyotulo = self.yhteensovitus_tyotulo #1.0
+        prosentti = 0.7 # vastaa 80 %
+        suojaosa = 0 #p['asumistuki_suojaosa']*p['aikuisia']
+        prosentti = self.asumistuki_korvausaste # 0.7 # vastaa 70 %
+        
+        yhteensovitus_tyotulo= self.yhteensovitus_tyotulo #1.0
+        yhteensovitus_muut = 1.0
         lapsiparam = 246*1.05 # FIXME 270?
         perusomavastuu_nollatulot = max(0,-0.50*(667+111*aikuisia+lapsiparam*lapsia))
         perusomavastuu = max(0,
             0.50*(max(0,yhteensovitus_tyotulo*palkkatulot1-suojaosa)
                  +max(0,yhteensovitus_tyotulo*palkkatulot2-suojaosa)
-                 +yhteensovitus*muuttulot
+                 +yhteensovitus_muut*muuttulot
                  -(667+111*aikuisia+lapsiparam*lapsia)))
         if perusomavastuu<10:
             perusomavastuu = 0
@@ -156,13 +164,13 @@ class BenefitsYleistuki(BenefitsHO):
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
-        kerroin_lapsi = 1.0 # p.o. 1.0
-        kerroin_aikuinen = 1.1
-        kerroin_yksinhuoltaja = 1.1
-        lapsi1 = 383.03 * kerroin_lapsi    # e/kk     alle 10v lapsi
-        lapsi2 = 355.27 * kerroin_lapsi     # e/kk
-        lapsi3 = 327.51 * kerroin_lapsi     # e/kk
-        yksinhuoltaja = 632.83 * kerroin_yksinhuoltaja    # e/kk
+        kerroin_lapsi = 1.10
+        kerroin_aikuinen = 1.0
+        kerroin_yksinhuoltaja = 1.0
+        lapsi1=383.03 * kerroin_lapsi    # e/kk     alle 10v lapsi
+        lapsi2=355.27 * kerroin_lapsi     # e/kk
+        lapsi3=327.51 * kerroin_lapsi     # e/kk
+        yksinhuoltaja=632.83 * kerroin_yksinhuoltaja    # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot
         muu = 471.84 * kerroin_aikuinen
         yksinasuva = 555.11 * kerroin_aikuinen
@@ -345,28 +353,26 @@ class BenefitsYleistuki(BenefitsHO):
                 tuki2 = self.sairauspaivaraha2023_YTU(0,vakiintunutpalkka) * ansiokerroin # mahdollinen porrastus tehdään tämän avulla
                 suojaosa = 0 
         
-                perus = self.sairauspaivaraha2023_YTU(0,0)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana (joita ei siis enää ole)
+                #perus = self.sairauspaivaraha2023_YTU(0,0)     # peruspäiväraha lasketaan tässä kohdassa lapsikorotukset mukana
 
                 # luovutaan rajasta
                 #vakpalkka=vakiintunutpalkka*(1-self.sotumaksu)     
                 #if tuki2>.9*vakpalkka:
                 #    tuki2=max(.9*vakpalkka,perus)    
         
-                ansiopaivarahamaara = self.ansiopaivaraha_sovittelu_YTU(tuki2,tyotaikaisettulot,suojaosa)
-                soviteltuperus = self.soviteltu_peruspaivaraha_YTU(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
+                vahentavat_tulot = max(0,tyotaikaisettulot-suojaosa)
+                ansiopaivarahamaara = max(0,tuki2-0.5*vahentavat_tulot)
+                #ansiopaivarahamaara = self.ansiopaivaraha_sovittelu(tuki2,tyotaikaisettulot,suojaosa)
+                soviteltuperus=self.soviteltu_peruspaivaraha_YTU(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
+                #ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,soviteltuperus)  
                 ansiopaivarahamaara = self.ansiopaivaraha_ylaraja_YTU(ansiopaivarahamaara,tyotaikaisettulot,vakiintunutpalkka,vakiintunutpalkka,soviteltuperus)  
 
                 perus = max(0,soviteltuperus-ansiopaivarahamaara)
-                tuki = omavastuukerroin*max(soviteltuperus,ansiopaivarahamaara)     # voi tulla vastaan pienillä tasoilla
+                tuki = omavastuukerroin*max(soviteltuperus,ansiopaivarahamaara)     # voi tulla vastaan pienillä tasoilla4
             else:
-                if True: #p[alku+'peruspaivarahalla']>0:
-                    ansiopaivarahamaara = 0
-                    perus = self.soviteltu_peruspaivaraha_YTU(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
-                    tuki = omavastuukerroin*perus
-                else: # tm-tuki
-                    ansiopaivarahamaara = 0
-                    perus = self.soviteltu_tmtuki(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p) 
-                    tuki = omavastuukerroin*perus
+                ansiopaivarahamaara = 0
+                perus = self.soviteltu_peruspaivaraha_YTU(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
+                tuki = omavastuukerroin*perus
         else:
             perus = 0    
             tuki = 0    
