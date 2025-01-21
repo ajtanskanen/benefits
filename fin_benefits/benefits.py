@@ -773,8 +773,8 @@ class Benefits():
                 if tuki2>.9*vakpalkka:
                     tuki2=max(.9*vakpalkka,perus)    
         
-                vahentavat_tulot=max(0,tyotaikaisettulot-suojaosa)
-                ansiopaivarahamaara=max(0,tuki2-0.5*vahentavat_tulot)
+                #vahentavat_tulot=max(0,tyotaikaisettulot-suojaosa)
+                #ansiopaivarahamaara=max(0,tuki2-0.5*vahentavat_tulot)
                 ansiopaivarahamaara = self.ansiopaivaraha_sovittelu(tuki2,tyotaikaisettulot,suojaosa)
                 soviteltuperus=self.soviteltu_peruspaivaraha(lapsia,tyotaikaisettulot,ansiopvrahan_suojaosa,p)    
                 ansiopaivarahamaara=self.ansiopaivaraha_ylaraja(ansiopaivarahamaara,tyotaikaisettulot,vakpalkka,vakiintunutpalkka,soviteltuperus)  
