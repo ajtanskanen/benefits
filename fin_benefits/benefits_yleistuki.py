@@ -193,7 +193,17 @@ class BenefitsYleistuki(BenefitsHO):
         #print(asumistuki,muuttulot)
 
         #asumistuki = self.asumistuki2023_YTU(omabruttopalkka,puolison_bruttopalkka,muuttulot,asumismenot,aikuisia,lapsia,kuntaryhma,p)
-        asumistuki,asumistuki_nollatulot,perusomavastuu_nollatulot,asu_vero = self.asumistuki2023_YTU(omabruttopalkka,puolison_bruttopalkka,muut_tulot_asumistuki,asumismenot,aikuisia,lapsia,kuntaryhma,p)
+        
+        if p['aikuisia']>1 and p['puoliso_alive']>0:
+            if p['elakkeella']>0 and p['puoliso_elakkeella']>0:
+                asumistuki,asumistuki_nollatulot,perusomavastuu_nollatulot,asu_vero = 0,0,0,0
+            else:
+                asumistuki,asumistuki_nollatulot,perusomavastuu_nollatulot,asu_vero = self.asumistuki2023_YTU(omabruttopalkka,puolison_bruttopalkka,muut_tulot_asumistuki,asumismenot,aikuisia,lapsia,kuntaryhma,p)
+        else:
+            if p['elakkeella']>0:
+                asumistuki,asumistuki_nollatulot,perusomavastuu_nollatulot,asu_vero = 0,0,0,0
+            else:
+                asumistuki,asumistuki_nollatulot,perusomavastuu_nollatulot,asu_vero = self.asumistuki2023_YTU(omabruttopalkka,puolison_bruttopalkka,muut_tulot_asumistuki,asumismenot,aikuisia,lapsia,kuntaryhma,p)
 
         #print(asumistuki,asumistuki_nollatulot,perusomavastuu_nollatulot)
         #menot=asumismenot+muutmenot    
