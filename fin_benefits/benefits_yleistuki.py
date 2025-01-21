@@ -31,12 +31,16 @@ class BenefitsYleistuki(BenefitsHO):
     def __init__(self,**kwargs):
         self.vaihe = 2
         self.setup_YTU()
-        self.yhteensovitus_tyotulo = 1.0        
+        self.yhteensovitus_tyotulo = 0.8 # 1.0        
+        self.asumistuki_korvausaste = 0.7
         super().__init__(**kwargs)
         print('Yleistuki 2023 BENEFITS')
 
     def set_yhteensovitus_tyotulo(self,prosentti):
         self.yhteensovitus_tyotulo = prosentti
+
+    def set_asumistuki_korvausaste(self,prosentti):
+        self.asumistuki_korvausaste = prosentti
 
     def set_vaihe(self,vaihe):
         self.vaihe = vaihe
@@ -106,16 +110,17 @@ class BenefitsYleistuki(BenefitsHO):
 
         max_meno=max_menot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_lisa[kuntaryhma]
 
-        prosentti=0.7 # vastaa 80 %
+        prosentti=self.asumistuki_korvausaste # 0.7 # vastaa 70 %
         suojaosa=0 #p['asumistuki_suojaosa']*p['aikuisia']
-        yhteensovitus=1.0
+        
         yhteensovitus_tyotulo= self.yhteensovitus_tyotulo #1.0
-        lapsiparam=246*1.1 # FIXME 270?
+        yhteensovitus_muut = 1.0
+        lapsiparam=246*1.10 # FIXME 270?
         perusomavastuu_nollatulot = max(0,-0.50*(667+111*aikuisia+lapsiparam*lapsia))
         perusomavastuu=max(0,
             0.50*(max(0,yhteensovitus_tyotulo*palkkatulot1-suojaosa)
                  +max(0,yhteensovitus_tyotulo*palkkatulot2-suojaosa)
-                 +yhteensovitus*muuttulot
+                 +yhteensovitus_muut*muuttulot
                  -(667+111*aikuisia+lapsiparam*lapsia)))
         if perusomavastuu<10:
             perusomavastuu=0
@@ -373,10 +378,13 @@ class BenefitsYleistuki(BenefitsHO):
         return tuki
 
     def sairauspaivaraha2023_YTU(self,palkka: float,vakiintunutpalkka: float):
+        '''
+        Tämä vain TT-laskennassa
+        '''
         minimi=31.99*25 # = peruspäiväraha
         taite1=32_797/self.kk_jakaja  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
-        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
+        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.15*max(vakiintunut-taite1,0))
 
         return max(0,raha-palkka)

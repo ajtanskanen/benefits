@@ -255,7 +255,7 @@ class Benefits():
 
     def toimeentulotuki_param2025(self) -> (float,float,float,float,float,float,float,float,float):
         '''
-        Päivitä
+        Päivitetty 10.12.2024
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
@@ -2121,11 +2121,11 @@ class Benefits():
         elif self.year==2024:
             elatustuki=196.02*lapsia
         elif self.year==2025:
-            elatustuki=196.02*lapsia*1.02
+            elatustuki=198.13*lapsia
         elif self.year==2026:
-            elatustuki=196.02*lapsia*1.02**2
+            elatustuki=198.13*lapsia*1.02
         elif self.year==2027:
-            elatustuki=196.02*lapsia*1.02**3
+            elatustuki=198.13*lapsia*1.02**2
         else:
             error()
         
@@ -4165,7 +4165,7 @@ class Benefits():
             else:
                 tuloraja=14_746/12 # oletetaan että puolisolla ei oikeutta asumistukeen
             
-        lisaomavastuu=0.413*max(0,palkkatulot+muuttulot-tuloraja)
+        lisaomavastuu=0.433*max(0,palkkatulot+muuttulot-tuloraja)
             
         tuki=max(0,(min(max_meno,vuokra)-perusomavastuu-lisaomavastuu)*prosentti)
         
