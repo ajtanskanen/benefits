@@ -608,6 +608,7 @@ class Marginals():
 
         if plot_netto and plottaa:
             # ALV:ia ei plotata nettotuloissa
+            print(tyotpvraha[0])
             self.plot_netto_income(netto,palkka,nettopalkka,asumistuki,toimeentulotuki,tyotpvraha,kotihoidontuki,lapsilisa,elake,opintotuki,elatustuki,perustulo,pal,
                 ax=ax,incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,
                 csfont=csfont,min_salary=min_salary, max_salary=max_salary,legend=legend,source=source,header=header,head_text=head_text,figname=figname,show=show)

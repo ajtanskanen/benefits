@@ -82,8 +82,10 @@ def perheparametrit(perhetyyppi=10,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
     p['saa_ansiopaivarahaa']=saa_ansiopaivarahaa
 
     p['asumismenot_toimeentulo']=asumismenot_toimeentulo
-    p['asumismenot_asumistuki']=asumismenot_asumistuki
     p['asumismenot_yhdistetty']=asumismenot_yhdistetty
+    #p['asumismenot_asumistuki']=asumismenot_asumistuki
+    p['asumismenot_asumistuki']=asumismenot_yhdistetty
+
     p['lapsia_kotihoidontuella']=lapsia_kotihoidontuella
     p['lapsia_alle_3v']=alle3v
     p['lapsia_alle_kouluikaisia']=lapsia
@@ -231,7 +233,7 @@ def bruttoparametrit(perhetyyppi=1,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
 def get_n_perheet():
     return 73
 
-def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int):
+def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int,yhdistetty: bool=True):
 # päivitetty luvut
     if vuosi==2018:
         max_menot=np.array([[508, 492, 390, 344],[735, 706, 570, 501],[937, 890, 723, 641],[1095, 1038, 856, 764]])
@@ -268,6 +270,9 @@ def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int):
     else:
         asumismenot_toimeentulo=max_menot[kuntaryhmä-1,3]+max_lisa[kuntaryhmä-1]*(ind-4)
         asumismenot_asumistuki=max_menot[kuntaryhmä-1,3]+max_lisa[kuntaryhmä-1]*(ind-4)-ind*30    
+
+    if yhdistetty:
+        asumismenot_asumistuki = asumismenot_toimeentulo
 
     return asumismenot_toimeentulo,asumismenot_asumistuki
 

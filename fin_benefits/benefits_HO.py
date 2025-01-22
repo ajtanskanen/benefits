@@ -29,13 +29,18 @@ class BenefitsHO(Benefits):
     def set_year(self,vuosi):
         super().set_year(vuosi)
         self.setup_HO()
+        self.veroparam2023()
 
     def setup_HO(self):
+        '''
+        korvataan benefits-modulissa olevat rutiinit
+        '''
         self.asumistuki=self.asumistuki2023
         self.tyotulovahennys=self.tyotulovahennys2023
         self.valtionvero_asteikko=self.valtionvero_asteikko_2023
         self.lapsilisa=self.lapsilisa2023
         self.veroparam=self.veroparam2023
+        self.ansiopaivaraha=self.ansiopaivaraha_HO
 
     def veroparam2023(self):
         '''
@@ -44,7 +49,7 @@ class BenefitsHO(Benefits):
         super().veroparam2023()
         self.tyottomyysvakuutusmaksu=0.0150 - 0.002 # vastaa VM:n arviota rakenteellisesta maksun muutoksesta 
 
-    def ansiopaivaraha(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
+    def ansiopaivaraha_HO(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         # porrastetaan ansio-osa keston mukaan
         # 2 kk -> 80%
         # 34 vko -> 75%
@@ -66,9 +71,10 @@ class BenefitsHO(Benefits):
         p2['tyottomyysturva_suojaosa_taso']=0
         p2['ansiopvrahan_suojaosa']=0
         p2['ansiopvraha_lapsikorotus']=0
+        lapsia = 0
 
         # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
-        return super().ansiopaivaraha(tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p2,ansiokerroin=kerroin,omavastuukerroin=omavastuukerroin,alku=alku)
+        return super().ansiopaivaraha_porrastus(tyoton,vakiintunutpalkka,0,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p2,ansiokerroin=kerroin,omavastuukerroin=omavastuukerroin,alku=alku)
 
     def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,aikuisia,lapsia,kuntaryhma,p,omavastuuprosentti=0.05,asumistuki=None,lapsilisa=None,muut_tulot_asumistuki: float=None):
         return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,aikuisia,lapsia,kuntaryhma,p,omavastuuprosentti=omavastuuprosentti,asumistuki=asumistuki,lapsilisa=lapsilisa,muut_tulot_asumistuki=muut_tulot_asumistuki)

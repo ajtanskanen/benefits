@@ -31,10 +31,10 @@ class BenefitsYleistuki(BenefitsHO):
     
     def __init__(self,**kwargs):
         self.vaihe = 2
-        self.setup_YTU()
+        super().__init__(**kwargs)
+        self.set_year(self.year)
         self.yhteensovitus_tyotulo = 0.8 # 1.0        
         self.asumistuki_korvausaste = 0.7
-        super().__init__(**kwargs)
         print('Yleistuki 2023 BENEFITS')
 
     def set_yhteensovitus_tyotulo(self,prosentti):
@@ -67,8 +67,10 @@ class BenefitsYleistuki(BenefitsHO):
         elif self.vaihe==4: # korvataan ansiosidonnainen päiväraha svpäivärahalla ja se kohdistuu kaikkiin
             self.asumistuki = self.asumistuki2023_YTU_stub
             self.toimeentulotuki = self.toimeentulotuki_YTU
-            self.toimeentulotuki_param2023=self.toimeentulotuki_param2023_YTU
+            self.toimeentulotuki_param2023 = self.toimeentulotuki_param2023_YTU
             self.ansiopaivaraha = self.ansiopaivaraha_porrastus_YTU
+
+        self.toimeentulotuki_param = self.toimeentulotuki_param2023
 
     def explain(self,p: dict =None):
         if p is None:
@@ -157,7 +159,7 @@ class BenefitsYleistuki(BenefitsHO):
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
-        kerroin_lapsi = 1.10
+        kerroin_lapsi = 1.05
         kerroin_aikuinen = 1.0
         kerroin_yksinhuoltaja = 1.0
         lapsi1=383.03 * kerroin_lapsi    # e/kk     alle 10v lapsi
@@ -216,8 +218,8 @@ class BenefitsYleistuki(BenefitsHO):
             omaetuoikeutettuosa = max(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
             puolison_etuoikeutettuosa = max(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
         else:        
-            omaetuoikeutettuosa = 0.2*omabruttopalkka # min(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
-            puolison_etuoikeutettuosa = 0.2*puolison_bruttopalkka # min(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
+            omaetuoikeutettuosa = 0.25*omabruttopalkka # min(min_etuoikeutettuosa,0.2*omabruttopalkka)     # etuoikeutettu osa edunsaajakohtainen 1.1.2015 alkaen
+            puolison_etuoikeutettuosa = 0.25*puolison_bruttopalkka # min(min_etuoikeutettuosa,0.2*puolison_bruttopalkka)    
             
         etuoikeutettuosa=omaetuoikeutettuosa+puolison_etuoikeutettuosa    
 
@@ -273,7 +275,7 @@ class BenefitsYleistuki(BenefitsHO):
 
         # asumisosan vähennys tulojen mukaan huomioidaan yhteensovituksessa, tulojen yhteensovitus ei voi olla yli 80 % (etuoikeutettu osa 20%)
         totu_osa = max(0,tuki1+menot-max(0,omabruttopalkka-omaetuoikeutettuosa-omapalkkavero-asu_vero_oma)\
-                                    -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero-asu_vero_puoliso)-verot-muuttulot)        
+                                    -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero-asu_vero_puoliso)-max(0,verot-palkkavero)-muuttulot)        
 
         #print(f'omabruttopalkka {omabruttopalkka:.2f} muuttulot {muuttulot:.2f} totu_osa {totu_osa:.2f} asu_osa {asu_osa:.2f} asumistuki {asumistuki:.2f} ast0 {asumistuki_nollatulot:.2f} po0 {perusomavastuu_nollatulot:.2f}')
 
@@ -394,3 +396,9 @@ class BenefitsYleistuki(BenefitsHO):
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.15*max(vakiintunut-taite1,0))
 
         return max(0,raha-palkka)
+
+    def valtionvero_asteikko_2023(self):
+        rajat=np.array([0,19_900,29_700,49_000,150_000])/self.kk_jakaja
+        pros=(1-100/20000)*np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
+        pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
+        return rajat,pros

@@ -616,6 +616,7 @@ class Benefits():
                        kesto: float,p: dict,ansiokerroin: float=None,omavastuukerroin: float=1.0,alku: str='',korotettu: bool=False):
         ansiopvrahan_suojaosa=0
         lapsikorotus=0
+        lapsia=0
     
         if tyoton>0 and p[alku+'elakkeella']<1:
             if self.year==2018:
