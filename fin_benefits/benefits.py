@@ -222,6 +222,7 @@ class Benefits():
         lapsi_kerroin_alle18_2 = 0.65
         lapsi_kerroin_alle18_3 = 0.60
         lapsi_kerroin_18 = 0.73
+        aikuinen_kerroin = 0.85
         yksinasuva=555.11
         lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
