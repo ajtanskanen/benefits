@@ -177,6 +177,7 @@ class BenefitsYleistuki(BenefitsHO):
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
+        yksinasuva=555.11
 
         lapsi_kerroin_alle10_1 = 0.75
         lapsi_kerroin_alle10_2 = 0.70
@@ -185,7 +186,9 @@ class BenefitsYleistuki(BenefitsHO):
         lapsi_kerroin_alle18_2 = 0.65
         lapsi_kerroin_alle18_3 = 0.60
         lapsi_kerroin_18 = 0.75
-        yksinasuva=555.11
+        aikuinen_kerroin = 0.85
+        yksinhuoltaja_kerroin = 1.14
+
         lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsi3 = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -203,12 +206,14 @@ class BenefitsYleistuki(BenefitsHO):
         return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa        
 
 
-    def toimeentulotuki_param2025(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2025_YTU(self) -> (float,float,float,float,float,float,float,float,float):
         '''
         Päivitetty 10.12.2024
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
+        yksinasuva=593.55
+
         lapsi_kerroin_alle10_1 = 0.75
         lapsi_kerroin_alle10_2 = 0.70
         lapsi_kerroin_alle10_3 = 0.65
@@ -216,7 +221,9 @@ class BenefitsYleistuki(BenefitsHO):
         lapsi_kerroin_alle18_2 = 0.70
         lapsi_kerroin_alle18_3 = 0.65
         lapsi_kerroin_18 = 0.75
-        yksinasuva=593.55
+        aikuinen_kerroin = 0.85
+        yksinhuoltaja_kerroin = 1.14
+        
         lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsi3 = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -225,9 +232,11 @@ class BenefitsYleistuki(BenefitsHO):
         lapsi2_10_17 = yksinasuva * lapsi_kerroin_alle18_2    # e/kk
         lapsi3_10_17 = yksinasuva * lapsi_kerroin_alle18_3      # e/kk
 
-        yksinhuoltaja=676.65     # e/kk
-        # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
-        muu=504.52
+        yksinhuoltaja = yksinhuoltaja_kerroin * yksinasuva
+        
+        # muu 18v täyttänyt ja avio- ja avopuolisot
+        muu = aikuinen_kerroin * yksinasuva
+
         # Helsinki: 715 507 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
