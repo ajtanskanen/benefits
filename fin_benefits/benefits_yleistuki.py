@@ -17,8 +17,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.font_manager as font_manager
 from .benefits_HO import BenefitsHO
+from .benefits import Benefits
 
-class BenefitsYleistuki(BenefitsHO):
+class BenefitsYleistuki(Benefits):
     """
     Description:
         The Finnish Social Security as a Gym Module
@@ -76,10 +77,12 @@ class BenefitsYleistuki(BenefitsHO):
 
         if self.year==2023:
             self.toimeentulotuki_param = self.toimeentulotuki_param2023
-            self.tyotulovahennys = self.tyotulovahennys2023
-            self.valtionvero_asteikko = self.valtionvero_asteikko_2023
-            self.lapsilisa = self.lapsilisa2023
-            self.veroparam = self.veroparam2023
+            self.valtionvero_asteikko = self.valtionvero_asteikko_2023_HO
+            self.lapsilisa = self.lapsilisa2023_HO
+            self.asumistuki=self.asumistuki2023_HO
+            self.tyotulovahennys=self.tyotulovahennys2023_HO
+            self.veroparam=self.veroparam2023_HO
+            #self.ansiopaivaraha=self.ansiopaivaraha_HO
         elif self.year==2025:
             self.toimeentulotuki_param = self.toimeentulotuki_param2025
             self.tyotulovahennys = self.tyotulovahennys2025
@@ -173,7 +176,6 @@ class BenefitsYleistuki(BenefitsHO):
 
     def toimeentulotuki_param2023_YTU(self) -> (float,float,float,float,float,float,float,float,float):
         '''
-        Päivitä
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
@@ -185,14 +187,35 @@ class BenefitsYleistuki(BenefitsHO):
         lapsi_kerroin_alle18_2 = 0.65
         lapsi_kerroin_alle18_3 = 0.60
         lapsi_kerroin_18 = 0.75
-        yksinasuva=555.11
-        lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
-        lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
-        lapsi3 = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
-        yksinhuoltaja=632.83     # e/kk
+
+        kerroin = 1.1
+        yksinasuva = 555.11 * kerroin
+
+        lapsi_kerroin_alle10_1 = 0.63
+        lapsi_kerroin_alle10_2 = 0.58
+        lapsi_kerroin_alle10_3 = 0.53
+        lapsi_kerroin_alle18_1 = 0.70
+        lapsi_kerroin_alle18_2 = 0.65
+        lapsi_kerroin_alle18_3 = 0.60
+        lapsi_kerroin_18 = 0.73
+        lapsiparam = np.zeros((3,3))
+
+        lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
+        lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
+        lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
+
+        lapsiparam[1,0] = yksinasuva * lapsi_kerroin_alle18_1     # e/kk   10-17 v lapsi
+        lapsiparam[1,1] = yksinasuva * lapsi_kerroin_alle18_2    # e/kk
+        lapsiparam[1,2] = yksinasuva * lapsi_kerroin_alle18_3      # e/kk
+
+        lapsiparam[2,0] = yksinasuva * lapsi_kerroin_18     # e/kk  18+ lapsi
+        lapsiparam[2,1] = yksinasuva * lapsi_kerroin_18    # e/kk
+        lapsiparam[2,2] = yksinasuva * lapsi_kerroin_18      # e/kk
+
+        yksinhuoltaja = 632.83 * kerroin    # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot
-        muu = 471.84 
-        yksinasuva = 555.11 
+        muu = 471.84 * kerroin
+        
         # Helsinki: 694 869 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
@@ -200,10 +223,9 @@ class BenefitsYleistuki(BenefitsHO):
         max_asumismenot = np.array([[694, 492, 398, 352],[869, 621, 557, 463],[993, 747, 675, 568],[1089, 793, 746, 617]])
         max_lisa = np.array([122, 99, 96, 96])
 
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa        
+        return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
 
-
-    def toimeentulotuki_param2025(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2025_YTU(self) -> (float,float,float,float,float,float,float,float,float):
         '''
         Päivitetty 10.12.2024
         '''
@@ -216,7 +238,26 @@ class BenefitsYleistuki(BenefitsHO):
         lapsi_kerroin_alle18_2 = 0.70
         lapsi_kerroin_alle18_3 = 0.65
         lapsi_kerroin_18 = 0.75
-        yksinasuva=593.55
+        muu_kerroin = 0.80
+        yksinhuoltaja_kerroin = 1.14
+        
+        kerroin = 630 / 593.55
+        yksinasuva = 593.55 * kerroin
+
+        lapsiparam = np.zeros((3,3))
+
+        lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
+        lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
+        lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
+
+        lapsiparam[1,0] = yksinasuva * lapsi_kerroin_alle18_1     # e/kk   10-17 v lapsi
+        lapsiparam[1,1] = yksinasuva * lapsi_kerroin_alle18_2    # e/kk
+        lapsiparam[1,2] = yksinasuva * lapsi_kerroin_alle18_3      # e/kk
+
+        lapsiparam[2,0] = yksinasuva * lapsi_kerroin_18     # e/kk  18+ lapsi
+        lapsiparam[2,1] = yksinasuva * lapsi_kerroin_18    # e/kk
+        lapsiparam[2,2] = yksinasuva * lapsi_kerroin_18      # e/kk
+
         lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsi3 = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -225,9 +266,10 @@ class BenefitsYleistuki(BenefitsHO):
         lapsi2_10_17 = yksinasuva * lapsi_kerroin_alle18_2    # e/kk
         lapsi3_10_17 = yksinasuva * lapsi_kerroin_alle18_3      # e/kk
 
-        yksinhuoltaja=676.65     # e/kk
+        yksinhuoltaja = yksinasuva * yksinhuoltaja_kerroin    # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
-        muu=504.52
+        muu = yksinasuva * muu_kerroin
+
         # Helsinki: 715 507 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
@@ -235,16 +277,14 @@ class BenefitsYleistuki(BenefitsHO):
         max_asumismenot=np.array([[715, 507, 418, 363],[895, 652, 574, 463],[1023, 784, 709, 596],[1122, 793, 746, 617]])
         max_lisa=np.array([122, 99, 96, 96])
 
-        return min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa   
+        return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
 
     def toimeentulotuki_YTU(self,omabruttopalkka: float,omapalkkavero: float,puolison_bruttopalkka: float,puolison_palkkavero: float,
                         muuttulot: float,verot: float,asumismenot: float,muutmenot: float,aikuisia: int, lapsia: int,kuntaryhma: int,
                         p: dict,omavastuuprosentti: float=0.0,alennus: int=0,asumistuki: float=None,muut_tulot_asumistuki: float=None):
         '''
-        asumistuki tässä eläkeläisen asumistuki
-        - se poistettava! FIXME
         '''
-        min_etuoikeutettuosa,lapsi1,lapsi2,lapsi3,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_asumislisa = self.toimeentulotuki_param()
+        min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_asumislisa,lapsiparam = self.toimeentulotuki_param()
         max_asumismeno = max_asumismenot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_asumislisa[kuntaryhma]
 
         asumismenot = min(asumismenot,max_asumismeno)            
@@ -281,21 +321,16 @@ class BenefitsYleistuki(BenefitsHO):
         if aikuisia<2:
             if lapsia<1: 
                 tuki1 = yksinasuva     # yksinasuva 485,50
-            elif lapsia==1:
-                tuki1 = yksinhuoltaja+lapsi1     # yksinhuoltaja 534,05
-            elif lapsia==2:
-                tuki1 = yksinhuoltaja+lapsi1+lapsi2     # yksinhuoltaja 534,05
-            else:
-                tuki1 = yksinhuoltaja+lapsi1+lapsi2+lapsi3*(lapsia-2)     # yksinhuoltaja 534,05
+            elif lapsia>0:
+                lapset_alle10 = p['lapsia_alle_kouluikaisia']
+                lapset_10_17 = lapsia - lapset_alle10
+                lapset_18 = 0 # näitä ei mukana simulaatiossa
+                tuki1 = yksinasuva + self.toimeentulotuki_lapsiosuus(lapset_alle10,lapset_10_17,lapset_18,lapsiparam)
         else:
-            if lapsia<1:
-                tuki1 = muu*aikuisia
-            elif lapsia==1:
-                tuki1 = muu*aikuisia+lapsi1     # yksinhuoltaja 534,05
-            elif lapsia==2:
-                tuki1 = muu*aikuisia+lapsi1+lapsi2     # yksinhuoltaja 534,05
-            else:
-                tuki1 = muu*aikuisia+lapsi1+lapsi2+lapsi3*(lapsia-2)     # yksinhuoltaja 534,05
+            lapset_alle10 = p['lapsia_alle_kouluikaisia']
+            lapset_10_17 = lapsia - lapset_alle10
+            lapset_18 = 0 # näitä ei mukana simulaatiossa
+            tuki1 = muu*aikuisia + self.toimeentulotuki_lapsiosuus(lapset_alle10,lapset_10_17,lapset_18,lapsiparam)
 
         # if (bruttopalkka-etuoikeutettuosa>palkkavero)
         #    tuki = max(0,tuki1+menot-max(0,bruttopalkka-etuoikeutettuosa-palkkavero)-verot-muuttulot)    
@@ -484,8 +519,60 @@ class BenefitsYleistuki(BenefitsHO):
 
         return max(0,raha-palkka)
 
-    def valtionvero_asteikko_2023(self):
+    def ansiopaivaraha_HO(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
+        # porrastetaan ansio-osa keston mukaan
+        # 2 kk -> 80%
+        # 34 vko -> 75%
+        if self.porrastus:
+            if kesto>34/52*12*21.5:
+                kerroin=0.75
+            elif kesto>2*21.5:
+                kerroin=0.80
+            else:
+                kerroin=1.00 # =1-2/3/21.5
+        else:
+            if kesto<3*21.5:
+                kerroin=1.00 # =1-2/3/21.5
+            else:
+                kerroin=1.00 # =1-2/3/21.5
+            
+        p2=p.copy()
+
+        p2['tyottomyysturva_suojaosa_taso']=0
+        p2['ansiopvrahan_suojaosa']=0
+        p2['ansiopvraha_lapsikorotus']=0
+        lapsia = 0
+
+        # kutsutaan alkuperäistä ansiopäivärahaa kertoimella
+        return super().ansiopaivaraha_porrastus(tyoton,vakiintunutpalkka,0,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p2,ansiokerroin=kerroin,omavastuukerroin=omavastuukerroin,alku=alku)
+
+    def veroparam2023_HO(self):
+        '''
+        Päivitetty 6.5.2023
+        '''
+        super().veroparam2023()
+        self.tyottomyysvakuutusmaksu=0.0150 - 0.002 # vastaa VM:n arviota rakenteellisesta maksun muutoksesta 
+
+ 
+    def valtionvero_asteikko_2023_HO(self):
         rajat=np.array([0,19_900,29_700,49_000,150_000])/self.kk_jakaja
         pros=(1-100/20000)*np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
+
+    def lapsilisa2023_HO(self,yksinhuoltajakorotus: bool=False) -> float:
+        lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69]) + 2.0
+        if yksinhuoltajakorotus:
+            # yksinhuoltajakorotus 53,30 e/lapsi
+            lapsilisat += 68.3 + 10.0
+            
+        return lapsilisat
+
+    def tyotulovahennys2023_HO(self,ika: float,lapsia: int):
+        if ika>=65:
+            max_tyotulovahennys=3230/self.kk_jakaja
+        else:
+            max_tyotulovahennys=2030/self.kk_jakaja
+        ttulorajat=np.array([0,22000,77000])/self.kk_jakaja # 127000??
+        ttulopros=np.array([0.13,0.0203,0.121])
+        return max_tyotulovahennys,ttulorajat,ttulopros
