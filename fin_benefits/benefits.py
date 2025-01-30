@@ -391,6 +391,9 @@ class Benefits():
         lapsi_kerroin_alle18_2 = 0.65
         lapsi_kerroin_alle18_3 = 0.60
         lapsi_kerroin_18 = 0.73
+        aikuinen_kerroin = 0.85
+        yksinhuoltaja_kerroin = 1.14
+
         yksinasuva=593.55
         lapsiparam = np.zeros((3,3))
 

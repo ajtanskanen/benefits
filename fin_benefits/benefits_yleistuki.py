@@ -179,6 +179,7 @@ class BenefitsYleistuki(Benefits):
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
+        yksinasuva=555.11
 
         lapsi_kerroin_alle10_1 = 0.75
         lapsi_kerroin_alle10_2 = 0.70
@@ -231,6 +232,8 @@ class BenefitsYleistuki(Benefits):
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
+        yksinasuva=593.55
+
         lapsi_kerroin_alle10_1 = 0.75
         lapsi_kerroin_alle10_2 = 0.70
         lapsi_kerroin_alle10_3 = 0.65
