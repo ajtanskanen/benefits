@@ -215,13 +215,20 @@ class Benefits():
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
-        lapsi1=383.03     # e/kk     alle 10v lapsi
-        lapsi2=355.27     # e/kk
-        lapsi3=327.51     # e/kk
+        lapsi_kerroin_alle10_1 = 0.63
+        lapsi_kerroin_alle10_2 = 0.58
+        lapsi_kerroin_alle10_3 = 0.53
+        lapsi_kerroin_alle18_1 = 0.70
+        lapsi_kerroin_alle18_2 = 0.65
+        lapsi_kerroin_alle18_3 = 0.60
+        lapsi_kerroin_18 = 0.73
+        yksinasuva=555.11
+        lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
+        lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
+        lapsi3 = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
         yksinhuoltaja=632.83     # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=471.84
-        yksinasuva=555.11
         # Helsinki: 694 869 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
@@ -237,13 +244,24 @@ class Benefits():
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
-        lapsi1=383.03     # e/kk     alle 10v lapsi
-        lapsi2=355.27     # e/kk
-        lapsi3=327.51     # e/kk
+        lapsi_kerroin_alle10_1 = 0.63
+        lapsi_kerroin_alle10_2 = 0.58
+        lapsi_kerroin_alle10_3 = 0.53
+        lapsi_kerroin_alle18_1 = 0.70
+        lapsi_kerroin_alle18_2 = 0.65
+        lapsi_kerroin_alle18_3 = 0.60
+        lapsi_kerroin_18 = 0.73
+        yksinasuva=587.71
+        lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
+        lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
+        lapsi3 = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
+
+        lapsi1_10_17 = yksinasuva * lapsi_kerroin_alle18_1     # e/kk  
+        lapsi2_10_17 = yksinasuva * lapsi_kerroin_alle18_2    # e/kk
+        lapsi3_10_17 = yksinasuva * lapsi_kerroin_alle18_3      # e/kk
         yksinhuoltaja=669.99     # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=499.55
-        yksinasuva=587.71
         # Helsinki: 694 869 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
@@ -259,16 +277,25 @@ class Benefits():
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
-        lapsi1=373.94     # e/kk     alle 10v lapsi
-        lapsi2=344.26     # e/kk
-        lapsi3=314,58     # e/kk
-        lapsi1_10_17=415.49     # e/kk     alle 10v lapsi
-        lapsi2_10_17=385.81     # e/kk
-        lapsi3_10_17=356.13     # e/kk
+        lapsi_kerroin_alle10_1 = 0.63
+        lapsi_kerroin_alle10_2 = 0.58
+        lapsi_kerroin_alle10_3 = 0.53
+        lapsi_kerroin_alle18_1 = 0.70
+        lapsi_kerroin_alle18_2 = 0.65
+        lapsi_kerroin_alle18_3 = 0.60
+        lapsi_kerroin_18 = 0.73
+        yksinasuva=593.55
+        lapsi1 = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
+        lapsi2 = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
+        lapsi3 = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
+
+        lapsi1_10_17 = yksinasuva * lapsi_kerroin_alle18_1     # e/kk  
+        lapsi2_10_17 = yksinasuva * lapsi_kerroin_alle18_2    # e/kk
+        lapsi3_10_17 = yksinasuva * lapsi_kerroin_alle18_3      # e/kk
+
         yksinhuoltaja=676.65     # e/kk
         # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
         muu=504.52
-        yksinasuva=593.55
         # Helsinki: 715 507 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
@@ -552,6 +579,9 @@ class Benefits():
         return tuki
 
     def peruspaivaraha2025(self,lapsia: int) -> float:
+        '''
+        päivitetty 29.1.2025
+        '''
         if self.use_extra_ppr:
             pvraha=21.5*37.21*self.extra_ppr_factor
         else:
@@ -614,6 +644,10 @@ class Benefits():
 
     def ansiopaivaraha_porrastus(self,tyoton: int,vakiintunutpalkka,lapsia: int,tyotaikaisettulot: float,saa_ansiopaivarahaa: int,
                        kesto: float,p: dict,ansiokerroin: float=None,omavastuukerroin: float=1.0,alku: str='',korotettu: bool=False):
+        '''
+        päivitetty 29.1.2025
+        '''
+        
         ansiopvrahan_suojaosa=0
         lapsikorotus=0
         lapsia=0
@@ -706,6 +740,10 @@ class Benefits():
 
     def ansiopaivaraha_perus(self,tyoton: int,vakiintunutpalkka,lapsia: int,tyotaikaisettulot: float,saa_ansiopaivarahaa: int,
                        kesto: float,p: dict,ansiokerroin: float=1.0,omavastuukerroin: float=1.0,alku: str='',korotettu: bool=False):
+        '''
+        ei-porratettu
+        '''
+        
         ansiopvrahan_suojaosa=p['ansiopvrahan_suojaosa']
         lapsikorotus=p['ansiopvraha_lapsikorotus']
     
@@ -932,15 +970,19 @@ class Benefits():
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
 
     def elaketulovahennys2025(self,elaketulot: float,puhdas_ansiotulo: float):
-        raja1_elaketulovahennys_kunnallis=10_320/self.kk_jakaja
+        '''
+        päivitetty 29.1.2025
+        '''
+        raja1_elaketulovahennys_kunnallis=11_030/self.kk_jakaja
         raja2_elaketulovahennys_kunnallis=22_500/self.kk_jakaja
         elaketulovahennys_kunnallis=max(0,min(elaketulot,max(0,raja1_elaketulovahennys_kunnallis
             -0.51*max(0,min(puhdas_ansiotulo,raja2_elaketulovahennys_kunnallis)-raja1_elaketulovahennys_kunnallis)
-            -0.15*max(0,puhdas_ansiotulo-raja2_elaketulovahennys_kunnallis)))
+            -0.196*max(0,puhdas_ansiotulo-raja2_elaketulovahennys_kunnallis)))
         )
         elaketulovahennys_valtio=elaketulovahennys_kunnallis
 
         return elaketulovahennys_valtio,elaketulovahennys_kunnallis
+    
     def tyotulovahennys2018(self):
         max_tyotulovahennys=1540/self.kk_jakaja
         ttulorajat=np.array([2500,33000,127_000])/self.kk_jakaja
@@ -996,14 +1038,15 @@ class Benefits():
         
     def tyotulovahennys2025(self,ika: float,lapsia: int):
         '''
-        tarvitaan tieto yksihuoltajuudesta...
+        tarvitaan tieto yksihuoltajuudesta ja iästä, FIXME!
+        päivitetty 29.1.2025
         '''
         #if ika>=65:
         #    max_tyotulovahennys=3340/self.kk_jakaja
         #else:
         max_tyotulovahennys=(3_225+50*lapsia)/self.kk_jakaja
-        ttulorajat=np.array([0,22000,77000])/self.kk_jakaja*1.032 # 127000??
-        ttulopros=np.array([0.13,0.0203,0.121])
+        ttulorajat=np.array([0,24250,42550])/self.kk_jakaja
+        ttulopros=np.array([0.18,0.0222,0.0344])
         return max_tyotulovahennys,ttulorajat,ttulopros
         
     def laske_tyotulovahennys2018_2022(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float, lapsia: int):
@@ -1751,6 +1794,9 @@ class Benefits():
         return rajat,pros               
 
     def valtionvero_asteikko_2025(self):
+        '''
+        päivitetty 29.1.2025
+        '''
         rajat=np.array([0,21_200,31_500,52_100,88_200,150_000])/self.kk_jakaja
         pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.4175,0.4425+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
@@ -2330,13 +2376,13 @@ class Benefits():
             elif self.year==2023:
                 tuki=385.40# +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2024:
-                tuki=385.40# +650*0.4 = opintolainahyvitys mukana?
+                tuki=421.01# +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2025:
-                tuki=385.40# +650*0.4 = opintolainahyvitys mukana?
+                tuki=421.01# +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2026:
-                tuki=385.40# +650*0.4 = opintolainahyvitys mukana?
+                tuki=421.01# +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2027:
-                tuki=385.40# +650*0.4 = opintolainahyvitys mukana?
+                tuki=421.01# +650*0.4 = opintolainahyvitys mukana?
         else:
             if self.year==2018:
                 tuki=250.28 #+650*0.4 # opintolainahyvitys mukana
@@ -2351,13 +2397,13 @@ class Benefits():
             elif self.year==2023:
                 tuki=268.23 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2024:
-                tuki=268.23 # +650*0.4 = opintolainahyvitys mukana?
+                tuki=279.39 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2025:
-                tuki=268.23 # +650*0.4 = opintolainahyvitys mukana?
+                tuki=279.39 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2026:
-                tuki=268.23 # +650*0.4 = opintolainahyvitys mukana?
+                tuki=279.39 # +650*0.4 = opintolainahyvitys mukana?
             elif self.year==2027:
-                tuki=268.23 # +650*0.4 = opintolainahyvitys mukana?
+                tuki=279.39 # +650*0.4 = opintolainahyvitys mukana?
             
         if self.year==2018:
             raja=696
