@@ -36,10 +36,9 @@ class BenefitsYleistuki(BenefitsHO):
         self.yhteensovitus_tyotulo = 0.8 # 1.0        
         self.asumistuki_korvausaste = 0.7
         super().__init__(**kwargs)
-        self.year = 2023
         #self.setup_YTU()
         self.set_year(self.year)
-        print('Yleistuki 2023 BENEFITS')
+        print(f'Yleistuki {self.year} BENEFITS')
 
     def set_yhteensovitus_tyotulo(self,prosentti):
         self.yhteensovitus_tyotulo = prosentti
@@ -126,7 +125,7 @@ class BenefitsYleistuki(BenefitsHO):
         
         yhteensovitus_tyotulo= self.yhteensovitus_tyotulo #1.0
         yhteensovitus_muut = 1.0
-        lapsiparam = 246*1.05 # FIXME 270?
+        lapsiparam = 246*1.05
         perusomavastuu_nollatulot = max(0,-0.50*(667+111*aikuisia+lapsiparam*lapsia))
         perusomavastuu = max(0,
             0.50*(max(0,yhteensovitus_tyotulo*palkkatulot1-suojaosa)
@@ -167,10 +166,10 @@ class BenefitsYleistuki(BenefitsHO):
         '''
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
-        kerroin_lapsi = 1.05
+        kerroin_lapsi = 0.75 / 0.63
         kerroin_aikuinen = 1.0
         kerroin_yksinhuoltaja = 1.0
-        lapsi1=383.03 * kerroin_lapsi    # e/kk     alle 10v lapsi
+        lapsi1=383.03 * kerroin_lapsi   # e/kk     alle 10v lapsi
         lapsi2=355.27 * kerroin_lapsi     # e/kk
         lapsi3=327.51 * kerroin_lapsi     # e/kk
         yksinhuoltaja=632.83 * kerroin_yksinhuoltaja    # e/kk
@@ -400,7 +399,7 @@ class BenefitsYleistuki(BenefitsHO):
     def sairauspaivaraha2023_YTU(self,palkka: float,vakiintunutpalkka: float):
         minimi = 31.99*25 #  =  peruspäiväraha
         taite1 = 32_797/self.kk_jakaja  
-        vakiintunut = (1-self.sotumaksu)*vakiintunutpalkka                    
+        vakiintunut = (1-0.0858)*vakiintunutpalkka                    
                     
         raha = max(minimi,0.7*min(taite1,vakiintunut)+0.15*max(vakiintunut-taite1,0))
 

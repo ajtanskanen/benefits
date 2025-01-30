@@ -2220,60 +2220,71 @@ class Benefits():
         
         return suojaosa
         
-    def lapsilisa2018(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2018(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([95.75,105.80,135.01,154.64,174.27])
         if yksinhuoltajakorotus:
             lapsilisat += 53.3
 
         return lapsilisat
     
-    def lapsilisa2019(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2019(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,153.24,172.69])
         if yksinhuoltajakorotus:
             lapsilisat += 53.3
             
         return lapsilisat
     
-    def lapsilisa2020(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2020(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
             lapsilisat += 53.3
             
         return lapsilisat
     
-    def lapsilisa2021(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2021(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
             lapsilisat += 63.3
             
         return lapsilisat
     
-    def lapsilisa2022(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2022(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
             lapsilisat += 63.3
             
         return lapsilisat
     
-    def lapsilisa2023(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2023(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69])
         if yksinhuoltajakorotus:
             lapsilisat += 68.3
             
         return lapsilisat
     
-    def lapsilisa2024(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2024(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,173.24,192.69])
         if yksinhuoltajakorotus:
             lapsilisat += 73.3
             
         return lapsilisat
     
-    def lapsilisa2025(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2025(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         '''
         vuoden 2025 tasossa
+
+        alle 3v lisälapsilisa 26 e/kk
         '''
-        lapsilisat=np.array([94.88,104.84,133.79,173.24,192.69])
+        lisa_alle3v = 26
+        if alle3>0:
+            if alle3==1:
+                lapsilisat=np.array([94.88+lisa_alle3v,104.84,133.79,173.24,192.69])
+            elif alle3==2:
+                lapsilisat=np.array([94.88+lisa_alle3v,104.84+lisa_alle3v,133.79,173.24,192.69])
+            elif alle3>2:
+                lapsilisat=np.array([94.88+lisa_alle3v,104.84+lisa_alle3v,133.79+lisa_alle3v,173.24,192.69])
+        else:
+            lapsilisat=np.array([94.88,104.84,133.79,173.24,192.69])
         if yksinhuoltajakorotus:
             lapsilisat += 73.3
             
@@ -3065,7 +3076,7 @@ class Benefits():
                 yksinhuoltajakorotus = True
             else:
                 yksinhuoltajakorotus = False
-            q['lapsilisa']=self.laske_lapsilisa(lapsia,yksinhuoltajakorotus=yksinhuoltajakorotus)
+            q['lapsilisa']=self.laske_lapsilisa(lapsia,yksinhuoltajakorotus=yksinhuoltajakorotus,alle3v=p['lapsia_alle_3v'])
         else:
             q['pvhoito']=0
             q['pvhoito_ilman_etuuksia']=0
@@ -3874,7 +3885,7 @@ class Benefits():
 
         max_meno=max_menot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_lisa[kuntaryhma]
 
-        prosentti=0.7 # vastaa 80 %
+        prosentti=0.7 # vastaa 70 %
         suojaosa=0
         perusomavastuu=max(0,0.50*(max(0,palkkatulot1-suojaosa)+max(0,palkkatulot2-suojaosa)+muuttulot-(667+111*aikuisia+246*lapsia)))
         if perusomavastuu<10:
