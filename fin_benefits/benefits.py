@@ -127,6 +127,7 @@ class Benefits():
         lapsi_kerroin_18 = 0.73
         yksinasuva=485.50
 
+        lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -165,6 +166,7 @@ class Benefits():
         lapsi_kerroin_18 = 0.73
         yksinasuva=497.29
 
+        lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -202,6 +204,7 @@ class Benefits():
         lapsi_kerroin_18 = 0.73
         yksinasuva=502.21
 
+        lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -239,6 +242,7 @@ class Benefits():
         lapsi_kerroin_18 = 0.73
         yksinasuva=504.16
 
+        lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -275,6 +279,7 @@ class Benefits():
         lapsi_kerroin_18 = 0.73
         yksinasuva=514.82
 
+        lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -306,6 +311,9 @@ class Benefits():
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
         yksinasuva=555.11
+        aikuinen_kerroin = 0.85
+        yksinhuoltaja_kerroin = 1.14
+
         lapsi_kerroin_alle10_1 = 0.63
         lapsi_kerroin_alle10_2 = 0.58
         lapsi_kerroin_alle10_3 = 0.53
@@ -314,6 +322,7 @@ class Benefits():
         lapsi_kerroin_alle18_3 = 0.60
         lapsi_kerroin_18 = 0.73
 
+        lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -326,9 +335,10 @@ class Benefits():
         lapsiparam[2,1] = yksinasuva * lapsi_kerroin_18    # e/kk
         lapsiparam[2,2] = yksinasuva * lapsi_kerroin_18      # e/kk
         
-        yksinhuoltaja=632.83     # e/kk
-        # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
-        muu=471.84
+        yksinhuoltaja = yksinasuva * yksinhuoltaja_kerroin    # e/kk
+        # muu 18v täyttänyt ja avio- ja avopuolisot
+        muu = yksinasuva * aikuinen_kerroin
+
         # Helsinki: 694 869 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
@@ -353,7 +363,10 @@ class Benefits():
         lapsi_kerroin_alle18_2 = 0.65
         lapsi_kerroin_alle18_3 = 0.60
         lapsi_kerroin_18 = 0.73
+        aikuinen_kerroin = 0.85
+        yksinhuoltaja_kerroin = 1.14
 
+        lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
         lapsiparam[0,1] = yksinasuva * lapsi_kerroin_alle10_2    # e/kk
         lapsiparam[0,2] = yksinasuva * lapsi_kerroin_alle10_3      # e/kk
@@ -366,9 +379,10 @@ class Benefits():
         lapsiparam[2,1] = yksinasuva * lapsi_kerroin_18    # e/kk
         lapsiparam[2,2] = yksinasuva * lapsi_kerroin_18      # e/kk
         
-        yksinhuoltaja=669.99     # e/kk
-        # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
-        muu=499.55
+        yksinhuoltaja = yksinasuva * yksinhuoltaja_kerroin    # e/kk
+        # muu 18v täyttänyt ja avio- ja avopuolisot
+        muu = yksinasuva * aikuinen_kerroin
+
         # Helsinki: 694 869 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96
@@ -409,9 +423,10 @@ class Benefits():
         lapsiparam[2,1] = yksinasuva * lapsi_kerroin_18    # e/kk
         lapsiparam[2,2] = yksinasuva * lapsi_kerroin_18      # e/kk
 
-        yksinhuoltaja=676.65     # e/kk
-        # muu 18v täyttänyt ja avio- ja avopuolisot 412,68
-        muu=504.52
+        yksinhuoltaja = yksinasuva * yksinhuoltaja_kerroin    # e/kk
+        # muu 18v täyttänyt ja avio- ja avopuolisot
+        muu = yksinasuva * aikuinen_kerroin
+
         # Helsinki: 715 507 993 1089 122
         # Kangasala: 492 621 747 793 99
         # Heinola: 398 557 675 746 96

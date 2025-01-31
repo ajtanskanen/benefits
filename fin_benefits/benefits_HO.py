@@ -29,20 +29,21 @@ class BenefitsHO(Benefits):
     def set_year(self,vuosi):
         super().set_year(vuosi)
         self.setup_HO()
-        self.veroparam2023()
+        self.veroparam2023_HO()
 
     def setup_HO(self):
         '''
         korvataan benefits-modulissa olevat rutiinit
         '''
-        self.asumistuki=self.asumistuki2023
-        self.tyotulovahennys=self.tyotulovahennys2023
-        self.valtionvero_asteikko=self.valtionvero_asteikko_2023
-        self.lapsilisa=self.lapsilisa2023
-        self.veroparam=self.veroparam2023
+        self.asumistuki=self.asumistuki2023_HO
+        self.tyotulovahennys=self.tyotulovahennys2023_HO
+        self.valtionvero_asteikko=self.valtionvero_asteikko_2023_HO
+        self.valtionvero_asteikko_2023=self.valtionvero_asteikko_2023_HO
+        self.lapsilisa=self.lapsilisa2023_HO
+        self.veroparam=self.veroparam2023_HO
         self.ansiopaivaraha=self.ansiopaivaraha_HO
 
-    def veroparam2023(self):
+    def veroparam2023_HO(self):
         '''
         Päivitetty 6.5.2023
         '''
@@ -79,7 +80,7 @@ class BenefitsHO(Benefits):
     def toimeentulotuki(self,omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,aikuisia,lapsia,kuntaryhma,p,omavastuuprosentti=0.05,asumistuki=None,lapsilisa=None,muut_tulot_asumistuki: float=None):
         return super().toimeentulotuki(omabruttopalkka,omapalkkavero,puolison_bruttopalkka,puolison_palkkavero,muuttulot,verot,asumismenot,muutmenot,aikuisia,lapsia,kuntaryhma,p,omavastuuprosentti=omavastuuprosentti,asumistuki=asumistuki,lapsilisa=lapsilisa,muut_tulot_asumistuki=muut_tulot_asumistuki)
 
-    def asumistuki2023(self,palkkatulot1: float,palkkatulot2: float,muuttulot: float,vuokra: float,aikuisia: int,lapsia: int,kuntaryhma: int,p: dict) -> float:
+    def asumistuki2023_HO(self,palkkatulot1: float,palkkatulot2: float,muuttulot: float,vuokra: float,aikuisia: int,lapsia: int,kuntaryhma: int,p: dict) -> float:
         # Ruokakunnan koko
         # henkilöä    I kuntaryhmä,
         # e/kk    II kuntaryhmä,
@@ -123,13 +124,13 @@ class BenefitsHO(Benefits):
     
         return tuki    
 
-    def valtionvero_asteikko_2023(self):
+    def valtionvero_asteikko_2023_HO(self):
         rajat=np.array([0,19_900,29_700,49_000,150_000])/self.kk_jakaja
         pros=(1-100/20000)*np.maximum(0,np.array([0.1264,0.19,0.3025,0.34,0.44+self.additional_income_tax_high])+self.additional_income_tax)
         pros=np.maximum(0,np.minimum(pros,0.44+self.additional_income_tax_high+self.additional_income_tax))
         return rajat,pros
 
-    def lapsilisa2023(self,yksinhuoltajakorotus: bool=False) -> float:
+    def lapsilisa2023_HO(self,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=np.array([94.88,104.84,133.79,163.24,182.69]) + 2.0
         if yksinhuoltajakorotus:
             # yksinhuoltajakorotus 53,30 e/lapsi
@@ -143,7 +144,7 @@ class BenefitsHO(Benefits):
     #       
     #    return ansiopaivarahamaara 
 
-    def tyotulovahennys2023(self,ika: float,lapsia: int):
+    def tyotulovahennys2023_HO(self,ika: float,lapsia: int):
         if ika>=65:
             max_tyotulovahennys=3230/self.kk_jakaja
         else:
@@ -152,7 +153,7 @@ class BenefitsHO(Benefits):
         ttulopros=np.array([0.13,0.0203,0.121])
         return max_tyotulovahennys,ttulorajat,ttulopros
 
-    def sairauspaivaraha2023(self,palkka: float,vakiintunutpalkka: float):
+    def sairauspaivaraha2023_HO(self,palkka: float,vakiintunutpalkka: float):
         minimi=31.99*25
         taite1=32_797/self.kk_jakaja  
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
