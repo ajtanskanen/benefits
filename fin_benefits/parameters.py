@@ -233,7 +233,7 @@ def bruttoparametrit(perhetyyppi=1,kuntaryhmä=2,vuosi=2018,tulosta=False,ei_toi
 def get_n_perheet():
     return 73
 
-def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int,yhdistetty: bool=True):
+def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int,yhdistetty: bool=True,korkeat_asumiskulut: bool=False):
 # päivitetty luvut
     if vuosi==2018:
         max_menot=np.array([[508, 492, 390, 344],[735, 706, 570, 501],[937, 890, 723, 641],[1095, 1038, 856, 764]])
@@ -251,17 +251,17 @@ def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int,yhdis
         max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
         max_lisa=np.array([144, 137, 124, 119])
     elif vuosi==2023:
-        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
-        max_lisa=np.array([144, 137, 124, 119])
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])*1.03
+        max_lisa=np.array([144, 137, 124, 119])*1.03
     elif vuosi==2024:
-        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
-        max_lisa=np.array([144, 137, 124, 119])
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])*1.03**2
+        max_lisa=np.array([144, 137, 124, 119])*1.03**2
     elif vuosi==2025:
-        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
-        max_lisa=np.array([144, 137, 124, 119])
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])*1.03**3
+        max_lisa=np.array([144, 137, 124, 119])*1.03**3
     else:
-        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])
-        max_lisa=np.array([144, 137, 124, 119])    
+        max_menot=np.array([[537, 520, 413, 364],[778, 746, 602, 530],[990, 941, 764, 678],[1157, 1097, 906, 808]])*1.03**4
+        max_lisa=np.array([144, 137, 124, 119])*1.03**4
     
     ind=lapsia+aikuisia-1
     if ind<4:
@@ -274,9 +274,13 @@ def _max_asumismenot(lapsia: int,aikuisia: int,kuntaryhmä: int,vuosi: int,yhdis
     if yhdistetty:
         asumismenot_asumistuki = asumismenot_toimeentulo
 
+    if korkeat_asumiskulut:
+        asumismenot_asumistuki *= 1.5
+        asumismenot_toimeentulo *= 1.5
+
     return asumismenot_toimeentulo,asumismenot_asumistuki
 
-def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
+def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018,korkeat_asumiskulut: bool=True):
     puoliso_elakkeella,puoliso_elake=0,0
     elakkeella,elake=0,0
     lapsia,paivahoidossa=0,0
@@ -1219,13 +1223,13 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018):
         puoliso_saa_ansiopaivarahaa=0   
 
     if asumismenot_toimeentulo is None:
-        asumismenot_toimeentulo,asumismenot_asumistuki = _max_asumismenot(lapsia,aikuisia,kuntaryhmä,vuosi)
+        asumismenot_toimeentulo,asumismenot_asumistuki = _max_asumismenot(lapsia,aikuisia,kuntaryhmä,vuosi,korkeat_asumiskulut=korkeat_asumiskulut)
 
     return lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake,\
            puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
            asumismenot_toimeentulo,asumismenot_asumistuki,elatustuki,ika
     
-def _bruttoesimerkit(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2024,bruttotulo=None):
+def _bruttoesimerkit(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2024,bruttotulo=None,korkeat_asumiskulut: bool=False):
     puoliso_elakkeella,puoliso_elake=0,0
     elakkeella,elake=0,0
     lapsia,paivahoidossa=0,0
@@ -1274,7 +1278,7 @@ def _bruttoesimerkit(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2024,bruttot
         puoliso_saa_ansiopaivarahaa=0   
 
     if asumismenot_toimeentulo is None:
-        asumismenot_toimeentulo,asumismenot_asumistuki = _max_asumismenot(lapsia,aikuisia,kuntaryhmä,vuosi)
+        asumismenot_toimeentulo,asumismenot_asumistuki = _max_asumismenot(lapsia,aikuisia,kuntaryhmä,vuosi,korkeat_asumiskulut=korkeat_asumiskulut)
 
     return lapsia,paivahoidossa,alle3v,lapsia_kotihoidontuella,aikuisia,vakiintunutpalkka,tyoton,saa_ansiopaivarahaa,elakkeella,elake,\
            puoliso_tulot,puoliso_vakiintunutpalkka,puoliso_tyoton,puoliso_saa_ansiopaivarahaa,puoliso_elakkeella,puoliso_elake, \
