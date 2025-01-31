@@ -179,17 +179,17 @@ class BenefitsYleistuki(Benefits):
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
 
-        kerroin = 1.1
+        kerroin = 650 / 593.55
         yksinasuva = 555.11 * kerroin
 
         lapsi_kerroin_alle10_1 = 0.75
         lapsi_kerroin_alle10_2 = 0.70
         lapsi_kerroin_alle10_3 = 0.65
-        lapsi_kerroin_alle18_1 = 0.70
-        lapsi_kerroin_alle18_2 = 0.65
-        lapsi_kerroin_alle18_3 = 0.60
+        lapsi_kerroin_alle18_1 = 0.75
+        lapsi_kerroin_alle18_2 = 0.70 
+        lapsi_kerroin_alle18_3 = 0.65
         lapsi_kerroin_18 = 0.85
-        aikuinen_kerroin = 0.80
+        aikuinen_kerroin = 0.85
         yksinhuoltaja_kerroin = 1.14
 
         lapsiparam = np.zeros((3,3))
