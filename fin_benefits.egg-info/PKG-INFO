@@ -1,9 +1,8 @@
 Metadata-Version: 2.1
-Name: fin_benefits
+Name: fin-benefits
 Version: 1.10.0
 Summary: Finnish earning-related social security as a Python module. The module enables analysis of incentives such as participation rax rate and effective marginal tax.
 Author: Antti Tanskanen
 Author-email: antti.tanskanen@ek.fi
 Keywords: social-security earnings-related
 License-File: LICENCE
-Requires-Dist: numpy
