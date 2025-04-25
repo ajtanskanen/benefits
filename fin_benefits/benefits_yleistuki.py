@@ -179,7 +179,7 @@ class BenefitsYleistuki(Benefits):
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
 
-        kerroin = 650 / 593.55
+        kerroin = 640 / 593.55
         yksinasuva = 555.11 * kerroin
 
         lapsi_kerroin_alle10_1 = 0.75
@@ -188,7 +188,7 @@ class BenefitsYleistuki(Benefits):
         lapsi_kerroin_alle18_1 = 0.75
         lapsi_kerroin_alle18_2 = 0.70 
         lapsi_kerroin_alle18_3 = 0.65
-        lapsi_kerroin_18 = 0.85
+        lapsi_kerroin_18 = 0.75
         aikuinen_kerroin = 0.85
         yksinhuoltaja_kerroin = 1.14
 
@@ -226,7 +226,7 @@ class BenefitsYleistuki(Benefits):
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
         
-        kerroin = 650 / 593.55
+        kerroin = 640 / 593.55
         yksinasuva = 593.55 * kerroin
 
 
@@ -236,7 +236,7 @@ class BenefitsYleistuki(Benefits):
         lapsi_kerroin_alle18_1 = 0.75
         lapsi_kerroin_alle18_2 = 0.70
         lapsi_kerroin_alle18_3 = 0.65
-        lapsi_kerroin_18 = 0.85
+        lapsi_kerroin_18 = 0.75
         aikuinen_kerroin = 0.85
         yksinhuoltaja_kerroin = 1.14
         
@@ -506,9 +506,9 @@ class BenefitsYleistuki(Benefits):
             kerroin2 = 0.19 # (1-0.0858)*0.15 # = 0.13713
         else: # nykytila ilman pros.vähennyksiä
             minimi = 31.99*25 #  =  peruspäiväraha
-            taite1 = 30_000 # (1-0.0858)*32_797/self.kk_jakaja # = 29983
+            taite1 = 35_500 # (1-0.0858)*32_797/self.kk_jakaja # = 29983
             vakiintunut = vakiintunutpalkka
-            kerroin1 = 0.65 # (1-0.0858)*0.7 # = 0.63994
+            kerroin1 = 0.64 # (1-0.0858)*0.7 # = 0.63994
             kerroin2 = 0.15 # (1-0.0858)*0.15 # = 0.13713
                     
         raha = max(minimi,kerroin1*min(taite1,vakiintunut)+kerroin2*max(vakiintunut-taite1,0))
@@ -557,7 +557,6 @@ class BenefitsYleistuki(Benefits):
         '''
         super().veroparam2023()
         self.tyottomyysvakuutusmaksu=0.0150 - 0.002 # vastaa VM:n arviota rakenteellisesta maksun muutoksesta 
-
  
     def valtionvero_asteikko_2023_HO(self):
         rajat=np.array([0,19_900,29_700,49_000,150_000])/self.kk_jakaja

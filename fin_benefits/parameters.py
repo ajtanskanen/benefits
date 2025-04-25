@@ -1209,7 +1209,27 @@ def _perheet(perhetyyppi: int,kuntaryhmä: int=0,vuosi: int=2018,korkeat_asumisk
         puoliso_tyoton=0
         puoliso_saa_ansiopaivarahaa=0                
         puoliso_elakkeella=0
-        puoliso_elake=0                               
+        puoliso_elake=0         
+    elif perhetyyppi==75: # Samin esimerkki
+        lapsia=4
+        paivahoidossa=4 # sic! 0 jos lapsi ei päivähoidossa, vaikka olisi työskentelyä (näin Kela vaikuttaa olettaneen)
+        elatustuki=1
+        lapsia_kotihoidontuella=0    
+        alle3v=0
+        aikuisia=1
+        vakiintunutpalkka=1500    
+        asumismenot_toimeentulo = 890
+        asumismenot_asumistuki = 850
+        tyoton=1
+        saa_ansiopaivarahaa=0
+        elakkeella=0
+        elake=0
+        puoliso_tulot=0  
+        puoliso_vakiintunutpalkka=0    
+        puoliso_tyoton=0
+        puoliso_saa_ansiopaivarahaa=0                
+        puoliso_elakkeella=0
+        puoliso_elake=0                                       
     else: # 1+0
         lapsia=0    
         paivahoidossa=0    
