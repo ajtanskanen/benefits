@@ -12,3 +12,4 @@ from .benefits_unemp_korotus import BenefitsKorotus
 from .ben_utils import get_palette_EK,get_style_EK
 from .ben_test import Bentest
 from .benefits_yleistuki import BenefitsYleistuki
+from .benefits_puoliväliriihi2025 import BenefitsPuoliväliriihi2025

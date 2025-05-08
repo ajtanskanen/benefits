@@ -320,7 +320,7 @@ class Labels():
             labels['yhteensä']='yhteensä'
             labels['aikuisia']='aikuisia'
             labels['lapsia']='lapsia'
-            labels['ovella']='ove:lla'
+            labels['ovella']='ovella'
             labels['opiskelijoita']='opiskelijoita'
             labels['lapsiperheitä']='lapsiperheitä'
             labels['pareja']='pareja'

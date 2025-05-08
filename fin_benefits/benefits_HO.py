@@ -144,7 +144,7 @@ class BenefitsHO(Benefits):
     #       
     #    return ansiopaivarahamaara 
 
-    def tyotulovahennys2023_HO(self,ika: float,lapsia: int):
+    def tyotulovahennys2023_HO(self,ika: float,lapsia: int,yksinhuoltaja: int=0):
         if ika>=65:
             max_tyotulovahennys=3230/self.kk_jakaja
         else:
