@@ -1256,7 +1256,7 @@ class Benefits():
         #    max_tyotulovahennys=3340/self.kk_jakaja
         #else:
         max_tyotulovahennys=(3_225+50*lapsia+50*yksinhuoltaja)/self.kk_jakaja
-        ttulorajat=np.array([0,24250,42550])/self.kk_jakaja
+        ttulorajat=np.array([0,242_50,42_550])/self.kk_jakaja
         ttulopros=np.array([0.18,0.0222,0.0344])
         return max_tyotulovahennys,ttulorajat,ttulopros
         
@@ -1265,9 +1265,14 @@ class Benefits():
         tarvitaan tieto yksihuoltajuudesta ja iästä, FIXME!
         päivitetty 29.1.2025
         '''
-        max_tyotulovahennys=(3_385+105*lapsia+105*yksinhuoltaja)/self.kk_jakaja
-        ttulorajat=np.array([0,35_000,50_000])/self.kk_jakaja
-        ttulopros=np.array([0.18,0.0222,0.0])
+        if False: # Puoliväliriihi 2025
+            max_tyotulovahennys=(3_385+105*lapsia+105*yksinhuoltaja)/self.kk_jakaja
+            ttulorajat=np.array([0,35_000,50_000])/self.kk_jakaja
+            ttulopros=np.array([0.18,0.0222,0.0])
+        else: # inflaatiokorjattu
+            max_tyotulovahennys=(3_345+50*lapsia+50*yksinhuoltaja)/self.kk_jakaja
+            ttulorajat=np.array([0,25_150,44_150])/self.kk_jakaja
+            ttulopros=np.array([0.18,0.0222,0.0344])
 
         return max_tyotulovahennys,ttulorajat,ttulopros
 
@@ -2033,14 +2038,19 @@ class Benefits():
         return vero
         
     def raippavero2025(self,elaketulo: float):
-        alaraja=57_000/self.kk_jakaja
-        pros=0.04
+        alaraja=47_000/self.kk_jakaja
+        pros=0.0585
         vero=max(elaketulo-alaraja,0)*pros
         return vero
         
     def raippavero2026(self,elaketulo: float):
-        alaraja=47_000/self.kk_jakaja
-        pros=0.0585
+        if False: # Puoliväliriihi
+            alaraja=57_000/self.kk_jakaja
+            pros=0.0400
+        else:
+            alaraja=47_000/self.kk_jakaja
+            pros=0.0585
+
         vero=max(elaketulo-alaraja,0)*pros
         return vero
         
@@ -2099,9 +2109,15 @@ class Benefits():
         '''
         päivitetty 7.5.2025
         '''
-        rajat=np.array([0,22_000,32_700,40_200,52_100,150_000])/self.kk_jakaja
-        pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.3325,0.375+self.additional_income_tax_high,0.375+self.additional_income_tax_high])+self.additional_income_tax)
-        pros=np.maximum(0,np.minimum(pros,0.375+self.additional_income_tax_high+self.additional_income_tax))
+        if False: # Puoliväliriihi
+            rajat=np.array([0,22_000,32_700,40_200,52_100,150_000])/self.kk_jakaja
+            pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.3325,0.375+self.additional_income_tax_high,0.375+self.additional_income_tax_high])+self.additional_income_tax)
+            pros=np.maximum(0,np.minimum(pros,0.375+self.additional_income_tax_high+self.additional_income_tax))
+        else:
+            rajat=np.array([0,22_000,32_700,54_100,91_600,155_700])/self.kk_jakaja
+            pros=np.maximum(0,np.array([0.1264,0.19,0.3025,0.3400,0.4175,0.4425+self.additional_income_tax_high])+self.additional_income_tax)
+            pros=np.maximum(0,np.minimum(pros,0.4425+self.additional_income_tax_high+self.additional_income_tax))
+
         return rajat,pros                   
 
 ### Hoitolisä
