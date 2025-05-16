@@ -3380,7 +3380,7 @@ class Benefits():
         self.check_p(p)
 
         aikuisia=p['aikuisia']
-        lapsia=p['lapsia']
+        lapsia=p['lapsia'] # tässä mukana myös 17-vuotiaat
 
         if aikuisia==1 and lapsia>0:
             yksinhuoltaja=1

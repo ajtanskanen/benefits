@@ -49,7 +49,7 @@ class BenefitsPuoliväliriihi2025(Benefits):
             #self.valtionvero_asteikko_2024 = self.valtionvero_asteikko_2024_puoliväliriihi
             self.veroparam = self.veroparam2026_puoliväliriihi
             self.laske_tyotulovahennys = self.laske_tyotulovahennys2026_puoliväliriihi
-            self.raippavero = raippavero2026
+            self.raippavero = self.raippavero2026
 
     def veroparam2024_puoliväliriihi(self):
         '''
