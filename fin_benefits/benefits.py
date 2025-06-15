@@ -4335,8 +4335,8 @@ class Benefits():
         # 
         # 137    130    123    118
         # enimmaismenot kuntaryhmittain kun hloita 1-4
-        max_menot=np.array([[605, 585, 465, 410],[840, 840, 678, 597],[1_060, 1_060, 861, 673],[1_235, 1_235, 1_020, 910]])
-        max_lisa=np.array([154, 154, 139, 134])
+        max_menot=np.array([[605, 585, 465, 410],[840, 840, 678, 597],[1_060, 1_060, 861, 673],[1_235, 1_235, 1_020, 910]])*1.028
+        max_lisa=np.array([154, 154, 139, 134])*1.028
         # kuntaryhma=3
 
         max_meno=max_menot[min(3,aikuisia+lapsia-1),kuntaryhma]+max(0,aikuisia+lapsia-4)*max_lisa[kuntaryhma]
@@ -4620,7 +4620,7 @@ class Benefits():
         # e/kk    II kuntaryhmä,
         # e/kk    III kuntaryhmä,
         #
-        max_menot=np.array([9_287,8_541,7_493])/12*1.03
+        max_menot=np.array([9_287,8_541,7_493])/12*1.03*1.02
         max_meno=max_menot[max(0,kuntaryhma-1)]
 
         prosentti=0.85 # vastaa 85 %
@@ -4655,7 +4655,7 @@ class Benefits():
         # e/kk    II kuntaryhmä,
         # e/kk    III kuntaryhmä,
         #
-        max_menot=np.array([9_287,8_541,7_493])/12*1.03
+        max_menot=np.array([9_287,8_541,7_493])/12*1.03*1.02*1.028
         max_meno=max_menot[max(0,kuntaryhma-1)]
 
         prosentti=0.85 # vastaa 85 %
@@ -6006,9 +6006,9 @@ class Benefits():
         return max(raha,palkka)        
 
     def aitiysraha2026(self,palkka: float,vakiintunutpalkka: float,kesto: float):
-        minimi=31.99*25
-        taite1=40_106/self.kk_jakaja  
-        taite2=61_705/self.kk_jakaja 
+        minimi=31.99*25*1.028
+        taite1=40_106/self.kk_jakaja*1.028
+        taite2=61_705/self.kk_jakaja*1.028
         if kesto<56/260:
             vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
             raha=max(minimi,0.9*min(taite1,vakiintunut)+0.325*max(vakiintunut-taite1,0))
@@ -6092,8 +6092,8 @@ class Benefits():
         return max(0,raha-palkka)        
         
     def sairauspaivaraha2026(self,palkka: float,vakiintunutpalkka: float):
-        minimi=31.99*25
-        taite1=28_241/self.kk_jakaja
+        minimi=31.99*25*1.028
+        taite1=28_241/self.kk_jakaja*1.028
         vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
         raha=max(minimi,0.7*min(taite1,vakiintunut)+0.15*max(vakiintunut-taite1,0))

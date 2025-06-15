@@ -81,6 +81,7 @@ class BenefitsYleistuki(Benefits):
             self.lapsilisa = self.lapsilisa2023_HO
             self.tyotulovahennys=self.tyotulovahennys2023_HO
             self.veroparam=self.veroparam2023_HO
+            self.sairauspaivaraha=self.sairauspaivaraha2023_YTU
             #self.ansiopaivaraha=self.ansiopaivaraha_HO
         elif self.year==2025:
             self.toimeentulotuki_param = self.toimeentulotuki_param2025
@@ -88,6 +89,7 @@ class BenefitsYleistuki(Benefits):
             self.valtionvero_asteikko = self.valtionvero_asteikko_2025
             self.lapsilisa = self.lapsilisa2025
             self.veroparam = self.veroparam2025
+            self.sairauspaivaraha=self.sairauspaivaraha2025_YTU
         else:
             print(f'year {self.year} not supported in yleistuki')
 
@@ -473,7 +475,10 @@ class BenefitsYleistuki(Benefits):
 
     def soviteltu_peruspaivaraha_YTU(self,lapsia: int,tyotaikaisettulot: float,ansiopvrahan_suojaosa: int,p: dict) -> float:
         suojaosa = 0
-        pvraha = self.sairauspaivaraha2023_YTU(0,0)
+        if self.year==2023:
+            pvraha = self.sairauspaivaraha2023_YTU(0,0)
+        elif self.year==2025:
+            pvraha = self.sairauspaivaraha2025_YTU(0,0)
         vahentavattulo = max(0,tyotaikaisettulot-suojaosa)
         tuki = max(0,pvraha-0.5*vahentavattulo)
     
@@ -489,11 +494,11 @@ class BenefitsYleistuki(Benefits):
         return max(0,raha-palkka)
 
     def sairauspaivaraha2023(self,palkka: float,vakiintunutpalkka: float):
-        minimi = 31.99*25
-        taite1 = 32_797/self.kk_jakaja  
-        vakiintunut = (1-0.0858)*vakiintunutpalkka                    
+        minimi=31.99*25
+        taite1=32_797/self.kk_jakaja  
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
-        raha = max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
+        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.2*max(vakiintunut-taite1,0))
 
         return max(0,raha-palkka)
 
@@ -516,13 +521,13 @@ class BenefitsYleistuki(Benefits):
         return max(0,raha-palkka)
     
     def sairauspaivaraha2025(self,palkka: float,vakiintunutpalkka: float):
-        minimi = 31.99*25
-        taite1 = 32_797/self.kk_jakaja  
-        vakiintunut = (1-0.0858)*vakiintunutpalkka                    
+        minimi=31.99*25
+        taite1=28_241/self.kk_jakaja
+        vakiintunut=(1-self.sotumaksu)*vakiintunutpalkka                    
                     
-        raha = max(minimi,0.7*min(taite1,vakiintunut)+0.15*max(vakiintunut-taite1,0))
+        raha=max(minimi,0.7*min(taite1,vakiintunut)+0.15*max(vakiintunut-taite1,0))
 
-        return max(0,raha-palkka)
+        return max(0,raha-palkka) 
 
     def ansiopaivaraha_HO(self,tyoton,vakiintunutpalkka,lapsia,tyotaikaisettulot,saa_ansiopaivarahaa,kesto,p,ansiokerroin=1.0,omavastuukerroin=1.0,alku=''):
         # porrastetaan ansio-osa keston mukaan
