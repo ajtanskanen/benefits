@@ -232,7 +232,7 @@ class Labels():
         labels={}
         if language=='English':
             labels['työllisiä']='Employed'
-            labels['työikäisiä 18-62']='Employed 18-62'
+            labels['työikäisiä 18-62']='Aged 18-62'
             labels['työllisiä 18-62']='Employed 18-62'
             labels['työssä ja eläkkeellä']='Employed & retired'
             labels['työssä 63+']='Employed 63+'
@@ -313,10 +313,11 @@ class Labels():
             labels['Työaika [h]']='Work time [h]'
             labels['Työttömyys [%]']='Unemployment [%]'
             labels['Osatyön osuus %']='Part-time work [%]'
+            labels['muut työvoiman ulkopuolella']='Outside of workforce'
         else:
             labels['työllisiä']='Työllisiä'
             labels['työikäisiä 18-62']='työikäisiä 18-62'
-            labels['työllisiä 18-62']='työikäisiä 18-62'
+            labels['työllisiä 18-62']='työllisiä 18-62'
             labels['työssä ja eläkkeellä']='työssä ja eläkkeellä'
             labels['työssä 63+']='työssä 63+'
             labels['palkansaajia']='palkansaajia'
@@ -396,6 +397,7 @@ class Labels():
             labels['Työaika [h]']='Työaika [h]'
             labels['Työttömyys [%]']='Työttömyys [%]'
             labels['Osatyön osuus %']='Osatyön osuus työnteosta [%]'
+            labels['muut työvoiman ulkopuolella']='muut työvoiman ulkopuolella'
             
         return labels        
             

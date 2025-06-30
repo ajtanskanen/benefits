@@ -3427,7 +3427,7 @@ class Benefits():
             q[puoliso+'ylevero']=0
             q[puoliso+'verot_vain_elake']=0
             
-        # elatustuki (ei vaikuta kannnusteisiin, vain tuloihin, koska ei yhteensovitusta)
+        # elatustuki (ei vaikuta kannusteisiin, vain tuloihin, koska ei yhteensovitusta)
         if aikuisia==1 and p['saa_elatustukea']>0 and p[omatalku+'alive']>0:
             q[omat+'elatustuki']=self.laske_elatustuki(lapsia,aikuisia)
         else:
