@@ -8,7 +8,7 @@ class Labels():
     def get_labels(self,language='English'):
         labels={}
         #print('labels, language:',language)
-        if language=='English':
+        if language=='English' or language=='eng' or language=='Eng':
             labels['ero määrissä']='Difference in numbers'
             labels['osuus tilassa x']='Proportion in state {} [%]'
             labels['age']='Age [y]'
@@ -68,7 +68,7 @@ class Labels():
             labels['pois siirtyneiden osuus']='proportion of those moved away'
             labels['Naiset']='Women'
             labels['Miehet']='Men'
-            labels['työssä']="Working"
+            labels['työssä']="Employed"
             labels['työttömänä']="Unemployed"
             labels['eläkkeellä']="Retired"
             labels['Verot [euroa]']='Taxes [euroa]'
@@ -86,7 +86,29 @@ class Labels():
             labels['Työaika [h]']='Work time [h]'
             labels['Työttömyys [%]']='Unemployment [%]'
             labels['Osatyön osuus %']='Part-time work [%]'
-        else:
+            labels['äitiysvapaa']="mother's leave"
+            labels['isyysvapaa']="father's leave"
+            labels['khtuki']='child home care'
+            labels['tyött']='unemployed'
+            labels['tm-tuki']='tm-tuki'
+            labels['student']='student'
+            labels['outsider']='outside of wf'
+            labels['putki']='ext.unemp'
+            labels['osa-aika']='part time work'
+            labels['kokoaikatyö']='full time work'
+            labels['osatyö']='part time work'
+            labels['ve+kokoaikatyö']='ret+ft'
+            labels['ve+osatyö']='ret+pt'
+            labels['ve+työ']='ret+work'
+            labels['eläke']='retired'
+            labels['tk']='disabled'
+            labels['putki']='putki'
+            labels['työtön']='unemployed'
+            labels['svpaivaraha']='sick leave'
+            labels['työttömyysputki']='ext.unemp'
+            labels['vanhuuseläke']='pension'
+            labels['tk-eläke']='disabled'
+        elif language=='Finnish' or language=='fin' or language=='Fin':
             labels['Menetetty palkkasumma']='Menetetty palkkasumma [euroa]'
             labels['Menetetty palkkasumma %']='Menetetty palkkasumma [%]'
             labels['ero määrissä']='Ero määrissä'
@@ -164,12 +186,36 @@ class Labels():
             labels['Työaika [h]']='Työaika [h]'
             labels['Työttömyys [%]']='Työttömyys [%]'
             labels['Osatyön osuus %']='Osatyön osuus työnteosta [%]'
+            labels['äitiysvapaa']='äitiysvapaa'
+            labels['isyysvapaa']='isyysvapaa'
+            labels['khtuki']='khtuki'
+            labels['tyött']='tyött'
+            labels['tm-tuki']='tm-tuki'
+            labels['student']='student'
+            labels['outsider']='outsider'
+            labels['putki']='putki'
+            labels['osa-aika']='osa-aika'
+            labels['kokoaikatyö']='kokoaikatyö'
+            labels['osatyö']='osatyö'
+            labels['ve+kokoaikatyö']='ve+kokoaikatyö'
+            labels['ve+osatyö']='ve+osatyö'
+            labels['ve+työ']='ve+työ'
+            labels['eläke']='eläke'
+            labels['tk']='tk'
+            labels['putki']='putki'
+            labels['työtön']='työtön'
+            labels['svpaivaraha']='svpaivaraha'
+            labels['työttömyysputki']='työttömyysputki'
+            labels['vanhuuseläke']='vanhuuseläke'
+            labels['tk-eläke']='tk-eläke'
+        else:
+            print('Unknown language:',language)
 
         return labels
         
     def ben_labels(self,language='English'):
         labels={}
-        if language=='English':
+        if language=='English' or language=='eng' or language=='Eng':
             labels['wage']='Wage (e/m)'
             labels['parttimewage']='Part-time wage (e/m)'
             labels['pure wage']='Wage'
@@ -197,7 +243,7 @@ class Labels():
             labels['kunnallisvero']='Municipal tax'
             labels['telp']='TEL-P'
             labels['kotihoidontuki']='Child home care allowance'
-        else:
+        elif language=='Finnish' or language=='fin' or language=='Fin':
             labels['wage']='Palkka (e/kk)'
             labels['parttimewage']='Osa-aikatyön palkka (e/kk)'
             labels['pure wage']='Palkka'
@@ -225,12 +271,14 @@ class Labels():
             labels['sairausvakuutusmaksu']='Sairausvakuutusmaksu'
             labels['työttömyysvakuutusmaksu']='Työttömyysvakuutusmaksu'
             labels['kotihoidontuki']='Kotihoidontuki'
+        else:
+            print('Unknown language:',language)
             
         return labels
 
     def get_output_labels(self,language='English'):
         labels={}
-        if language=='English':
+        if language=='English' or language=='eng' or language=='Eng':
             labels['työllisiä']='Employed'
             labels['työikäisiä 18-62']='Aged 18-62'
             labels['työllisiä 18-62']='Employed 18-62'

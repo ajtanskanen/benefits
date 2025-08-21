@@ -56,7 +56,7 @@ class Marginals():
             if key=='year':
                 if value is not None:
                     self.year=value
-            elif key=='language': # language for plotting
+            elif key=='language' or key=='lang': # language for plotting
                 if value is not None:
                     self.language=value
             elif key=='additional_income_tax':
@@ -145,8 +145,10 @@ class Marginals():
                 extraheader=None,dodisplay=False,counter=False,countertext='',min_y=None,max_y=None):
         if ax is None:
             figi,axs = plt.subplots()
+            noshow=False
         else:
             axs=ax
+            noshow=True
         #sns.set_theme()
         axs.set_axisbelow(False)
         self.plot_marg_extra(axs,palkka,margverot,margasumistuki,margtoimeentulotuki,margtyotpvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
@@ -169,25 +171,27 @@ class Marginals():
         axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
         axs.set_xlim(min_salary, max_salary)
         axs.set_ylim(0, 119)
-        if legend:
-            #axs.legend(loc='upper right')
-            handles, labels = axs.get_legend_handles_labels()
-            lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
-        if source is not None:
-            self.add_source(source,**csfont)
-        if header is not None:
-            axs.set_title(head_text,**csfont)
-        if extraheader is not None:
-            #axs.title.set_text(head_text,csfont)
-            self.add_extraheader(head_text,**csfont)
-        if counter is not None:
-            #axs.title.set_text(head_text,csfont)
-            self.add_counter(countertext,**csfont)
+
+        if not noshow:
+            if legend:
+                #axs.legend(loc='upper right')
+                handles, labels = axs.get_legend_handles_labels()
+                lgd=axs.legend(handles[::-1], labels[::-1], loc='upper right')
+            if source is not None:
+                self.add_source(source,**csfont)
+            if header is not None:
+                axs.set_title(head_text,**csfont)
+            if extraheader is not None:
+                #axs.title.set_text(head_text,csfont)
+                self.add_extraheader(head_text,**csfont)
+            if counter is not None:
+                #axs.title.set_text(head_text,csfont)
+                self.add_counter(countertext,**csfont)
     
-        if figname is not None:
-            plt.savefig(figname+'_eff.png')
-        if show:
-            plt.show()    
+            if figname is not None:
+                plt.savefig(figname+'_eff.png')
+            if show:
+                plt.show()    
     
     def plot_osatva_marg(self,osatva,palkka,osatva_verot,osatva_asumistuki,osatva_toimeentulotuki,osatva_tyotpvraha,osatva_pvhoito,osatva_elake,osatva_opintotuki,osatva_perustulo,osatva_alv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,
@@ -576,10 +580,11 @@ class Marginals():
     def laske_ja_plottaa_marginaalit(self,p=None,p0=None,min_salary=0,max_salary=8000,
                 basenetto=None,baseeff=None,basetva=None,basebrutto=None,plot_julkinen=True,dt=100,plottaa=True,
                 otsikko="Vaihtoehto",otsikkobase="Perustapaus",legend=True,ret=False,
-                plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=False,figname=None,grayscale=False,
+                plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=False,plot_osatva=True,
+                figname=None,grayscale=False,
                 incl_perustulo=False,incl_elake=True,fig=None,ax=None,incl_opintotuki=False,
                 incl_alv=False,incl_kotihoidontuki=False,show=True,head_text=None,
-                plot_osatva=True,header=True,source='Lähde: EK',palette=None,palette_EK=False,
+                header=True,source='Lähde: EK',palette=None,palette_EK=False,
                 baseline_eff=None,min_y=None,max_y=None,minmarg_y=None,maxmarg_y=None,
                 square=False):
 
@@ -587,7 +592,8 @@ class Marginals():
             plt.style.use('grayscale')
             plt.rcParams['figure.facecolor'] = 'white' # Or any suitable colour...
             pal=sns.dark_palette("darkgray", 6, reverse=True)
-            axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
+            #if ax is not None:
+            #    ax.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             reverse=True
         else:
             pal=sns.color_palette()
@@ -640,8 +646,7 @@ class Marginals():
             self.plot_eff_marg(effmarg,palkka,margverot,margasumistuki,margtoimeentulotuki,margtyotpvraha,margpvhoito,margelake,margopintotuki,margperustulo,margalv,pal,
                 ax=ax,incl_perustulo=incl_perustulo,incl_elake=incl_elake,incl_opintotuki=incl_opintotuki,incl_kotihoidontuki=incl_kotihoidontuki,incl_alv=incl_alv,
                 csfont=csfont,min_salary=min_salary, max_salary=max_salary,legend=legend,source=source,header=header,head_text=head_text,figname=figname,show=show,
-                baseline_eff=baseline_eff,
-                min_y=minmarg_y,max_y=maxmarg_y)
+                baseline_eff=baseline_eff,min_y=minmarg_y,max_y=maxmarg_y)
 
         if plot_brutto and plottaa:
             # ALV:ia ei plotata bruttotuloissa
@@ -940,13 +945,13 @@ class Marginals():
         plt.show()
 
     def plot_insentives(self,netto,eff,tva,osa_tva,brutto=None,min_y=None,max_y=None,
-            min_salary=0,max_salary=6000,step_salary=1,
+            min_salary=0,max_salary=6000,step_salary=1,publication=False,
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,basebrutto=None,
             basenetto2=None,baseeff2=None,basetva2=None,baseosatva2=None,basebrutto2=None,
             basenetto3=None,baseeff3=None,basetva3=None,baseosatva3=None,basebrutto3=None,
             dt=100,otsikko="Vaihtoehto",otsikkobase="Nykytila",otsikkobase2="",otsikkobase3="",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_osatva=False,plot_brutto=False,
-            figname=None,grayscale=False,source=None,header=None,palette_EK=True):
+            figname=None,grayscale=False,source=None,header=None,palette_EK=True,ax=None):
     
         if grayscale:
             plt.style.use('grayscale')
@@ -956,21 +961,33 @@ class Marginals():
         else:
             pal=sns.color_palette()    
     
-        if palette_EK:
+        if palette_EK and not publication:
             csfont,pal=self.setup_EK_fonts()
         else:
             csfont = {}
             linecolors ={}
-    
-        linestyle={'linewidth': 3}
-        linestyle2={'linewidth': 3}
-        linestyle3={'linewidth': 3,'linestyle': 'dashed'}
-        linestyle4={'linewidth': 3,'linestyle': 'dashed'}
-        legendstyle={'frameon': False}
+
+        if publication:
+            linestyle={'linewidth': 2}
+            linestyle2={'linewidth': 2}
+            linestyle3={'linewidth': 2,'linestyle': 'dashed'}
+            linestyle4={'linewidth': 2,'linestyle': 'dashed'}
+            legendstyle={'frameon': False}
+        else:
+            linestyle={'linewidth': 3}
+            linestyle2={'linewidth': 3}
+            linestyle3={'linewidth': 3,'linestyle': 'dashed'}
+            linestyle4={'linewidth': 3,'linestyle': 'dashed'}
+            legendstyle={'frameon': False}
     
         x=np.arange(min_salary,max_salary,step_salary)
         if plot_netto:
-            fig, axs = plt.subplots()
+            if ax is not None:
+                axs = ax
+                noshow = True
+            else:
+                fig, axs = plt.subplots()
+                noshow = False
             if basenetto is not None or basenetto2 is not None or basenetto3 is not None:
                 axs.plot(x,netto,label=otsikko,**linestyle)
                 if basenetto is not None:
@@ -989,21 +1006,27 @@ class Marginals():
             axs.set_xlim(0, max_salary)
             if min_y is not None:
                 axs.set_ylim(min_y, max_y)
-            if source is not None:
-                self.add_source(source,**csfont)
-    
-            if header is not None:
-                #axs.title.set_text(head_text,csfont)
-                axs.set_title(header,**csfont)
+            if not noshow:
+                if source is not None:
+                    self.add_source(source,**csfont)
         
-            if figname is not None:
-                #plt.savefig(figname+'_netto.eps', format='eps')
-                plt.savefig(figname+'_netto.png', format='png',dpi=300)
-        
-            plt.show()
+                if header is not None:
+                    #axs.title.set_text(head_text,csfont)
+                    axs.set_title(header,**csfont)
+            
+                if figname is not None:
+                    #plt.savefig(figname+'_netto.eps', format='eps')
+                    plt.savefig(figname+'_netto.png', format='png',dpi=300)
+            
+                plt.show()
             
         if plot_brutto:
-            fig, axs = plt.subplots()
+            if ax is not None:
+                axs = ax
+                noshow = True
+            else:
+                fig, axs = plt.subplots()
+                noshow = False
             if basebrutto is not None or basebrutto2 is not None:
                 axs.plot(x,brutto,label=otsikko,**linestyle)
                 if basebrutto is not None:
@@ -1022,22 +1045,27 @@ class Marginals():
             axs.set_xlim(0, max_salary)
             if min_y is not None:
                 axs.set_ylim(min_y, max_y)
-
-            if source is not None:
-                self.add_source(source,**csfont)
-    
-            if header is not None:
-                #axs.title.set_text(head_text,csfont)
-                axs.set_title(header,**csfont)
+            if not noshow:
+                if source is not None:
+                    self.add_source(source,**csfont)
         
-            if figname is not None:
-                #plt.savefig(figname+'_brutto.eps', format='eps')
-                plt.savefig(figname+'_brutto.png', format='png',dpi=300)
-        
-            plt.show()            
+                if header is not None:
+                    #axs.title.set_text(head_text,csfont)
+                    axs.set_title(header,**csfont)
+            
+                if figname is not None:
+                    #plt.savefig(figname+'_brutto.eps', format='eps')
+                    plt.savefig(figname+'_brutto.png', format='png',dpi=300)
+            
+                plt.show()            
 
         if plot_eff:
-            fig, axs = plt.subplots()
+            if ax is not None:
+                axs = ax
+                noshow = True
+            else:
+                fig, axs = plt.subplots()
+                noshow = False
             if baseeff is not None or baseeff2 is not None:
                 if baseeff is not None:
                     axs.plot(x,baseeff,label=otsikkobase,**linestyle)
@@ -1055,18 +1083,24 @@ class Marginals():
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 119)
-            if source is not None:
-                self.add_source(source,**csfont)
-    
-            if header is not None:
-                #axs.title.set_text(head_text,csfont)
-                axs.set_title(header,**csfont)
-            if figname is not None:
-                plt.savefig(figname+'_effmarg.png', format='png')
-            plt.show()
+            if not noshow:
+                if source is not None:
+                    self.add_source(source,**csfont)
+        
+                if header is not None:
+                    #axs.title.set_text(head_text,csfont)
+                    axs.set_title(header,**csfont)
+                if figname is not None:
+                    plt.savefig(figname+'_effmarg.png', format='png')
+                plt.show()
 
         if plot_tva:
-            fig, axs = plt.subplots()
+            if ax is not None:
+                axs = ax
+                noshow = True
+            else:
+                fig, axs = plt.subplots()
+                noshow = False
             if basetva is not None or basetva2 is not None:
                 if basetva is not None:
                     axs.plot(x,basetva,label=otsikkobase,**linestyle)
@@ -1084,18 +1118,24 @@ class Marginals():
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
             axs.set_ylim(0, 120)
-            if source is not None:
-                self.add_source(source,**csfont)
+            if not noshow:
+                if source is not None:
+                    self.add_source(source,**csfont)
     
-            if header is not None:
-                #axs.title.set_text(head_text,csfont)
-                axs.set_title(header,**csfont)
-            if figname is not None:
-                plt.savefig(figname+'_tva.png', format='png')
-            plt.show()
+                if header is not None:
+                    #axs.title.set_text(head_text,csfont)
+                    axs.set_title(header,**csfont)
+                if figname is not None:
+                    plt.savefig(figname+'_tva.png', format='png')
+                plt.show()
 
         if plot_osatva:
-            fig, axs = plt.subplots()
+            if ax is not None:
+                axs = ax
+                noshow = True
+            else:
+                fig, axs = plt.subplots()
+                noshow = False
             if baseosatva is not None or baseosatva2 is not None or baseosatva3 is not None:
                 if baseosatva is not None:
                     axs.plot(x,baseosatva,label=otsikkobase,**linestyle)
@@ -1113,14 +1153,15 @@ class Marginals():
             axs.set_ylabel('Osatyöstä kokotyöhön siirtymisen eff.rajavero (%)',**csfont)
             axs.grid(True,color='black',fillstyle='top',lw=0.5,axis='y',alpha=1.0)
             axs.set_xlim(0, max_salary)
-            if source is not None:
-                self.add_source(source,**csfont)
-            if header is not None:
-                #axs.title.set_text(head_text,csfont)
-                axs.set_title(header,**csfont)
-            if figname is not None:
-                plt.savefig(figname+'_osatva.png', format='png')
-            plt.show()    
+            if not noshow:
+                if source is not None:
+                    self.add_source(source,**csfont)
+                if header is not None:
+                    #axs.title.set_text(head_text,csfont)
+                    axs.set_title(header,**csfont)
+                if figname is not None:
+                    plt.savefig(figname+'_osatva.png', format='png')
+                plt.show()    
     
     def laske_ja_plottaa(self,p=None,p0=None,min_salary=0,max_salary=8000,step_salary=1,
             basenetto=None,baseeff=None,basetva=None,baseosatva=None,basebrutto=None,
@@ -1128,7 +1169,8 @@ class Marginals():
             basenetto3=None,baseeff3=None,basetva3=None,baseosatva3=None,basebrutto3=None,
             dt=100,plottaa=True,otsikko="Vaihtoehto",otsikkobase="Nykytila",otsikkobase2="",otsikkobase3="",selite=True,
             plot_tva=True,plot_eff=True,plot_netto=True,plot_brutto=True,plot_osatva=True,min_y=None,max_y=None,
-            incl_alv=False,figname=None,grayscale=None,source='Lähde: EK',header=True,short=False):
+            incl_alv=False,figname=None,grayscale=None,source='Lähde: EK',header=True,short=False,ax=None,
+            publication=False):
     
         netto,eff,tva,osa_tva,brutto=self.comp_insentives(p=p,p0=p0,min_salary=min_salary,incl_alv=incl_alv,
                                                    max_salary=max_salary,step_salary=step_salary,dt=dt)
@@ -1140,7 +1182,7 @@ class Marginals():
         
         if plottaa:
             self.plot_insentives(netto,eff,tva,osa_tva,brutto=brutto,min_salary=min_salary,max_salary=max_salary+1,
-                step_salary=step_salary,min_y=min_y,max_y=max_y,
+                step_salary=step_salary,min_y=min_y,max_y=max_y,ax=ax,publication=publication,
                 basenetto=basenetto,baseeff=baseeff,basetva=basetva,baseosatva=baseosatva,basebrutto=basebrutto,
                 dt=dt,otsikko=otsikko,otsikkobase=otsikkobase,selite=selite,
                 plot_tva=plot_tva,plot_eff=plot_eff,plot_netto=plot_netto,plot_osatva=plot_osatva,plot_brutto=plot_brutto,

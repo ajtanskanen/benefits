@@ -52,13 +52,13 @@ class Benefits():
             if key=='year':
                 if value is not None:
                     self.year=value
-            elif key=='language': # language for plotting
+            elif key=='language' or key=='lang': # language for plotting
                 if value is not None:
                     self.language=value
-            elif key=='include_kirkollisvero': # language for plotting
+            elif key=='include_kirkollisvero':
                 if value is not None:
                     self.include_kirkollisvero=value
-            elif key=='include_joustavahoitoraha': # language for plotting
+            elif key=='include_joustavahoitoraha':
                 if value is not None:
                     self.include_joustavahoitoraha=value
             elif key=='additional_income_tax':
