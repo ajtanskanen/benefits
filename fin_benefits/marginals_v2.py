@@ -11,6 +11,7 @@ import numpy as np
 from .parameters import perheparametrit, print_examples, tee_selite,get_n_perheet
 from .labels import Labels
 from .ben_utils import get_palette_EK,get_style_EK, compare_q_print, print_q
+#from .ben_utils import get_palette_Tela,get_style_Tela, compare_q_print, print_q
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.font_manager as font_manager
@@ -46,6 +47,8 @@ class Marginals():
         self.irr_vain_tyoelake=False
         self.include_perustulo=False
         self.ben=ben
+        self.EK=True
+        self.Tela=False
 
         if 'kwargs' in kwargs:
             kwarg=kwargs['kwargs']
@@ -53,7 +56,13 @@ class Marginals():
             kwarg=kwargs
     
         for key, value in kwarg.items():
-            if key=='year':
+            if key=='EK':
+                if value is not None:
+                    self.EK=value
+            elif key=='Tela':
+                if value is not None:
+                    self.Tela=value
+            elif key=='year':
                 if value is not None:
                     self.year=value
             elif key=='language' or key=='lang': # language for plotting
@@ -92,6 +101,11 @@ class Marginals():
 
         if self.vaihtuva_tyelmaksu:
             self.get_tyelpremium()
+
+    #def setup_ek(self):
+
+    #def setup_tela(self):
+        
 
     def plot_tva_marg(self,tva,palkka,tva_verot,tva_asumistuki,tva_toimeentulotuki,tva_tyotpvraha,tva_pvhoito,tva_elake,tva_opintotuki,tva_perustulo,tva_alv,pal,
                 ax=None,incl_perustulo=False,incl_elake=False,incl_opintotuki=False,incl_kotihoidontuki=False,incl_alv=False,

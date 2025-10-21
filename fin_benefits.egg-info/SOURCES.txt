@@ -22,6 +22,7 @@ fin_benefits/ben_utils.py
 fin_benefits/benefits.py
 fin_benefits/benefits_HO.py
 fin_benefits/benefits_HOrev.py
+fin_benefits/benefits_puoliväliriihi2025.py
 fin_benefits/benefits_unemp_EK.py
 fin_benefits/benefits_unemp_EK2020.py
 fin_benefits/benefits_unemp_korotus.py

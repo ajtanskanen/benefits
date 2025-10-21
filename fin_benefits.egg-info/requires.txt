@@ -1,1 +1,7 @@
+gym
 numpy
+pandas
+tqdm
+seaborn
+matplotlib
+ipython

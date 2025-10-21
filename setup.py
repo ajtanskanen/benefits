@@ -9,9 +9,9 @@ extensions = [
 
 setup(
     name='fin_benefits',
-    version='1.10.0',
+    version='1.11.0',
     packages=find_packages(),
-    install_requires=['numpy'],
+	install_requires=['gym','numpy','pandas','tqdm','seaborn','matplotlib','ipython'],
     
     # metadata to display on PyPI
     author="Antti Tanskanen",
