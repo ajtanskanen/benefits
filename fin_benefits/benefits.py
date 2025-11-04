@@ -2835,6 +2835,12 @@ class Benefits():
                 p[alku+'elakkeella']=0
             if alku+'tyoelake' not in p:
                 p[alku+'tyoelake']=0
+            if alku+'tyokyvyttomyyselake' not in p:
+                p[alku+'tyokyvyttomyyselake']=0
+            if alku+'osittainenvanhuuselake' not in p:
+                p[alku+'osittainenvanhuuselake']=0
+            if alku+'vanhuuselake' not in p:
+                p[alku+'vanhuuselake']=0
             if alku+'kansanelake' not in p:
                 p[alku+'kansanelake']=0
             if alku+'sairauspaivarahalla' not in p:
@@ -2847,271 +2853,6 @@ class Benefits():
                 p[alku+'tyoaika']=0
             if alku+'isyysvapaa_kesto' not in p:
                 p[alku+'isyysvapaa_kesto']=0
-
-    # def laske_tulot(self,p: dict,tt_alennus=0,include_takuuelake: bool=True,legacy: bool=True):
-    #     q={} # tulokset tänne
-        
-    #     self.check_p(p)
-    #     q['perustulo']=0
-    #     q['puoliso_perustulo']=0
-    #     q['puhdas_tyoelake']=0
-    #     q['multiplier']=1
-    #     q['kotihoidontuki']=0
-    #     q['kotihoidontuki_netto']=0
-    #     q['puoliso_opintotuki']=0
-    #     q['puoliso_kotihoidontuki']=0
-    #     q['puoliso_kotihoidontuki_netto']=0
-    #     q['puoliso_ansiopvraha_netto']=0
-    #     q['puoliso_opintotuki_netto']=0
-    #     if p['elakkeella']>0: # vanhuuseläkkeellä
-    #         p['tyoton']=0
-    #         q['isyyspaivaraha'],q['aitiyspaivaraha'],q['kotihoidontuki'],q['sairauspaivaraha']=(0,0,0,0)
-    #         q['elake_maksussa']=p['tyoelake']
-    #         q['elake_tuleva']=0
-    #         p['saa_ansiopaivarahaa']=0
-    #         # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
-    #         if (p['aikuisia']>1):
-    #             q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=0,include_takuuelake=include_takuuelake,disability=p['disabled'])
-    #             q['puhdas_tyoelake']=self.laske_puhdas_tyoelake(p['ika'],p['tyoelake'],disability=p['disabled'],yksin=0)
-    #         else:
-    #             q['kokoelake']=self.laske_kokonaiselake(p['ika'],q['elake_maksussa'],yksin=1,include_takuuelake=include_takuuelake,disability=p['disabled'])
-    #             q['puhdas_tyoelake']=self.laske_puhdas_tyoelake(p['ika'],p['tyoelake'],disability=p['disabled'],yksin=1)
-
-    #         q['ansiopvraha'],q['tyotpvraha'],q['peruspvraha']=(0,0,0)
-    #         #oletetaan että myös puoliso eläkkeellä
-    #         q['puoliso_ansiopvraha']=0
-    #         q['opintotuki']=0
-    #     elif p['opiskelija']>0:
-    #         q['elake_maksussa']=p['tyoelake']
-    #         q['kokoelake']=p['tyoelake']
-    #         q['elake_tuleva']=0
-    #         q['puoliso_ansiopvraha']=0
-    #         q['ansiopvraha'],q['tyotpvraha'],q['peruspvraha']=(0,0,0)
-    #         q['isyyspaivaraha'],q['aitiyspaivaraha'],q['kotihoidontuki'],q['sairauspaivaraha']=(0,0,0,0)
-    #         q['opintotuki']=0
-    #         if p['aitiysvapaalla']>0:
-    #             q['aitiyspaivaraha']=self.aitiysraha(0,p['vakiintunutpalkka'],p['aitiysvapaa_kesto'])
-    #         elif p['isyysvapaalla']>0:
-    #             q['isyyspaivaraha']=self.isyysraha(0,p['vakiintunutpalkka'])
-    #         elif p['kotihoidontuella']>0:
-    #             q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
-    #         else:
-    #             q['opintotuki']=self.opintoraha(0,p)
-    #     else: # ei eläkkeellä     
-    #         q['opintotuki']=0
-    #         q['elake_maksussa']=p['tyoelake']
-    #         q['kokoelake']=p['tyoelake']
-    #         q['elake_tuleva']=0
-    #         q['puoliso_ansiopvraha']=0
-    #         q['ansiopvraha'],q['tyotpvraha'],q['peruspvraha']=(0,0,0)
-    #         q['isyyspaivaraha'],q['aitiyspaivaraha'],q['kotihoidontuki'],q['sairauspaivaraha']=(0,0,0,0)
-    #         if p['aitiysvapaalla']>0:
-    #             q['aitiyspaivaraha']=self.aitiysraha(0,p['vakiintunutpalkka'],p['aitiysvapaa_kesto'])
-    #         elif p['isyysvapaalla']>0:
-    #             q['isyyspaivaraha']=self.isyysraha(0,p['vakiintunutpalkka'])
-    #         elif p['sairauspaivarahalla']>0:
-    #             q['sairauspaivaraha']=self.sairauspaivaraha(0,p['vakiintunutpalkka'])
-    #         elif p['kotihoidontuella']>0:
-    #             q['kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
-    #         elif p['tyoton']>0:
-    #             if 'omavastuukerroin' in p:
-    #                 omavastuukerroin=p['omavastuukerroin']
-    #             else:
-    #                 omavastuukerroin=1.0
-    #             q['ansiopvraha'],q['tyotpvraha'],q['peruspvraha']=self.ansiopaivaraha(p['tyoton'],p['vakiintunutpalkka'],p['lapsia'],p['t'],p['saa_ansiopaivarahaa'],p['tyottomyyden_kesto'],p,omavastuukerroin=omavastuukerroin)
-                
-    #     if p['aikuisia']>1:
-    #         if p['puoliso_elakkeella']>0: # vanhuuseläkkeellä
-    #             p['puoliso_tyoton']=0
-    #             q['puoliso_isyyspaivaraha'],q['puoliso_aitiyspaivaraha'],q['puoliso_kotihoidontuki'],q['puoliso_sairauspaivaraha']=(0,0,0,0)
-    #             q['puoliso_elake_maksussa']=p['puoliso_tyoelake']
-    #             q['puoliso_elake_tuleva']=0
-    #             p['puoliso_saa_ansiopaivarahaa']=0
-    #             # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
-    #             q['puoliso_kokoelake']=self.laske_kokonaiselake(p['puoliso_ika'],q['puoliso_elake_maksussa'],yksin=0)
-    #             q['puoliso_ansiopvraha'],q['puoliso_tyotpvraha'],q['puoliso_peruspvraha']=(0,0,0)
-    #             q['puoliso_opintotuki']=0
-    #         elif p['puoliso_opiskelija']>0:
-    #             q['puoliso_kokoelake']=0
-    #             q['puoliso_elake_maksussa']=p['puoliso_tyoelake']
-    #             q['puoliso_elake_tuleva']=0
-    #             q['puoliso_ansiopvraha'],q['puoliso_tyotpvraha'],q['puoliso_peruspvraha']=(0,0,0)
-    #             q['puoliso_isyyspaivaraha'],q['puoliso_aitiyspaivaraha'],q['puoliso_kotihoidontuki'],q['puoliso_sairauspaivaraha']=(0,0,0,0)
-    #             q['puoliso_opintotuki']=0
-    #             if p['puoliso_aitiysvapaalla']>0:
-    #                 q['puoliso_aitiyspaivaraha']=self.aitiysraha(0,p['puoliso_vakiintunutpalkka'],p['puoliso_aitiysvapaa_kesto'])
-    #             elif p['puoliso_isyysvapaalla']>0:
-    #                 q['puoliso_isyyspaivaraha']=self.isyysraha(0,p['puoliso_vakiintunutpalkka'])
-    #             elif p['puoliso_kotihoidontuella']>0:
-    #                 q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
-    #             else:
-    #                 q['puoliso_opintotuki']=self.opintoraha(0,p)
-    #         else: # ei eläkkeellä     
-    #             q['puoliso_kokoelake']=0
-    #             q['puoliso_opintotuki']=0
-    #             q['puoliso_elake_maksussa']=p['puoliso_tyoelake']
-    #             q['puoliso_elake_tuleva']=0
-    #             q['puoliso_puolison_ansiopvraha']=0
-    #             q['puoliso_ansiopvraha'],q['puoliso_tyotpvraha'],q['puoliso_peruspvraha']=(0,0,0)
-    #             q['puoliso_isyyspaivaraha'],q['puoliso_aitiyspaivaraha'],q['puoliso_kotihoidontuki'],q['puoliso_sairauspaivaraha']=(0,0,0,0)
-    #             if p['puoliso_aitiysvapaalla']>0:
-    #                 q['puoliso_aitiyspaivaraha']=self.aitiysraha(0,p['puoliso_vakiintunutpalkka'],p['puoliso_aitiysvapaa_kesto'])
-    #             elif p['puoliso_isyysvapaalla']>0:
-    #                 q['puoliso_isyyspaivaraha']=self.isyysraha(0,p['puoliso_vakiintunutpalkka'])
-    #             elif p['puoliso_sairauspaivarahalla']>0:
-    #                 q['puoliso_sairauspaivaraha']=self.sairauspaivaraha(0,p['puoliso_vakiintunutpalkka'])
-    #             elif p['puoliso_kotihoidontuella']>0:
-    #                 q['puoliso_kotihoidontuki']=self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],p['lapsia_alle_kouluikaisia'])
-    #             elif p['puoliso_tyoton']>0:
-    #                 q['puoliso_ansiopvraha'],q['puoliso_tyotpvraha'],q['puoliso_peruspvraha']=self.ansiopaivaraha(p['puoliso_tyoton'],p['puoliso_vakiintunutpalkka'],p['lapsia'],p['puoliso_tulot'],p['puoliso_saa_ansiopaivarahaa'],p['puoliso_tyottomyyden_kesto'],p)
-            
-    #     # q['verot] sisältää kaikki veronluonteiset maksut
-    #     _,q['verot'],q['valtionvero'],q['kunnallisvero'],q['kunnallisveroperuste'],q['valtionveroperuste'],\
-    #         q['ansiotulovahennys'],q['perusvahennys'],q['tyotulovahennys'],q['tyotulovahennys_kunnallisveroon'],\
-    #         q['ptel'],q['sairausvakuutusmaksu'],q['tyotvakmaksu'],q['tyel_kokomaksu'],q['ylevero']=self.verotus(p['t'],
-    #             q['ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
-    #             q['kokoelake'],p['lapsia'],p)
-    #     _,q['verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['t'],0,0,p['lapsia'],p)
-
-    #     if (p['aikuisia']>1):
-    #         _,q['puoliso_verot'],_,_,_,_,_,_,_,_,q['puoliso_ptel'],q['puoliso_sairausvakuutusmaksu'],\
-    #             q['puoliso_tyotvakmaksu'],q['puoliso_tyel_kokomaksu'],q['puoliso_ylevero']\
-    #             =self.verotus(p['puoliso_tulot'],q['puoliso_ansiopvraha']+q['puoliso_aitiyspaivaraha']+q['puoliso_isyyspaivaraha']+q['puoliso_kotihoidontuki']+q['puoliso_sairauspaivaraha']+q['puoliso_opintotuki'],
-    #                 q['puoliso_kokoelake'],p['lapsia'],p)
-    #         _,q['puoliso_verot_ilman_etuuksia'],_,_,_,_,_,_,_,_,_,_,_,_,_=self.verotus(p['puoliso_tulot'],0,0,0,p)
-    #     else:
-    #         q['puoliso_verot_ilman_etuuksia']=0
-    #         q['puoliso_verot']=0
-    #         q['puoliso_ptel']=0
-    #         q['puoliso_sairausvakuutusmaksu']=0
-    #         q['puoliso_tyotvakmaksu']=0
-    
-    #     if p['aikuisia']==1 and p['saa_elatustukea']>0:
-    #         q['elatustuki']=self.laske_elatustuki(p['lapsia'],p['aikuisia'])
-    #     else:
-    #         q['elatustuki']=0
-        
-    #     if p['elakkeella']>0:
-    #         q['asumistuki']=self.elakkeensaajan_asumistuki(p['t']+p['puoliso_tulot'],q['kokoelake'],p['asumismenot_asumistuki'],p['aikuisia'],p['kuntaryhma'],p)
-    #     else:
-    #         q['asumistuki']=self.asumistuki(p[t],p['puoliso_tulot'],q['ansiopvraha']+q['puoliso_ansiopvraha']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['sairauspaivaraha']+q['opintotuki'],
-    #               p['asumismenot_asumistuki'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p)
-            
-    #     if p['lapsia']>0:
-    #         q['pvhoito']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['kokoelake']+q['elatustuki']+q['ansiopvraha']+q['puoliso_ansiopvraha']+q['sairauspaivaraha'],p)
-    #         if (p['lapsia_kotihoidontuella']>0):
-    #             alle_kouluikaisia=max(0,p['lapsia_kotihoidontuella']-p['lapsia_alle_3v'])
-    #             q['pvhoito']=0 #max(0,q['pvhoito']-self.kotihoidontuki(p['lapsia_kotihoidontuella'],p['lapsia_alle_3v'],alle_kouluikaisia)) # ok?
-    #         q['pvhoito_ilman_etuuksia']=self.paivahoitomenot(p['lapsia_paivahoidossa'],p['puoliso_tulot']+p['t']+q['elatustuki'],p)
-    #         if p['aikuisia']==1:
-    #             yksinhuoltajakorotus=1
-    #         else:
-    #             yksinhuoltajakorotus=0
-    #         q['lapsilisa']=self.laske_lapsilisa(p['lapsia'],yksinhuoltajakorotus=yksinhuoltajakorotus)
-    #     else:
-    #         q['pvhoito']=0
-    #         q['pvhoito_ilman_etuuksia']=0
-    #         q['lapsilisa']=0
-    
-    #     # lasketaan netotettu ansiopäiväraha huomioiden verot (kohdistetaan ansiopvrahaan se osa veroista, joka ei aiheudu palkkatuloista)
-    #     q['kokoelake_netto'],q['isyyspaivaraha_netto'],q['ansiopvraha_netto'],q['aitiyspaivaraha_netto'],q['sairauspaivaraha_netto'],\
-    #         q['puoliso_ansiopvraha_netto'],q['opintotuki_netto']=(0,0,0,0,0,0,0)
-            
-    #     if p['elakkeella']>0:
-    #         q['kokoelake_netto']=q['kokoelake']-(q['verot']-q['verot_ilman_etuuksia'])
-    #     elif p['opiskelija']>0:
-    #         q['opintotuki_netto']=q['opintotuki']-(q['verot']-q['verot_ilman_etuuksia'])
-    #     elif p['aitiysvapaalla']>0:
-    #         q['aitiyspaivaraha_netto']=q['aitiyspaivaraha']-(q['verot']-q['verot_ilman_etuuksia']) 
-    #     elif p['isyysvapaalla']>0:
-    #         q['isyyspaivaraha_netto']=q['isyyspaivaraha']-(q['verot']-q['verot_ilman_etuuksia']) 
-    #     elif p['kotihoidontuella']>0:
-    #         q['kotihoidontuki_netto']=q['kotihoidontuki']-(q['verot']-q['verot_ilman_etuuksia']) 
-    #     elif p['sairauspaivarahalla']>0:
-    #         q['sairauspaivaraha_netto']=q['sairauspaivaraha']-(q['verot']-q['verot_ilman_etuuksia']) 
-    #     else:
-    #         q['ansiopvraha_netto']=q['ansiopvraha']-(q['verot']-q['verot_ilman_etuuksia'])
-            
-    #     if p['aikuisia']>1:
-    #         if p['puoliso_tyoton']>0: # vanhuuseläkkeellä
-    #             q['puoliso_ansiopvraha_netto']=q['puoliso_ansiopvraha']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
-    #         elif p['puoliso_opiskelija']>0:
-    #             q['puoliso_opintotuki_netto']=q['puoliso_opintotuki']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
-    #         elif p['puoliso_kotihoidontuella']>0:
-    #             q['puoliso_kotihoidontuki_netto']=q['puoliso_kotihoidontuki']-(q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia']) 
-    #     else:
-    #         q['puoliso_ansiopvraha_netto']=0
-    #     #print('ptyötön',q['puoliso_ansiopvraha_netto'],q['puoliso_ansiopvraha'],q['puoliso_verot']-q['puoliso_verot_ilman_etuuksia'])
-            
-    #     if (p['isyysvapaalla']>0 or p['aitiysvapaalla']>0) and p['tyoton']>0:
-    #         print('error: vanhempainvapaalla & työtön ei toteutettu')
-    
-    #     # jaetaan ilman etuuksia laskettu pvhoitomaksu puolisoiden kesken ansiopäivärahan suhteessa
-    #     # eli kohdistetaan päivähoitomaksun korotus ansiopäivärahan mukana
-    #     # ansiopäivärahaan miten huomioitu päivähoitomaksussa, ilman etuuksia
-
-    #     if q['puoliso_ansiopvraha_netto']+q['ansiopvraha_netto']>0:
-    #         suhde=max(0,q['ansiopvraha_netto']/(q['puoliso_ansiopvraha_netto']+q['ansiopvraha_netto']))
-    #         q['ansiopvraha_nettonetto']=q['ansiopvraha_netto']-suhde*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
-    #         q['puoliso_ansiopvraha_nettonetto']=q['puoliso_ansiopvraha_netto']-(1-suhde)*(q['pvhoito']-q['pvhoito_ilman_etuuksia'])
-    #     else:
-    #         q['ansiopvraha_nettonetto']=0
-    #         q['puoliso_ansiopvraha_nettonetto']=0
-
-    #     if p['opiskelija']>0 or p['ei_toimeentulotukea']>0:
-    #         q['toimeentulotuki']=0
-    #     else:
-    #         q['toimeentulotuki']=self.toimeentulotuki(p['t'],q['verot_ilman_etuuksia'],p['puoliso_tulot'],q['puoliso_verot_ilman_etuuksia'],\
-    #             q['elatustuki']+q['opintotuki_netto']+q['puoliso_opintotuki_netto']+q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['asumistuki']+q['sairauspaivaraha_netto']\
-    #             +q['lapsilisa']+q['kokoelake_netto']+q['aitiyspaivaraha_netto']+q['isyyspaivaraha_netto']+q['kotihoidontuki_netto']+q['puoliso_kotihoidontuki_netto'],\
-    #             0,p['asumismenot_toimeentulo'],q['pvhoito'],p['aikuisia'],p['lapsia'],p['kuntaryhma'],p)
-
-    #     kateen=q['opintotuki']+q['kokoelake']+p['puoliso_tulot']+p['t']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimeentulotuki']\
-    #         +q['ansiopvraha']+q['puoliso_ansiopvraha']+q['elatustuki']-q['puoliso_verot']-q['verot']-q['pvhoito']+q['lapsilisa']+q['sairauspaivaraha']
-    #     omanetto=q['opintotuki']+q['kokoelake']+p['t']+q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']+q['toimeentulotuki']\
-    #         +q['ansiopvraha']+q['elatustuki']-q['verot']-q['pvhoito']+q['lapsilisa']+q['sairauspaivaraha']
-            
-    #     q['kateen']=kateen # tulot yhteensä perheessä
-    #     q['perhetulot_netto']=p['puoliso_tulot']+p['t']-q['verot_ilman_etuuksia']-q['puoliso_verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
-    #     q['omattulot_netto']=p['t']-q['verot_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'] # ilman etuuksia
-    #     q['etuustulo_netto']=q['ansiopvraha_netto']+q['puoliso_ansiopvraha_netto']+q['opintotuki']\
-    #         +q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
-    #         +q['toimeentulotuki']-(q['pvhoito_ilman_etuuksia']-q['pvhoito_ilman_etuuksia'])
-    #     q['etuustulo_brutto']=q['ansiopvraha']+q['puoliso_ansiopvraha']+q['opintotuki']\
-    #         +q['aitiyspaivaraha']+q['isyyspaivaraha']+q['kotihoidontuki']+q['asumistuki']\
-    #         +q['toimeentulotuki']+q['kokoelake']
-    #     q['brutto']=q['etuustulo_brutto']+p['t']+p['puoliso_tulot']
-            
-    #     #if p['aikuisia']>1 and False:
-    #     #    asumismeno=0.5*p['asumismenot_asumistuki']
-    #     #else:
-    #     asumismeno=p['asumismenot_asumistuki']
-            
-    #     q['alv']=self.laske_alv(max(0,kateen-asumismeno)) # vuokran ylittävä osuus tuloista menee kulutukseen
-        
-    #     # nettotulo, joka huomioidaan elinkaarimallissa alkaen versiosta 4. sisältää omat tulot ja puolet vuokrasta
-    #     q['netto']=max(0,kateen-q['alv'])
-    #     #q['netto']=max(0,omanetto-q['alv']-asumismeno)
-        
-    #     if not legacy:
-    #         kateen=q['netto']
-        
-    #     q['palkkatulot']=p['t']
-    #     if p['elakkeella']<1:
-    #         q['palkkatulot_eielakkeella']=p['t']
-    #     else:
-    #         q['palkkatulot_eielakkeella']=0
-            
-    #     q['puoliso_palkkatulot']=p['puoliso_tulot']
-    #     q['puoliso_tulot_netto']=p['puoliso_tulot']-q['puoliso_verot_ilman_etuuksia']
-    #     q['perustulo']=0
-    #     q['puoliso_perustulo']=0
-    #     q['perustulo_netto']=0
-    #     q['puoliso_perustulo_netto']=0
-    #     q['perustulo_nettonetto']=0
-    #     q['puoliso_perustulo_nettonetto']=0
-
-    #     return kateen,q
         
     def setup_puoliso_q(self,p: dict,q: dict,puoliso: str='puoliso_',alku: str='puoliso_',
                         include_takuuelake: bool=True,add_kansanelake: bool=True) -> dict:
@@ -3123,8 +2864,10 @@ class Benefits():
         q[puoliso+'puhdas_tyoelake']=0
         q[puoliso+'kansanelake']=0
         q[puoliso+'tyoelake']=0
+        q[puoliso+'tyokyvyttomyyselake']=0
+        q[puoliso+'osittainenvanhuuselake']=0
+        q[puoliso+'vanhuuselake']=0
         q[puoliso+'takuuelake']=0
-            
         q[puoliso+'perustulo']=0
         q[puoliso+'perustulo_netto']=0
         q[puoliso+'perustulo_nettonetto']=0
@@ -3145,6 +2888,9 @@ class Benefits():
                 q[puoliso+'isyyspaivaraha'],q[puoliso+'aitiyspaivaraha'],q[puoliso+'kotihoidontuki'],q[puoliso+'sairauspaivaraha']=(0,0,0,0)
                 q[puoliso+'elake_maksussa']=p[alku+'elake_maksussa']
                 q[puoliso+'tyoelake']=p[alku+'tyoelake']
+                q[puoliso+'tyokyvyttomyyselake']=p[alku+'tyokyvyttomyyselake']
+                q[puoliso+'osittainenvanhuuselake']=p[alku+'osittainenvanhuuselake']
+                q[puoliso+'vanhuuselake']=p[alku+'vanhuuselake']
                 q[puoliso+'kansanelake']=p[alku+'kansanelake']
                 q[puoliso+'elake_tuleva']=0
                 # huomioi takuueläkkeen, kansaneläke sisältyy eläke_maksussa-osaan
@@ -3158,6 +2904,9 @@ class Benefits():
                 q[puoliso+'kokoelake']=p[alku+'tyoelake']
                 q[puoliso+'elake_maksussa']=p[alku+'tyoelake']
                 q[puoliso+'tyoelake']=p[alku+'tyoelake']
+                q[puoliso+'tyokyvyttomyyselake']=p[alku+'tyokyvyttomyyselake'] 
+                q[puoliso+'osittainenvanhuuselake']=p[alku+'osittainenvanhuuselake']
+                q[puoliso+'vanhuuselake']=p[alku+'vanhuuselake']
                 q[puoliso+'elake_tuleva']=0
                 q[puoliso+'ansiopvraha'],q[puoliso+'tyotpvraha'],q[puoliso+'peruspvraha']=(0,0,0)
                 q[puoliso+'isyyspaivaraha'],q[puoliso+'aitiyspaivaraha'],q[puoliso+'kotihoidontuki'],q[puoliso+'sairauspaivaraha']=(0,0,0,0)
@@ -3175,6 +2924,9 @@ class Benefits():
                 q[puoliso+'opintotuki']=0
                 q[puoliso+'elake_maksussa']=p[alku+'tyoelake']
                 q[puoliso+'tyoelake']=p[alku+'tyoelake']
+                q[puoliso+'tyokyvyttomyyselake']=p[alku+'tyokyvyttomyyselake']
+                q[puoliso+'osittainenvanhuuselake']=p[alku+'osittainenvanhuuselake']
+                q[puoliso+'vanhuuselake']=p[alku+'vanhuuselake']
                 q[puoliso+'elake_tuleva']=0
                 q[puoliso+'ansiopvraha'],q[puoliso+'tyotpvraha'],q[puoliso+'peruspvraha']=(0,0,0)
                 q[puoliso+'isyyspaivaraha'],q[puoliso+'aitiyspaivaraha'],q[puoliso+'kotihoidontuki'],q[puoliso+'sairauspaivaraha']=(0,0,0,0)
@@ -3198,6 +2950,9 @@ class Benefits():
             q[puoliso+'opintotuki']=0
             q[puoliso+'elake_maksussa']=0
             q[puoliso+'tyoelake']=0
+            q[puoliso+'tyokyvyttomyyselake']=0
+            q[puoliso+'osittainenvanhuuselake']=0
+            q[puoliso+'vanhuuselake']=0
             q[puoliso+'elake_tuleva']=0
             q[puoliso+'ansiopvraha'],q[puoliso+'tyotpvraha'],q[puoliso+'peruspvraha']=(0,0,0)
             q[puoliso+'isyyspaivaraha'],q[puoliso+'aitiyspaivaraha'],q[puoliso+'kotihoidontuki'],q[puoliso+'sairauspaivaraha']=(0,0,0,0)
@@ -3215,6 +2970,9 @@ class Benefits():
         q[omat+'perustulo_nettonetto']=0
         q[omat+'palkkatulot']=p[alku+'t']
         q[omat+'tyoelake']=0
+        q[omat+'tyokyvyttomyyselake']=0
+        q[omat+'osittainenvanhuuselake']=0
+        q[omat+'vanhuuselake']=0
         q[omat+'kansanelake']=0
         q[omat+'takuuelake']=0
         q[omat+'joustava_hoitoraha']=0
@@ -3235,6 +2993,9 @@ class Benefits():
             q[omat+'isyyspaivaraha'],q[omat+'aitiyspaivaraha'],q[omat+'kotihoidontuki'],q[omat+'sairauspaivaraha']=(0,0,0,0)
             q[omat+'elake_maksussa']=p[alku+'elake_maksussa']
             q[omat+'tyoelake']=p[alku+'tyoelake']
+            q[omat+'tyokyvyttomyyselake']=p[alku+'tyokyvyttomyyselake']
+            q[omat+'osittainenvanhuuselake']=p[alku+'osittainenvanhuuselake']
+            q[omat+'vanhuuselake']=p[alku+'vanhuuselake']
             q[omat+'kansanelake']=p[alku+'kansanelake']
             q[omat+'elake_tuleva']=0
             #p['omat_saa_ansiopaivarahaa']=0
@@ -3258,6 +3019,9 @@ class Benefits():
             q[omat+'elake_maksussa']=p[alku+'elake_maksussa']
             q[omat+'kokoelake']=p[alku+'tyoelake']
             q[omat+'tyoelake']=p[alku+'tyoelake']
+            q[omat+'tyokyvyttomyyselake']=p[alku+'tyokyvyttomyyselake']
+            q[omat+'osittainenvanhuuselake']=p[alku+'osittainenvanhuuselake']
+            q[omat+'vanhuuselake']=p[alku+'vanhuuselake']
             q[omat+'elake_tuleva']=0
             q[omat+'ansiopvraha'],q[omat+'tyotpvraha'],q[omat+'peruspvraha']=(0,0,0)
             q[omat+'isyyspaivaraha'],q[omat+'aitiyspaivaraha'],q[omat+'kotihoidontuki'],q[omat+'sairauspaivaraha']=(0,0,0,0)
@@ -3275,6 +3039,9 @@ class Benefits():
             q[omat+'elake_maksussa']=p[alku+'elake_maksussa']
             q[omat+'kokoelake']=p[alku+'tyoelake']
             q[omat+'tyoelake']=p[alku+'tyoelake']
+            q[omat+'tyokyvyttomyyselake']=p[alku+'tyokyvyttomyyselake']
+            q[omat+'osittainenvanhuuselake']=p[alku+'osittainenvanhuuselake']
+            q[omat+'vanhuuselake']=p[alku+'vanhuuselake']
             q[omat+'elake_tuleva']=0
             q[omat+'ansiopvraha'],q[omat+'tyotpvraha'],q[omat+'peruspvraha']=(0,0,0)
             q[omat+'isyyspaivaraha'],q[omat+'aitiyspaivaraha'],q[omat+'kotihoidontuki'],q[omat+'sairauspaivaraha']=(0,0,0,0)

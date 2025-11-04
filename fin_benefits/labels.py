@@ -111,6 +111,9 @@ class Labels():
             labels['työttömyysputki']='ext.unemp'
             labels['vanhuuseläke']='pension'
             labels['tk-eläke']='disabled'
+            labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
+            labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
+            labels['vanhuuselakemeno']='vanhuuselakemeno'
         elif language=='Finnish' or language=='fin' or language=='Fin':
             labels['Menetetty palkkasumma']='Menetetty palkkasumma [euroa]'
             labels['Menetetty palkkasumma %']='Menetetty palkkasumma [%]'
@@ -214,6 +217,9 @@ class Labels():
             labels['työttömyysputki']='työttömyysputki'
             labels['vanhuuseläke']='vanhuuseläke'
             labels['tk-eläke']='tk-eläke'
+            labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
+            labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
+            labels['vanhuuselakemeno']='vanhuuselakemeno'
         else:
             print('Unknown language:',language)
 
@@ -369,6 +375,9 @@ class Labels():
             labels['Työttömyys [%]']='Unemployment [%]'
             labels['Osatyön osuus %']='Part-time work [%]'
             labels['muut työvoiman ulkopuolella']='Outside of workforce'
+            labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
+            labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
+            labels['vanhuuselakemeno']='vanhuuselakemeno'
         else:
             labels['työllisiä']='Työllisiä'
             labels['työikäisiä 18-62']='työikäisiä 18-62'
@@ -454,6 +463,9 @@ class Labels():
             labels['Työttömyys [%]']='Työttömyys [%]'
             labels['Osatyön osuus %']='Osatyön osuus työnteosta [%]'
             labels['muut työvoiman ulkopuolella']='muut työvoiman ulkopuolella'
+            labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
+            labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
+            labels['vanhuuselakemeno']='vanhuuselakemeno'
             
         return labels        
             
