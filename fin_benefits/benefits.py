@@ -4855,7 +4855,7 @@ class Benefits():
         '''
         Päivähoitomaksut 1.8.2021
         '''
-        minimimaksu=27
+        minimimaksu=28
 
         if p['osaaikainen_paivahoito']>0:
             osaaikainen=True
@@ -4875,25 +4875,25 @@ class Benefits():
         if lapsia>0:
             vakea=lapsia+aikuisia
             if vakea==1:
-                alaraja=2789
+                alaraja=3874
                 prosentti=prosentti1
             elif vakea==2:
-                alaraja=2789
+                alaraja=3874
                 prosentti=prosentti1
             elif vakea==3:
-                alaraja=3610
+                alaraja=4998
                 prosentti=prosentti1
             elif vakea==4:
-                alaraja=4099
+                alaraja=5675
                 prosentti=prosentti1
             elif vakea==5:
-                alaraja=4588
+                alaraja=6353
                 prosentti=prosentti1
             elif vakea==6:
-                alaraja=5075
+                alaraja=7028
                 prosentti=prosentti1
             else:
-                alaraja=5075+138*(vakea-6)
+                alaraja=7028+138*(vakea-6)
                 prosentti=prosentti1
 
             pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
@@ -4956,25 +4956,25 @@ class Benefits():
         if lapsia>0:
             vakea=lapsia+aikuisia
             if vakea==1:
-                alaraja=2789
+                alaraja=4066
                 prosentti=prosentti1
             elif vakea==2:
-                alaraja=2789
+                alaraja=4066
                 prosentti=prosentti1
             elif vakea==3:
-                alaraja=3610
+                alaraja=5245
                 prosentti=prosentti1
             elif vakea==4:
-                alaraja=4099
+                alaraja=5956
                 prosentti=prosentti1
             elif vakea==5:
-                alaraja=4588
+                alaraja=6667
                 prosentti=prosentti1
             elif vakea==6:
-                alaraja=5075
+                alaraja=7376
                 prosentti=prosentti1
             else:
-                alaraja=5075+138*(vakea-6)
+                alaraja=7376+138*(vakea-6)
                 prosentti=prosentti1
 
             pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
@@ -5037,25 +5037,25 @@ class Benefits():
         if lapsia>0:
             vakea=lapsia+aikuisia
             if vakea==1:
-                alaraja=2789
+                alaraja=4066
                 prosentti=prosentti1
             elif vakea==2:
-                alaraja=2789
+                alaraja=4066
                 prosentti=prosentti1
             elif vakea==3:
-                alaraja=3610
+                alaraja=5245
                 prosentti=prosentti1
             elif vakea==4:
-                alaraja=4099
+                alaraja=5956
                 prosentti=prosentti1
             elif vakea==5:
-                alaraja=4588
+                alaraja=6667
                 prosentti=prosentti1
             elif vakea==6:
-                alaraja=5075
+                alaraja=7376
                 prosentti=prosentti1
             else:
-                alaraja=5075+138*(vakea-6)
+                alaraja=7376+138*(vakea-6)
                 prosentti=prosentti1
 
             pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
@@ -5118,25 +5118,25 @@ class Benefits():
         if lapsia>0:
             vakea=lapsia+aikuisia
             if vakea==1:
-                alaraja=2789
+                alaraja=4369
                 prosentti=prosentti1
             elif vakea==2:
-                alaraja=2789
+                alaraja=4369
                 prosentti=prosentti1
             elif vakea==3:
-                alaraja=3610
+                alaraja=5635
                 prosentti=prosentti1
             elif vakea==4:
-                alaraja=4099
+                alaraja=6399
                 prosentti=prosentti1
             elif vakea==5:
-                alaraja=4588
+                alaraja=7163
                 prosentti=prosentti1
             elif vakea==6:
-                alaraja=5075
+                alaraja=7925
                 prosentti=prosentti1
             else:
-                alaraja=5075+138*(vakea-6)
+                alaraja=7925+138*(vakea-6)
                 prosentti=prosentti1
 
             pmaksu=min(maksimimaksu,max(0,tulot-alaraja)*prosentti)
