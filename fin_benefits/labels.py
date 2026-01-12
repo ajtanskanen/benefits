@@ -7,7 +7,6 @@
 class Labels():
     def get_labels(self,language='English'):
         labels={}
-        #print('labels, language:',language)
         if language=='English' or language=='eng' or language=='Eng':
             labels['ero määrissä']='Difference in numbers'
             labels['osuus tilassa x']='Proportion in state {} [%]'
@@ -111,9 +110,11 @@ class Labels():
             labels['työttömyysputki']='ext.unemp'
             labels['vanhuuseläke']='pension'
             labels['tk-eläke']='disabled'
-            labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
-            labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
-            labels['vanhuuselakemeno']='vanhuuselakemeno'
+            labels['tyokyvyttomyyselakemeno']='disability expenditure'
+            labels['osittainenvanhuuselakemeno']='partial pension expenditure'
+            labels['vanhuuselakemeno']='pension expenditure'
+            labels['kuolleet 65-70']='died 65-70'
+            labels['outsider 65-70']='outsider 65-70'
         elif language=='Finnish' or language=='fin' or language=='Fin':
             labels['Menetetty palkkasumma']='Menetetty palkkasumma [euroa]'
             labels['Menetetty palkkasumma %']='Menetetty palkkasumma [%]'
@@ -220,6 +221,8 @@ class Labels():
             labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
             labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
             labels['vanhuuselakemeno']='vanhuuselakemeno'
+            labels['kuolleet 65-70']='kuolleet 65-70'
+            labels['outsider 65-70']='outsider 65-70'
         else:
             print('Unknown language:',language)
 
@@ -378,6 +381,8 @@ class Labels():
             labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
             labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
             labels['vanhuuselakemeno']='vanhuuselakemeno'
+            labels['kuolleet 65-70']='kuolleet 65-70'
+            labels['outsider 65-70']='outsider 65-70'
         else:
             labels['työllisiä']='Työllisiä'
             labels['työikäisiä 18-62']='työikäisiä 18-62'
@@ -466,6 +471,9 @@ class Labels():
             labels['tyokyvyttomyyselakemeno']='tyokyvyttomyyselakemeno'
             labels['osittainenvanhuuselakemeno']='osittainenvanhuuselakemeno'
             labels['vanhuuselakemeno']='vanhuuselakemeno'
+            labels['kuolleet 65-70']='died 65-70'
+            labels['outsider 65-70']='outsider 65-70'
+
             
         return labels        
             

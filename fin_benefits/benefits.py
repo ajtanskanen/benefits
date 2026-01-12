@@ -1620,14 +1620,14 @@ class Benefits():
             self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium)
             self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
-        self.tyonantajan_sairausvakuutusmaksu=0.0175
-        self.tyonantajan_tyottomyysvakuutusmaksu=0.0061 # keskimäärin
+        self.tyonantajan_sairausvakuutusmaksu=0.0187
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0062 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
-        self.tyonantajan_tytalmaksu=0.0054 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_tytalmaksu=0.0053 # työtapaturma- ja ammattitautimaksu, keskimäärin
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
-        self.sairaanhoitomaksu=0.0105
+        self.sairaanhoitomaksu=0.0106
         self.sairaanhoitomaksu_etuus=0.0157 # muut
         
         self.paivarahamaksu_pros=0.0071 # palkka
@@ -1642,24 +1642,24 @@ class Benefits():
         '''
         self.kunnallisvero_pros=max(0,0.0751+self.additional_kunnallisvero)
         self.kirkollisvero_pros=0.0139
-        self.tyottomyysvakuutusmaksu=0.0059+0.0050 #
+        self.tyottomyysvakuutusmaksu=0.0089
         self.arvonlisavero = 0.255
         if self.vaihtuva_tyelmaksu:
             self.laske_vaihtuva_tyoelakemaksu(p['ika'])
         else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+            self.tyontekijan_maksu=max(0,0.0730+self.additional_tyel_premium) # PTEL
+            self.tyontekijan_maksu_52=max(0,0.0730+self.additional_tyel_premium) # PTEL
             self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium)
             self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
-        self.tyonantajan_sairausvakuutusmaksu=0.0175
-        self.tyonantajan_tyottomyysvakuutusmaksu=0.0061+0.0050 # keskimäärin
+        self.tyonantajan_sairausvakuutusmaksu=0.0191
+        self.tyonantajan_tyottomyysvakuutusmaksu=0.0092 # keskimäärin
         self.tyonantajan_ryhmahenkivakuutusmaksu=0.0006
-        self.tyonantajan_tytalmaksu=0.0054 # työtapaturma- ja ammattitautimaksu, keskimäärin
+        self.tyonantajan_tytalmaksu=0.0051 # työtapaturma- ja ammattitautimaksu, keskimäärin
         self.tyonantajan_sivukulut=max(0,self.tyonantajan_ryhmahenkivakuutusmaksu+self.tyonantajan_tyottomyysvakuutusmaksu+
             +self.tyonantajan_tyel+self.tyonantajan_sairausvakuutusmaksu+self.tyonantajan_tytalmaksu)
     
-        self.sairaanhoitomaksu=0.0105
+        self.sairaanhoitomaksu=0.0110
         self.sairaanhoitomaksu_etuus=0.0157 # muut
         
         self.paivarahamaksu_pros=0.0071 # palkka
