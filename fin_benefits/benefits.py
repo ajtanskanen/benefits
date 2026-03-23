@@ -14,6 +14,8 @@ from .ben_utils import print_q, compare_q_print
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.font_manager as font_manager
+from typing import Optional, List, Tuple
+import math
 
 class Benefits():
     """
@@ -102,7 +104,7 @@ class Benefits():
             print(tee_selite(p))
             
     def laske_vaihtuva_tyoelakemaksu(self,ika: int):
-        vuosi=int(self.floor(self.tyel_perusvuosi+ika)) # alkuvuonna 18
+        vuosi=int(math.floor(self.tyel_perusvuosi+ika)) # alkuvuonna 18
         
         # prosenttia palkoista, vuodesta 2017 alkaen, jatkettu päätepisteen tasolla vuoden 2085 jälkeen
         self.tyontekijan_maksu=self.data_ptel[vuosi]
@@ -114,9 +116,9 @@ class Benefits():
         self.koko_tyel_maksu=self.data_tyel_kokomaksu[vuosi]
         self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
     
-    def toimeentulotuki_param2018(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2018(self): # -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         self.toimeentulotuki_omavastuuprosentti = 0.0
-        min_etuoikeutettuosa=150
+        min_etuoikeutettuosa = 150.0
 
         lapsi_kerroin_alle10_1 = 0.63
         lapsi_kerroin_alle10_2 = 0.58
@@ -125,7 +127,7 @@ class Benefits():
         lapsi_kerroin_alle18_2 = 0.65
         lapsi_kerroin_alle18_3 = 0.60
         lapsi_kerroin_18 = 0.73
-        yksinasuva=485.50
+        yksinasuva = 485.50
 
         lapsiparam = np.zeros((3,3))
         lapsiparam[0,0] = yksinasuva * lapsi_kerroin_alle10_1     # e/kk     alle 10v lapsi
@@ -153,7 +155,7 @@ class Benefits():
         
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
     
-    def toimeentulotuki_param2019(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2019(self):# -> (float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray):
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
 
@@ -191,7 +193,7 @@ class Benefits():
         
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
 
-    def toimeentulotuki_param2020(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2020(self) -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
 
@@ -229,7 +231,7 @@ class Benefits():
         
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
         
-    def toimeentulotuki_param2021(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2021(self):# -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
 
@@ -266,7 +268,7 @@ class Benefits():
         
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
         
-    def toimeentulotuki_param2022(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2022(self) -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         self.toimeentulotuki_omavastuuprosentti = 0.0
         min_etuoikeutettuosa=150
 
@@ -304,7 +306,7 @@ class Benefits():
         
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
 
-    def toimeentulotuki_param2023(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2023(self):# -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         '''
         Päivitä
         '''
@@ -348,7 +350,7 @@ class Benefits():
 
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
         
-    def toimeentulotuki_param2024(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2024(self) -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         '''
         Päivitä
         '''
@@ -392,7 +394,7 @@ class Benefits():
 
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
 
-    def toimeentulotuki_param2025(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2025(self):# -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         '''
         Päivitetty 10.12.2024
         '''
@@ -436,7 +438,7 @@ class Benefits():
 
         return min_etuoikeutettuosa,yksinhuoltaja,muu,yksinasuva,max_asumismenot,max_lisa,lapsiparam
 
-    def toimeentulotuki_param2026(self) -> (float,float,float,float,float,float,float,float,float):
+    def toimeentulotuki_param2026(self) -> Tuple[float,float,float,float,float,float,np.ndarray,np.ndarray,np.ndarray]:
         '''
         Päivitetty 10.12.2024
         '''
@@ -1289,7 +1291,7 @@ class Benefits():
         '''
         Vuosille 2018-2022
         '''
-        max_tyotulovahennys,ttulorajat,ttulopros=self.tyotulovahennys()
+        max_tyotulovahennys,ttulorajat,ttulopros = self.tyotulovahennys()
     
         if palkkatulot_puhdas>ttulorajat[1]:
             if palkkatulot_puhdas>ttulorajat[2]:
@@ -1310,7 +1312,7 @@ class Benefits():
                 
         return tyotulovahennys
         
-    def laske_tyotulovahennys2023_2026(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float,lapsia: float,yksinhuoltaja: int=0):
+    def laske_tyotulovahennys2023_2026(self,puhdas_ansiotulo: float,palkkatulot_puhdas: float,ika: float,lapsia: int,yksinhuoltaja: int=0):
         '''
         Vuosille 2023-
         '''
@@ -1406,13 +1408,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0190 #
         self.arvonlisavero = 0.24
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,max(0,0.0635+self.additional_tyel_premium)) # PTEL
-            self.tyontekijan_maksu_52=max(0,max(0,0.0785+self.additional_tyel_premium)) # PTEL
-            self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium))
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,max(0,0.0635+self.additional_tyel_premium)) # PTEL
+        self.tyontekijan_maksu_52=max(0,max(0,0.0785+self.additional_tyel_premium)) # PTEL
+        self.koko_tyel_maksu=max(0,max(0,0.2440+self.additional_tyel_premium))
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0086
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
@@ -1435,13 +1437,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0125 #
         self.arvonlisavero = 0.24
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0077
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
@@ -1464,13 +1466,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0125 #
         self.arvonlisavero = 0.24
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0134
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
@@ -1493,13 +1495,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0140 #
         self.arvonlisavero = 0.24
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0153
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0142 # keskimäärin
@@ -1525,13 +1527,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0150 #
         self.arvonlisavero = 0.24
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0134
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0151 # keskimäärin
@@ -1557,13 +1559,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0138
         self.tyottomyysvakuutusmaksu=0.0150 #
         self.arvonlisavero = 0.24
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0153
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0154 # keskimäärin
@@ -1589,13 +1591,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0079 #
         self.arvonlisavero = 0.24
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium) # PTEL
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0116
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0082 # keskimäärin
@@ -1621,13 +1623,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0059 #
         self.arvonlisavero = 0.255
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium)
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0715+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0865+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium)
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0187
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0062 # keskimäärin
@@ -1653,13 +1655,13 @@ class Benefits():
         self.kirkollisvero_pros=0.0139
         self.tyottomyysvakuutusmaksu=0.0089
         self.arvonlisavero = 0.255
-        if self.vaihtuva_tyelmaksu:
-            self.laske_vaihtuva_tyoelakemaksu(p['ika'])
-        else:
-            self.tyontekijan_maksu=max(0,0.0730+self.additional_tyel_premium) # PTEL
-            self.tyontekijan_maksu_52=max(0,0.0730+self.additional_tyel_premium) # PTEL
-            self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium)
-            self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
+        #if self.vaihtuva_tyelmaksu:
+        #    self.laske_vaihtuva_tyoelakemaksu(p['ika'])
+        #else:
+        self.tyontekijan_maksu=max(0,0.0730+self.additional_tyel_premium) # PTEL
+        self.tyontekijan_maksu_52=max(0,0.0730+self.additional_tyel_premium) # PTEL
+        self.koko_tyel_maksu=max(0,0.2440+self.additional_tyel_premium)
+        self.tyonantajan_tyel=self.koko_tyel_maksu-self.tyontekijan_maksu
 
         self.tyonantajan_sairausvakuutusmaksu=0.0191
         self.tyonantajan_tyottomyysvakuutusmaksu=0.0092 # keskimäärin
@@ -2535,11 +2537,11 @@ class Benefits():
         elif self.year==2024:
             elatustuki=196.02*lapsia
         elif self.year==2025:
-            elatustuki=198.13*lapsia
+            elatustuki=197.71*lapsia
         elif self.year==2026:
-            elatustuki=198.13*lapsia*1.015
+            elatustuki=197.71*lapsia*1.015
         elif self.year==2027:
-            elatustuki=198.13*lapsia*1.015*1.02
+            elatustuki=197.71*lapsia*1.015*1.02
         else:
             error()
         
@@ -2710,7 +2712,7 @@ class Benefits():
             
         return lapsilisat
     
-    def laske_lapsilisa(self,lapsia: int,yksinhuoltajakorotus: int=0,alle3v: int=0) -> float:
+    def laske_lapsilisa(self,lapsia: int,yksinhuoltajakorotus: bool=False,alle3v: int=0) -> float:
         lapsilisat=self.lapsilisa(yksinhuoltajakorotus=yksinhuoltajakorotus,alle3v=alle3v)
 
         if lapsia==0:
@@ -6144,7 +6146,7 @@ class Benefits():
         # data
         self.data_tyel_kokomaksu[1962:2022]=[5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.15,5.15,5.65,6.1,6.4,6.9,7.9,9.9,12.0,10.0,11.7,13.3,13.3,12.4,11.1,11.1,11.5,12.2,13.0,13.8,14.9,16.9,16.9,14.4,18.5,18.6,20.6,21.1,21.2,21.5,21.5,21.5,21.1,21.1,21.4,21.4,21.6,21.2,21.1,21.1,21.3,21.6,22.1,22.8,22.8,23.6,24.0,24.0,24.4,24.4,24.4,24.4,24.4,24.4]
         # ETK
-        self.data_tyel_kokomaksu[2023:2085]=np.array([24.4,24.5,24.5,24.6,24.6,24.7,24.8,24.8,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
+        self.data_tyel_kokomaksu[2023:2085]=np.array([24.4,24.4,24.4,24.4,24.4,24.4,24.4,24.4,24.9,24.9,25.0,24.9,24.9,24.9,24.9,24.8,24.8,24.7,24.7,24.6,24.6,24.6,24.6,24.6,24.7,24.8,24.8,24.9,25.1,25.2,25.4,25.6,25.8,26.0,26.2,26.5,26.7,27.0,27.2,27.5,27.7,27.9,28.1,28.3,28.5,28.7,28.9,29.1,29.2,29.4,29.5,29.7,29.8,29.9,30.1,30.2,30.3,30.3,30.4,30.4,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5,30.5])/100
         self.data_ptel=0.5*(self.data_tyel_kokomaksu-self.data_tyel_kokomaksu[2017])+0.0615 # vuonna 2017 ptel oli 6,15 %
         self.data_ptel[1962:1993]=0
         
