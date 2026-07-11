@@ -634,7 +634,10 @@ class Benefits():
                 -max(0,puolison_bruttopalkka-puolison_etuoikeutettuosa-puolison_palkkavero)-verot-muuttulot)
 
         if p['toimeentulotuki_vahennys']>0: # vähennetään 20%
-            tuki=tuki*0.8
+            if p['toimeentulotuki_vahennys']>30: # vähennetään 40%
+                tuki=tuki*0.6
+            else:
+                tuki=tuki*0.8 # vähennetään 20 %
             if p['toimeentulotuki_vahennys']>99: # vähennetään 100%
                 tuki=0.0
                 
