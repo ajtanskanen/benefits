@@ -11,11 +11,11 @@ setup(
     name='fin_benefits',
     version='1.11.0',
     packages=find_packages(),
-	install_requires=['gym','numpy','pandas','tqdm','seaborn','matplotlib','ipython'],
+	install_requires=['numpy','pandas','tqdm','seaborn','matplotlib','ipython'],
     
     # metadata to display on PyPI
     author="Antti Tanskanen",
-    author_email="antti.tanskanen@ek.fi",
+    author_email="antti.tanskanen@gmail.com",
     description="Finnish earning-related social security as a Python module. The module enables analysis of "+
                 "incentives such as participation rax rate and effective marginal tax.",
     keywords="social-security earnings-related"

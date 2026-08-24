@@ -1,7 +1,4 @@
 import math
-import gym
-from gym import spaces, logger, utils, error
-from gym.utils import seeding
 import numpy as np
 from .benefits_HO import BenefitsHO
 from .benefits import Benefits

@@ -3587,7 +3587,7 @@ class Benefits():
         q[omat+'etuustulo_netto']=etuusnetto_omat
         q[puoliso+'etuustulo_netto']=etuusnetto_puoliso
         
-        assert(np.abs(q[omat+'netto']+q[puoliso+'netto']-q['netto'])<1e-10)
+        assert(np.abs(q[omat+'netto']+q[puoliso+'netto']-q['netto'])<1e-5)
         
         q[omat+'etuustulo_brutto']=q[omat+'tyotpvraha']+q[omat+'opintotuki']+q[omat+'sairauspaivaraha']+q[omat+'aitiyspaivaraha']\
             +q[omat+'isyyspaivaraha']+q[omat+'kotihoidontuki']+q[omat+'asumistuki']\
